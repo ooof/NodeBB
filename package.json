@@ -46,6 +46,7 @@
     "nodebb-plugin-soundpack-default": "~0.1.1",
     "nodebb-plugin-spam-be-gone": "^0.4.0",
     "nodebb-theme-lavender": "^1.0.22",
+    "nodebb-theme-sim": "git://github.com/cismous/nodebb-theme-sim",
     "nodebb-theme-vanilla": "^1.0.65",
     "nodebb-widget-essentials": "~0.2.12",
     "nodebb-rewards-essentials": "^0.0.1",

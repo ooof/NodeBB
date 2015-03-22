@@ -257,10 +257,10 @@ function enableDefaultTheme(next) {
 			return next(err);
 		}
 
-		winston.info('Enabling default theme: Lavender');
+		winston.info('Enabling default theme: Sim');
 		meta.themes.set({
 			type: 'local',
-			id: 'nodebb-theme-lavender'
+			id: 'nodebb-theme-sim'
 		}, next);
 	});
 }
@@ -452,13 +452,13 @@ function setCopyrightWidget(next) {
 		if (err) {
 			return next(err);
 		}
-		
+
 		if (!results.footer && results.footerJSON) {
-			db.setObjectField('widgets:global', 'footer', results.footerJSON.toString(), next);	
+			db.setObjectField('widgets:global', 'footer', results.footerJSON.toString(), next);
 		} else {
 			next();
 		}
-	});	
+	});
 }
 
 install.setup = function (callback) {
