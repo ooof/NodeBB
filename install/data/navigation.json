@@ -19,6 +19,17 @@
 		"textClass": "visible-xs-inline",
 		"text": "\\[\\[global:header.recent\\]\\]"
 	},
+    {
+        "route": "/votes",
+        "title": "\\[\\[global:header.votes\\]\\]",
+        "enabled": true,
+        "iconClass": "fa-flag",
+        "textClass": "visible-xs-inline",
+        "text": "\\[\\[global:header.votes\\]\\]",
+        "properties": {
+            "loggedIn": true
+        }
+    },
 	{
 		"route": "/tags",
 		"title": "\\[\\[global:header.tags\\]\\]",
