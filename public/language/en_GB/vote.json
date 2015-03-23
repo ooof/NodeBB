@@ -1,0 +1,8 @@
+{
+  "composer.new_vote": "New Vote",
+  "composer.invite_username": "Invite UserName",
+  "composer.invite_email": "Invite Email",
+  "composer.invite_reason": "Invite Reason",
+  "composer.type_username": "Type UserName",
+  "composer.type_email": "Type Email"
+}
