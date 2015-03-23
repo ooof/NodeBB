@@ -116,6 +116,33 @@ module.exports = function(app, middleware) {
 
 	app.use(middleware.maintenanceMode);
 
+	// 以下链接在未登录时，自动跳转到首页
+	var redirectHomeUrls = [
+		'confirm/?*',
+		'outgoing',
+		'search/?*',
+		'reset/?*',
+		'tos',
+		'topic/?*',
+		'tags/?*',
+		'popular/?*',
+		'recent',
+		'unread',
+		'category/?*',
+		'user/?*',
+		'notifications',
+		'chats/?*',
+		'users/?*',
+		'groups/?*',
+		'api/category/?*',
+		'api/topic/?*',
+		'admin/?*'
+	];
+
+	for(var i = 0, numUrl = redirectHomeUrls.length; i < numUrl; i++) {
+		app.all(relativePath + '/' + redirectHomeUrls[i], middleware.redirectToHomeIfGuest);
+	}
+
 	app.all(relativePath + '/api/?*', middleware.prepareAPI);
 	app.all(relativePath + '/api/admin/?*', middleware.isAdmin);
 	app.all(relativePath + '/admin/?*', middleware.ensureLoggedIn, middleware.applyCSRF, middleware.isAdmin);

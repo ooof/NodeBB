@@ -52,6 +52,14 @@ middleware.pageView = function(req, res, next) {
 	next();
 };
 
+middleware.redirectToHomeIfGuest = function(req, res, next) {
+	if (!req.user || parseInt(req.user.uid, 10) === 0) {
+		return res.redirect(nconf.get('relative_path') + '/');
+	} else {
+		next();
+	}
+};
+
 middleware.redirectToAccountIfLoggedIn = function(req, res, next) {
 	if (!req.user) {
 		return next();
