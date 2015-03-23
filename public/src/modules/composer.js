@@ -108,6 +108,8 @@ define('composer', [
 				post.save_id = ['composer', app.user.uid, 'tid', post.tid].join(':');
 			} else if (post.hasOwnProperty('pid')) {
 				post.save_id = ['composer', app.user.uid, 'pid', post.pid].join(':');
+			} else if (post.hasOwnProperty('vid')) {
+				post.save_id = ['composer', app.uid, 'vid', post.vid].join(':');
 			}
 		}
 
@@ -149,6 +151,15 @@ define('composer', [
 				isMain: true,
 				isMod: isMod
 			});
+		});
+	};
+
+	composer.newVote = function() {
+		push({
+			vid: 1,
+			body: '',
+			modified: false,
+			isMain: true
 		});
 	};
 
@@ -269,6 +280,7 @@ define('composer', [
 
 		var allowTopicsThumbnail = config.allowTopicsThumbnail && postData.isMain && (config.hasImageUploadPlugin || config.allowFileUploads),
 			isTopic = postData ? !!postData.cid : false,
+			isVote = composer.posts[post_uuid] ? !!composer.posts[post_uuid].vid : false,
 			isMain = postData ? !!postData.isMain : false,
 			isEditing = postData ? !!postData.pid : false,
 			isGuestPost = postData ? parseInt(postData.uid, 10) === 0 : false;
@@ -281,6 +293,7 @@ define('composer', [
 			showTags: isTopic || isMain,
 			minimumTagLength: config.minimumTagLength,
 			maximumTagLength: config.maximumTagLength,
+			isVote: isVote,
 			isTopic: isTopic,
 			isEditing: isEditing,
 			showHandleInput:  config.allowGuestHandles && (app.user.uid === 0 || (isEditing && isGuestPost && app.user.isAdmin)),
@@ -289,7 +302,10 @@ define('composer', [
 			isAdminOrMod: app.user.isAdmin || postData.isMod
 		};
 
-		parseAndTranslate('composer', data, function(composerTemplate) {
+
+		var composerTemplate = isVote ? 'votes/composer' : 'composer';
+
+		parseAndTranslate(composerTemplate, data, function(composerTemplate) {
 			if ($('#cmp-uuid-' + post_uuid).length) {
 				return;
 			}
