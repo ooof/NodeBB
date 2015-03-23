@@ -16,6 +16,7 @@ var async = require('async'),
 	helpers = require('./helpers');
 
 var Controllers = {
+	welcome: require('./welcome'),
 	posts: require('./posts'),
 	topics: require('./topics'),
 	categories: require('./categories'),
@@ -31,6 +32,10 @@ var Controllers = {
 
 
 Controllers.home = function(req, res, next) {
+	if (!req.user || parseInt(req.user.uid, 10) === 0) {
+		return Controllers.welcome.home(req, res);
+	}
+
 	var route = meta.config.homePageRoute || 'categories',
 		hook = 'action:homepage.get:' + route;
 

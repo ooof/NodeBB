@@ -258,6 +258,12 @@ $(document).ready(function() {
 					// Internal link
 					var url = this.href.replace(rootUrl + '/', '');
 
+					if (url === '') {
+						return;
+					} else if (this.pathname !== '/login' && !config.loggedIn) {
+						return e.preventDefault();
+					}
+
 					if(window.location.pathname === this.pathname && this.hash) {
 						if (this.hash !== window.location.hash) {
 							window.location.hash = this.hash;

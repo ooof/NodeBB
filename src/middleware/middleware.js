@@ -183,7 +183,12 @@ middleware.buildHeader = function(req, res, next) {
 				controllers.api.getConfig(req, res, next);
 			},
 			footer: function(next) {
-				app.render('footer', {loggedIn: (req.user ? parseInt(req.user.uid, 10) !== 0 : false)}, next);
+				var data = {
+					loggedIn: req.user ? parseInt(req.user.uid, 10) !== 0 : false
+				};
+				var templateUrl = !data.loggedIn && req.path === '/' ? 'welcome/footer' : 'footer';
+
+				app.render(templateUrl, data, next);
 			}
 		}, function(err, results) {
 			if (err) {
@@ -337,7 +342,14 @@ middleware.renderHeader = function(req, res, callback) {
 			templateValues.template = {name: res.locals.template};
 			templateValues.template[res.locals.template] = true;
 
-			app.render('header', templateValues, callback);
+			var templateUrl;
+			if (uid === 0 && req.path === '/') {
+				templateUrl = 'welcome/header';
+			} else {
+				templateUrl = 'header';
+			}
+
+			app.render(templateUrl, templateValues, callback);
 		});
 	});
 };
