@@ -7,13 +7,15 @@ var async = require('async'),
 	plugins = require('../plugins'),
 	user = require('../user'),
 	topics = require('../topics'),
+	votes = require('../votes'),
 	categories = require('../categories');
 
 
 module.exports = function(Posts) {
 	Posts.create = function(data, callback) {
 		var uid = data.uid,
-			tid = data.tid,
+			tid = data.tid ? data.tid : '',
+			vid = data.vid ? data.vid : '',
 			content = data.content,
 			timestamp = data.timestamp || Date.now();
 
@@ -32,7 +34,6 @@ module.exports = function(Posts) {
 				postData = {
 					'pid': pid,
 					'uid': uid,
-					'tid': tid,
 					'content': content,
 					'timestamp': timestamp,
 					'reputation': 0,
@@ -42,8 +43,18 @@ module.exports = function(Posts) {
 					'deleted': 0
 				};
 
+				if (tid) {
+					postData.tid = tid
+				} else if (vid) {
+					postData.vid = vid
+				}
+
 				if (data.toPid) {
 					postData.toPid = data.toPid;
+				}
+
+				if (data.toVid) {
+					postData.toVid = data.toVid;
 				}
 
 				if (data.ip && parseInt(meta.config.trackIpPerPost, 10) === 1) {
@@ -65,16 +76,29 @@ module.exports = function(Posts) {
 						user.onNewPostMade(postData, next);
 					},
 					function(next) {
-						topics.onNewPostMade(postData, next);
+						if (postData.vid) {
+							votes.onNewPostMade(postData, next);
+						} else {
+							topics.onNewPostMade(postData, next);
+						}
 					},
 					function(next) {
-						topics.getTopicFields(tid, ['cid', 'pinned'], function(err, topicData) {
-							if (err) {
-								return next(err);
-							}
-							postData.cid = topicData.cid;
-							categories.onNewPostMade(topicData.cid, topicData.pinned, postData, next);
-						});
+						if (postData.vid) {
+							votes.getVoteField(vid, 'pinned', function(err, voteData) {
+								if (err) {
+									return next(err);
+								}
+								votes.list.onNewPostMade(voteData.pinned, postData, next);
+							});
+						} else {
+                            topics.getTopicFields(tid, ['cid', 'pinned'], function(err, topicData) {
+                                if (err) {
+                                    return next(err);
+                                }
+                                postData.cid = topicData.cid;
+                                categories.onNewPostMade(topicData.cid, topicData.pinned, postData, next);
+                            });
+						}
 					},
 					function(next) {
 						db.sortedSetAdd('posts:pid', timestamp, postData.pid, next);

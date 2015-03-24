@@ -321,6 +321,13 @@ var	async = require('async'),
 		], callback);
 	};
 
+	User.addVoteIdToUser = function(uid, vid, timestamp, callback) {
+		async.parallel([
+			async.apply(db.sortedSetAdd, 'uid:' + uid + ':votes', timestamp, vid),
+			async.apply(User.incrementUserFieldBy, uid, 'votecount', 1)
+		], callback);
+	};
+
 	User.exists = function(userslug, callback) {
 		User.getUidByUserslug(userslug, function(err, exists) {
 			callback(err, !! exists);

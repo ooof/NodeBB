@@ -488,15 +488,36 @@ define('composer', [
 			bodyEl = postContainer.find('textarea'),
 			thumbEl = postContainer.find('input#topic-thumb-url');
 
+		var isVid = !!parseInt(postData.vid, 10);
+
 		options = options || {};
 
-		titleEl.val(titleEl.val().trim());
+		if (isVid) {
+			var usernameEl = postContainer.find('#username'),
+				emailEl = postContainer.find('#email'),
+				email = emailEl.val();
+			if (usernameEl.val().length < parseInt(config.minimumUsernameLength, 10)) {
+				return composerAlert('[[error:username-too-short, ' + config.minimumTitleLength + ']]');
+			} else if (emailEl.val().length < 1) {
+				return composerAlert('[[error:invalid-email]]');
+			} else if (emailEl.val()) {
+				var isEmail = typeof email === 'string' && email.length && email.indexOf('@') !== -1;
+				if (!isEmail) {
+					return composerAlert('[[error:invalid-email, ' + config.minimumTitleLength + ']]');
+				}
+			}
+		} else {
+			titleEl.val(titleEl.val().trim());
+		}
 		bodyEl.val(bodyEl.val().trim());
 		if (thumbEl.length) {
 			thumbEl.val(thumbEl.val().trim());
 		}
 
 		var checkTitle = parseInt(postData.cid, 10) || parseInt(postData.pid, 10);
+		if (isVid) {
+			checkTitle = false;
+		}
 
 		if (uploads.inProgress[post_uuid] && uploads.inProgress[post_uuid].length) {
 			return composerAlert('[[error:still-uploading]]');
@@ -543,6 +564,15 @@ define('composer', [
 				title: titleEl.val(),
 				topic_thumb: thumbEl.val() || '',
 				tags: tags.getTags(post_uuid)
+			};
+		} else if (parseInt(postData.vid, 10) > 0) {
+			action = 'votes.post';
+			composerData = {
+				handle: handleEl ? handleEl.val() : undefined,
+				content: bodyEl.val(),
+				email: emailEl.val(),
+				vid: postData.vid,
+				username: usernameEl.val()
 			};
 		}
 
