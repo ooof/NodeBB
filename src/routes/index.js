@@ -139,6 +139,7 @@ module.exports = function(app, middleware) {
 		'chats/?*',
 		'users/?*',
 		'groups/?*',
+		'votes/?*',
 		'api/category/?*',
 		'api/topic/?*',
 		'admin/?*'
