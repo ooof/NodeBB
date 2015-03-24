@@ -1,3 +1,4 @@
 {
-  "new_vote_button": "创建投票"
+	"new_vote_button": "创建投票",
+	"no_votes": "<strong>目前还邀请列表为空.</strong><br />您可以邀请他人加入!",
 }
