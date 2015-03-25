@@ -289,6 +289,32 @@ var async = require('async'),
 		});
 	};
 
+	UserNotifications.sendVoteNotificationToFollowers = function(uid, voteData, postData) {
+		db.getSetMembers('followers:' + uid, function(err, followers) {
+			if (err || !Array.isArray(followers) || !followers.length) {
+				return;
+			}
+
+			var username = voteData.username;
+			if (username) {
+				username = S(username).decodeHTMLEntities().s;
+			}
+
+			notifications.create({
+				bodyShort: '[[notifications:user_posted_vote, ' + postData.user.username + ', ' + username + ']]',
+				bodyLong: postData.content,
+				pid: postData.pid,
+				nid: 'vid:' + postData.vid + ':uid:' + uid,
+				vid: postData.vid,
+				from: uid
+			}, function (err, notification) {
+				if (!err && notification) {
+					notifications.push(notification, followers);
+				}
+			});
+		});
+	};
+
 	UserNotifications.sendWelcomeNotification = function(uid) {
 		if (!meta.config.welcomeNotification) {
 			return;

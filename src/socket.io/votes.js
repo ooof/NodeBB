@@ -137,7 +137,7 @@ SocketVotes.markAllRead = function(socket, data, callback) {
 };
 
 SocketVotes.markCategoryTopicsRead = function(socket, cid, callback) {
-	votes.getUnreadTids(socket.uid, 0, -1, function(err, tids) {
+	votes.getUnreadVids(socket.uid, 0, -1, function(err, tids) {
 		if (err) {
 			return callback(err);
 		}

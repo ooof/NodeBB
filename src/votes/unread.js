@@ -6,12 +6,11 @@ var async = require('async'),
 	db = require('../database'),
 	user = require('../user'),
 	notifications = require('../notifications'),
-	categories = require('../categories'),
 	privileges = require('../privileges');
 
 module.exports = function(Votes) {
 	Votes.getTotalUnread = function(uid, callback) {
-		Votes.getUnreadTids(uid, 0, 20, function(err, tids) {
+		Votes.getUnreadVids(uid, 0, 20, function(err, tids) {
 			callback(err, tids ? tids.length : 0);
 		});
 	};
@@ -26,13 +25,13 @@ module.exports = function(Votes) {
 
 		async.waterfall([
 			function(next) {
-				Votes.getUnreadTids(uid, start, stop, next);
+				Votes.getUnreadVids(uid, start, stop, next);
 			},
-			function(tids, next) {
-				if (!tids.length) {
+			function(vids, next) {
+				if (!vids.length) {
 					return next(null, []);
 				}
-				Votes.getVotesByTids(tids, uid, next);
+				Votes.getVotesByVids(vids, uid, next);
 			},
 			function(voteData, next) {
 				if (!Array.isArray(voteData) || !voteData.length) {
@@ -46,7 +45,7 @@ module.exports = function(Votes) {
 		], callback);
 	};
 
-	Votes.getUnreadTids = function(uid, start, stop, callback) {
+	Votes.getUnreadVids = function(uid, start, stop, callback) {
 		uid = parseInt(uid, 10);
 		if (uid === 0) {
 			return callback(null, []);
@@ -55,21 +54,18 @@ module.exports = function(Votes) {
 		var yesterday = Date.now() - 86400000;
 
 		async.parallel({
-			ignoredCids: function(next) {
-				user.getIgnoredCategories(uid, next);
-			},
-			recentTids: function(next) {
+			recentVids: function(next) {
 				db.getSortedSetRevRangeByScoreWithScores('votes:recent', 0, -1, '+inf', yesterday, next);
 			},
 			userScores: function(next) {
-				db.getSortedSetRevRangeByScoreWithScores('uid:' + uid + ':tids_read', 0, -1, '+inf', yesterday, next);
+				db.getSortedSetRevRangeByScoreWithScores('uid:' + uid + ':vids_read', 0, -1, '+inf', yesterday, next);
 			}
 		}, function(err, results) {
 			if (err) {
 				return callback(err);
 			}
 
-			if (results.recentTids && !results.recentTids.length) {
+			if (results.recentVids && !results.recentVids.length) {
 				return callback(null, []);
 			}
 
@@ -79,49 +75,38 @@ module.exports = function(Votes) {
 			});
 
 
-			var tids = results.recentTids.filter(function(recentVote, index) {
+			var vids = results.recentVids.filter(function(recentVote, index) {
 				return !userRead[recentVote.value] || recentVote.score > userRead[recentVote.value];
 			}).map(function(vote) {
 				return vote.value;
 			});
 
-			tids = tids.slice(0, 100);
+			vids = vids.slice(0, 100);
 
-			filterVotes(uid, tids, results.ignoredCids, function(err, tids) {
+			filterVotes(uid, vids, function(err, vids) {
 				if (err) {
 					return callback(err);
 				}
 
 				if (stop === -1) {
-					tids = tids.slice(start);
+					vids = vids.slice(start);
 				} else {
-					tids = tids.slice(start, stop + 1);
+					vids = vids.slice(start, stop + 1);
 				}
 
-				callback(null, tids);
+				callback(null, vids);
 			});
 		});
 	};
 
-	function filterVotes(uid, tids, ignoredCids, callback) {
-		if (!Array.isArray(ignoredCids) || !tids.length) {
+	function filterVotes(uid, tids, callback) {
+		if (!tids.length) {
 			return callback(null, tids);
 		}
 
 		async.waterfall([
 			function(next) {
 				privileges.votes.filter('read', tids, uid, next);
-			},
-			function(tids, next) {
-				Votes.getVotesFields(tids, ['tid', 'cid'], next);
-			},
-			function(votes, next) {
-				tids = votes.filter(function(vote) {
-					return vote && vote.cid && ignoredCids.indexOf(vote.cid.toString()) === -1;
-				}).map(function(vote) {
-					return vote.tid;
-				});
-				next(null, tids);
 			}
 		], callback);
 	}
@@ -141,8 +126,9 @@ module.exports = function(Votes) {
 		});
 	};
 
-	Votes.markAsUnreadForAll = function(vid, callback) {
-		Votes.markCategoryUnreadForAll(vid, callback);
+	Votes.markAsUnreadForAll = function(callback) {
+		callback = callback || function() {};
+		db.delete('vote_list:read_by_uid', callback);
 	};
 
 	Votes.markAsRead = function(vids, uid, callback) {
@@ -160,14 +146,14 @@ module.exports = function(Votes) {
 				db.sortedSetScores('votes:recent', vids, next);
 			},
 			userScores: function(next) {
-				db.sortedSetScores('uid:' + uid + ':tids_read', vids, next);
+				db.sortedSetScores('uid:' + uid + ':vids_read', vids, next);
 			}
 		}, function(err, results) {
 			if (err) {
 				return callback(err);
 			}
 
-			vids = vids.filter(function(tid, index) {
+			vids = vids.filter(function(vid, index) {
 				return !results.userScores[index] || results.userScores[index] < results.voteScores[index];
 			});
 
@@ -176,29 +162,36 @@ module.exports = function(Votes) {
 			}
 
 			var now = Date.now();
-			var scores = vids.map(function(tid) {
+			var scores = vids.map(function(vid) {
 				return now;
 			});
 
 			async.parallel({
 				markRead: function(next) {
-					db.sortedSetAdd('uid:' + uid + ':tids_read', scores, vids, next);
-				},
-				voteData: function(next) {
-					Votes.getVotesFields(vids, ['cid'], next);
+					db.sortedSetAdd('uid:' + uid + ':vids_read', scores, vids, next);
 				}
 			}, function(err, results) {
 				if (err) {
 					return callback(err);
 				}
 
-				var cids = results.voteData.map(function(vote) {
-					return vote && vote.cid;
-				}).filter(function(vote, index, array) {
-					return vote && array.indexOf(vote) === index;
-				});
+				var keys = ['vote_list:read_by_uid'];
 
-				categories.markAsRead(cids, uid, callback);
+				db.isMemberOfSets(keys, uid, function(err, hasRead) {
+					if (err) {
+						return callback(err);
+					}
+
+					keys = keys.filter(function(key, index) {
+						return !hasRead[index];
+					});
+
+					if (!keys.length) {
+						return callback();
+					}
+
+					db.setsAdd(keys, uid, callback);
+				});
 			});
 		});
 	};
@@ -214,16 +207,6 @@ module.exports = function(Votes) {
 			notifications.markReadMultiple(nids, uid, function() {
 				user.notifications.pushCount(uid);
 			});
-		});
-	};
-
-	Votes.markCategoryUnreadForAll = function(tid, callback) {
-		Votes.getVoteField(tid, 'cid', function(err, cid) {
-			if(err) {
-				return callback(err);
-			}
-
-			categories.markAsUnreadForAll(cid, callback);
 		});
 	};
 

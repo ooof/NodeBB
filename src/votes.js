@@ -41,11 +41,11 @@ var async = require('async'),
 		});
 	};
 
-	Votes.getVotesData = function(tids, callback) {
+	Votes.getVotesData = function(vids, callback) {
 		var keys = [];
 
-		for (var i=0; i<tids.length; ++i) {
-			keys.push('vote:' + tids[i]);
+		for (var i=0; i<vids.length; ++i) {
+			keys.push('vote:' + vids[i]);
 		}
 
 		db.getObjects(keys, function(err, votes) {
@@ -60,7 +60,7 @@ var async = require('async'),
 		if (!vote) {
 			return callback(null, vote);
 		}
-		vote.title = validator.escape(vote.title);
+		vote.username = validator.escape(vote.username);
 		vote.relativeTime = utils.toISOString(vote.timestamp);
 		callback(null, vote);
 	}
@@ -138,12 +138,12 @@ var async = require('async'),
 		], callback);
 	};
 
-	Votes.getVotesByVids = function(tids, uid, callback) {
-		if (!Array.isArray(tids) || !tids.length) {
+	Votes.getVotesByVids = function(vids, uid, callback) {
+		if (!Array.isArray(vids) || !vids.length) {
 			return callback(null, []);
 		}
 
-		Votes.getVotesData(tids, function(err, votes) {
+		Votes.getVotesData(vids, function(err, votes) {
 			function mapFilter(array, field) {
 				return array.map(function(vote) {
 					return vote && vote[field] && vote[field].toString();
@@ -157,7 +157,6 @@ var async = require('async'),
 			}
 
 			var uids = mapFilter(votes, 'uid');
-			var cids = mapFilter(votes, 'cid');
 
 			async.parallel({
 				teasers: function(next) {
@@ -166,14 +165,11 @@ var async = require('async'),
 				users: function(next) {
 					user.getMultipleUserFields(uids, ['uid', 'username', 'userslug', 'picture'], next);
 				},
-				categories: function(next) {
-					categories.getMultipleCategoryFields(cids, ['cid', 'name', 'slug', 'icon', 'bgColor', 'color', 'disabled'], next);
-				},
 				hasRead: function(next) {
-					Votes.hasReadVotes(tids, uid, next);
+					Votes.hasReadVotes(vids, uid, next);
 				},
 				tags: function(next) {
-					Votes.getVotesTagsObjects(tids, next);
+					Votes.getVotesTagsObjects(vids, next);
 				}
 			}, function(err, results) {
 				if (err) {
@@ -181,11 +177,9 @@ var async = require('async'),
 				}
 
 				var users = _.object(uids, results.users);
-				var categories = _.object(cids, results.categories);
 
 				for (var i=0; i<votes.length; ++i) {
 					if (votes[i]) {
-						votes[i].category = categories[votes[i].cid];
 						votes[i].user = users[votes[i].uid];
 						votes[i].teaser = results.teasers[i];
 						votes[i].tags = results.tags[i];
@@ -198,10 +192,6 @@ var async = require('async'),
 						votes[i].unreplied = parseInt(votes[i].postcount, 10) <= 1;
 					}
 				}
-
-				votes = votes.filter(function(vote) {
-					return vote &&	vote.category && !vote.category.disabled;
-				});
 
 				plugins.fireHook('filter:votes.get', {votes: votes, uid: uid}, function(err, voteData) {
 					callback(err, voteData.votes);

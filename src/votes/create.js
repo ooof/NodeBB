@@ -212,7 +212,7 @@ module.exports = function(Votes) {
 			},
 			function(data, next) {
 				postData = data;
-				Votes.markAsUnreadForAll(vid, next);
+				Votes.markAsUnreadForAll(next);
 			},
 			function(next) {
 				Votes.markAsRead([vid], uid, next);
@@ -223,7 +223,7 @@ module.exports = function(Votes) {
 						posts.getUserInfoForPosts([postData.uid], uid, next);
 					},
 					voteInfo: function(next) {
-						Votes.getVoteFields(tid, ['tid', 'title', 'slug', 'cid', 'postcount'], next);
+						Votes.getVoteFields(vid, ['vid', 'username', 'email', 'slug', 'postcount'], next);
 					},
 					settings: function(next) {
 						user.getSettings(uid, next);
@@ -232,7 +232,7 @@ module.exports = function(Votes) {
 						posts.getPidIndex(postData.pid, uid, next);
 					},
 					content: function(next) {
-						postTools.parsePost(postData, uid, next);
+						postTools.parsePost(postData, next);
 					}
 				}, next);
 			},
