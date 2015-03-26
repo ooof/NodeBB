@@ -46,26 +46,26 @@ module.exports = function(Votes) {
 				usersData.forEach(function(user) {
 					users[user.uid] = user;
 				});
-				var tidToPost = {};
+				var vidToPost = {};
 
 				async.each(postData, function(post, next) {
 					post.user = users[post.uid];
 					post.timestamp = utils.toISOString(post.timestamp);
-					tidToPost[post.tid] = post;
+					vidToPost[post.vid] = post;
 					postTools.parsePost(post, next);
 				}, function(err) {
 					if (err) {
 						return callback(err);
 					}
-					var teasers = topics.map(function(topic, index) {
-						if (tidToPost[topic.tid]) {
-							tidToPost[topic.tid].index = counts[index];
-							if (tidToPost[topic.tid].content) {
-								var s = S(tidToPost[topic.tid].content);
-								tidToPost[topic.tid].content = s.stripTags.apply(s, utils.stripTags).s;
+					var teasers = votes.map(function(vote, index) {
+						if (vidToPost[vote.vid]) {
+							vidToPost[vote.vid].index = counts[index];
+							if (vidToPost[vote.vid].content) {
+								var s = S(vidToPost[vote.vid].content);
+								vidToPost[vote.vid].content = s.stripTags.apply(s, utils.stripTags).s;
 							}
 						}
-						return tidToPost[topic.tid];
+						return vidToPost[vote.vid];
 					});
 
 					plugins.fireHook('filter:teasers.get', {teasers: teasers}, function(err, data) {
@@ -76,13 +76,13 @@ module.exports = function(Votes) {
 		});
 	};
 
-	Votes.getTeasersByTids = function(tids, callback) {
-		if (!Array.isArray(tids) || !tids.length) {
+	Votes.getTeasersByVids = function(vids, callback) {
+		if (!Array.isArray(vids) || !vids.length) {
 			return callback(null, []);
 		}
 		async.waterfall([
 			function(next) {
-				Votes.getVotesFields(tids, ['tid', 'postcount', 'teaserPid'], next);
+				Votes.getVotesFields(vids, ['tid', 'postcount', 'teaserPid'], next);
 			},
 			function(votes, next) {
 				Votes.getTeasers(votes, next);
@@ -91,7 +91,7 @@ module.exports = function(Votes) {
 	};
 
 	Votes.getTeaser = function(tid, callback) {
-		Votes.getTeasersByTids([tid], function(err, teasers) {
+		Votes.getTeasersByVids([tid], function(err, teasers) {
 			callback(err, Array.isArray(teasers) && teasers.length ? teasers[0] : null);
 		});
 	};
