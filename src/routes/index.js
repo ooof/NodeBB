@@ -103,7 +103,8 @@ function groupRoutes(app, middleware, controllers) {
 function votesRoutes(app, middleware, controllers) {
 	setupPageRoute(app, '/votes', middleware, [], controllers.votes.list);
 	setupPageRoute(app, '/votes/:vote_index', middleware, [], controllers.votes.list);
-	setupPageRoute(app, '/votes/details/:slug', middleware, [], controllers.votes.details);
+	setupPageRoute(app, '/votes/:vote_id/:slug/:post_index?', middleware, [], controllers.votes.details);
+	setupPageRoute(app, '/votes/:vote_id/:slug?', middleware, [middleware.addSlug], controllers.votes.details);
 }
 
 module.exports = function(app, middleware) {

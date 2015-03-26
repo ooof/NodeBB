@@ -49,6 +49,10 @@ define('composer', [
 		ajaxify.go('topic/' + data.data.slug);
 	});
 
+	$(window).on('action:composer.votes.post', function(ev, data) {
+		ajaxify.go('votes/' + data.data.slug);
+	});
+
 	// Query server for formatting options
 	socket.emit('modules.composer.getFormattingOptions', function(err, options) {
 		composer.formatting = options;

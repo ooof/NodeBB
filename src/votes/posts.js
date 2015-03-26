@@ -10,6 +10,7 @@ var async = require('async'),
 	posts = require('../posts'),
 	privileges = require('../privileges'),
 	meta = require('../meta');
+	require('../privileges/posts')(privileges);
 
 module.exports = function(Votes) {
 	Votes.onNewPostMade = function(postData, callback) {

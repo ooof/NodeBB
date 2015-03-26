@@ -200,25 +200,23 @@ var async = require('async'),
 		});
 	};
 
-	Votes.getVoteWithPosts = function(tid, set, uid, start, end, reverse, callback) {
-		Votes.getVoteData(tid, function(err, voteData) {
+	Votes.getVoteWithPosts = function(vid, set, uid, start, end, reverse, callback) {
+		Votes.getVoteData(vid, function(err, voteData) {
 			if (err || !voteData) {
 				return callback(err || new Error('[[error:no-vote]]'));
 			}
 
 			async.parallel({
 				posts: async.apply(getMainPostAndReplies, voteData, set, uid, start, end, reverse),
-				category: async.apply(Votes.getCategoryData, tid),
 				threadTools: async.apply(plugins.fireHook, 'filter:vote.thread_tools', {vote: voteData, uid: uid, tools: []}),
-				tags: async.apply(Votes.getVoteTagsObjects, tid),
-				isFollowing: async.apply(Votes.isFollowing, [tid], uid)
+				tags: async.apply(Votes.getVoteTagsObjects, vid),
+				isFollowing: async.apply(Votes.isFollowing, [vid], uid)
 			}, function(err, results) {
 				if (err) {
 					return callback(err);
 				}
 
 				voteData.posts = results.posts;
-				voteData.category = results.category;
 				voteData.thread_tools = results.threadTools.tools;
 				voteData.tags = results.tags;
 				voteData.isFollowing = results.isFollowing[0];
