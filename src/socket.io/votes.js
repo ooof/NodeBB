@@ -3,7 +3,6 @@
 var nconf = require('nconf'),
 	async = require('async'),
 	winston = require('winston'),
-
 	votes = require('../votes'),
 	categories = require('../categories'),
 	privileges = require('../privileges'),
@@ -16,8 +15,6 @@ var nconf = require('nconf'),
 	meta = require('../meta'),
 	events = require('../events'),
 	utils = require('../../public/src/utils'),
-
-
 	SocketVotes = {};
 
 
@@ -39,7 +36,7 @@ SocketVotes.post = function(socket, data, callback) {
 		}
 
 		if (data.lock) {
-			SocketVotes.doTopicAction('lock', 'event:vote_locked', socket, {tids: [result.voteData.tid], cid: result.voteData.cid});
+			SocketVotes.doTopicAction('lock', 'event:vote_locked', socket, {vids: [result.voteData.vid]});
 		}
 
 		callback(null, result.voteData);

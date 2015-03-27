@@ -113,7 +113,7 @@ define('composer', [
 			} else if (post.hasOwnProperty('pid')) {
 				post.save_id = ['composer', app.user.uid, 'pid', post.pid].join(':');
 			} else if (post.hasOwnProperty('vid')) {
-				post.save_id = ['composer', app.uid, 'vid', post.vid].join(':');
+				post.save_id = ['composer', app.user.uid, 'vid', post.vid].join(':');
 			}
 		}
 
@@ -284,7 +284,7 @@ define('composer', [
 
 		var allowTopicsThumbnail = config.allowTopicsThumbnail && postData.isMain && (config.hasImageUploadPlugin || config.allowFileUploads),
 			isTopic = postData ? !!postData.cid : false,
-			isVote = composer.posts[post_uuid] ? !!composer.posts[post_uuid].vid : false,
+			isVote = postData ? !!postData.vid : false,
 			isMain = postData ? !!postData.isMain : false,
 			isEditing = postData ? !!postData.pid : false,
 			isGuestPost = postData ? parseInt(postData.uid, 10) === 0 : false;
@@ -574,8 +574,7 @@ define('composer', [
 			composerData = {
 				handle: handleEl ? handleEl.val() : undefined,
 				content: bodyEl.val(),
-				email: emailEl.val(),
-				vid: postData.vid,
+				email: email,
 				username: usernameEl.val()
 			};
 		}

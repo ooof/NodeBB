@@ -53,10 +53,6 @@ module.exports = function(Posts) {
 					postData.toPid = data.toPid;
 				}
 
-				if (data.toVid) {
-					postData.toVid = data.toVid;
-				}
-
 				if (data.ip && parseInt(meta.config.trackIpPerPost, 10) === 1) {
 					postData.ip = data.ip;
 				}

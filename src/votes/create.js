@@ -13,13 +13,13 @@ var async = require('async'),
 	privileges = require('../privileges'),
 	categories = require('../categories');
 
-module.exports = function(Votes) {
-	Votes.create = function(data, callback) {
+module.exports = function (Votes) {
+	Votes.create = function (data, callback) {
 		var uid = data.uid,
 			username = data.username,
 			email = data.email;
 
-		db.incrObjectField('global', 'nextVid', function(err, vid) {
+		db.incrObjectField('global', 'nextVid', function (err, vid) {
 			if (err) {
 				return callback(err);
 			}
@@ -55,42 +55,40 @@ module.exports = function(Votes) {
 				voteData.thumb = data.thumb;
 			}
 
-			db.setObject('vote:' + vid, voteData, function(err) {
+			db.setObject('vote:' + vid, voteData, function (err) {
 				if (err) {
 					return callback(err);
 				}
 
 				async.parallel([
-					function(next) {
+					function (next) {
 						db.sortedSetsAdd([
 							'votes:vid',
 							'vote_list:vids',
 							'vote_list:uid:' + uid + ':vids'
 						], timestamp, vid, next);
 					},
-					function(next) {
+					function (next) {
 						user.addVoteIdToUser(uid, vid, timestamp, next);
 					},
-					function(next) {
+					function (next) {
 						db.incrObjectField('global', 'voteCount', next);
 					}
-				], function(err) {
+				], function (err) {
 					if (err) {
 						return callback(err);
 					}
-					plugins.fireHook('action:vote.save', voteData);
 					callback(null, vid);
 				});
 			});
 		});
 	};
 
-	Votes.post = function(data, callback) {
+	Votes.post = function (data, callback) {
 		var uid = data.uid,
 			username = data.username,
 			email = data.email,
-			content = data.content,
-			vid = data.vid;
+			content = data.content;
 
 		if (username) {
 			username = username.trim();
@@ -111,29 +109,26 @@ module.exports = function(Votes) {
 		}
 
 		async.waterfall([
-			function(next) {
+			function (next) {
 				checkContentLength(content, next);
 			},
-			function(next) {
+			function (next) {
 				user.isReadyToPost(uid, next);
 			},
-			function(next) {
-				plugins.fireHook('filter:vote.post', data, next);
+			function (next) {
+				content = data.content;
+				Votes.create({uid: uid, username: data.username, email: data.email}, next);
 			},
-			function(filteredData, next) {
-				content = filteredData.content || data.content;
-				Votes.create({uid: uid, vid: vid, username: data.username, email: data.email}, next);
+			function (vid, next) {
+				Votes.reply({uid: uid, vid: vid, handle: data.handle, content: content, req: data.req}, next);
 			},
-			function(vid, next) {
-				Votes.reply({uid:uid, vid:vid, handle: data.handle, content:content, req: data.req}, next);
-			},
-			function(postData, next) {
+			function (postData, next) {
 				async.parallel({
-					postData: function(next) {
+					postData: function (next) {
 						next(null, postData);
 					},
-					settings: function(next) {
-						user.getSettings(uid, function(err, settings) {
+					settings: function (next) {
+						user.getSettings(uid, function (err, settings) {
 							if (err) {
 								return next(err);
 							}
@@ -144,13 +139,13 @@ module.exports = function(Votes) {
 							}
 						});
 					},
-					voteData: function(next) {
+					voteData: function (next) {
 						Votes.getVotesByVids([postData.vid], uid, next);
 					}
 				}, next);
 			},
-			function(data, next) {
-				if(!Array.isArray(data.voteData) || !data.voteData.length) {
+			function (data, next) {
+				if (!Array.isArray(data.voteData) || !data.voteData.length) {
 					return next(new Error('[[error:no-vote]]'));
 				}
 
@@ -172,21 +167,21 @@ module.exports = function(Votes) {
 		], callback);
 	};
 
-	Votes.reply = function(data, callback) {
+	Votes.reply = function (data, callback) {
 		var vid = data.vid,
 			uid = data.uid,
 			content = data.content,
 			postData;
 
 		async.waterfall([
-			function(next) {
+			function (next) {
 				async.parallel({
 					exists: async.apply(Votes.exists, vid),
 					locked: async.apply(Votes.isLocked, vid),
 					isAdmin: async.apply(user.isAdministrator, uid)
 				}, next);
 			},
-			function(results, next) {
+			function (results, next) {
 				if (!results.exists) {
 					return next(new Error('[[error:no-vote]]'));
 				}
@@ -196,47 +191,44 @@ module.exports = function(Votes) {
 
 				user.isReadyToPost(uid, next);
 			},
-			function(next) {
-				plugins.fireHook('filter:vote.reply', data, next);
-			},
-			function(filteredData, next) {
-				content = filteredData.content || data.content;
+			function (next) {
+				content = data.content;
 				if (content) {
 					content = content.trim();
 				}
 
 				checkContentLength(content, next);
 			},
-			function(next) {
-				posts.create({uid: uid, vid: vid, handle: data.handle, content: content, toVid: data.toVid, ip: data.req ? data.req.ip : null}, next);
+			function (next) {
+				posts.create({uid: uid, vid: vid, handle: data.handle, content: content, toPid: data.toPid, ip: data.req ? data.req.ip : null}, next);
 			},
-			function(data, next) {
+			function (data, next) {
 				postData = data;
 				Votes.markAsUnreadForAll(next);
 			},
-			function(next) {
+			function (next) {
 				Votes.markAsRead([vid], uid, next);
 			},
-			function(next) {
+			function (next) {
 				async.parallel({
-					userInfo: function(next) {
+					userInfo: function (next) {
 						posts.getUserInfoForPosts([postData.uid], uid, next);
 					},
-					voteInfo: function(next) {
+					voteInfo: function (next) {
 						Votes.getVoteFields(vid, ['vid', 'username', 'email', 'slug', 'postcount'], next);
 					},
-					settings: function(next) {
+					settings: function (next) {
 						user.getSettings(uid, next);
 					},
-					postIndex: function(next) {
+					postIndex: function (next) {
 						posts.getPidIndex(postData.pid, uid, next);
 					},
-					content: function(next) {
+					content: function (next) {
 						postTools.parsePost(postData, next);
 					}
 				}, next);
 			},
-			function(results, next) {
+			function (results, next) {
 				postData.user = results.userInfo[0];
 				postData.vote = results.voteInfo;
 
@@ -272,9 +264,9 @@ module.exports = function(Votes) {
 
 	function checkContentLength(content, callback) {
 		if (!content || content.length < parseInt(meta.config.miminumPostLength, 10)) {
-			return callback(new Error('[[error:content-too-short, '  + meta.config.minimumPostLength + ']]'));
+			return callback(new Error('[[error:content-too-short, ' + meta.config.minimumPostLength + ']]'));
 		} else if (content.length > parseInt(meta.config.maximumPostLength, 10)) {
-			return callback(new Error('[[error:content-too-long, '  + meta.config.maximumPostLength + ']]'));
+			return callback(new Error('[[error:content-too-long, ' + meta.config.maximumPostLength + ']]'));
 		}
 		callback();
 	}

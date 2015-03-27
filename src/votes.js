@@ -2,7 +2,6 @@
 
 var async = require('async'),
 	validator = require('validator'),
-
 	_ = require('underscore'),
 	db = require('./database'),
 	posts = require('./posts'),
@@ -13,9 +12,8 @@ var async = require('async'),
 	privileges = require('./privileges');
 
 (function(Votes) {
-
 	require('./votes/create')(Votes);
-	require('./votes/votes')(Votes);
+	require('./votes/list')(Votes);
 	require('./votes/delete')(Votes);
 	require('./votes/unread')(Votes);
 	require('./votes/recent')(Votes);
@@ -24,7 +22,6 @@ var async = require('async'),
 	require('./votes/fork')(Votes);
 	require('./votes/posts')(Votes);
 	require('./votes/follow')(Votes);
-	require('./votes/tags')(Votes);
 	require('./votes/teaser')(Votes);
 	require('./votes/suggested')(Votes);
 
@@ -167,9 +164,6 @@ var async = require('async'),
 				},
 				hasRead: function(next) {
 					Votes.hasReadVotes(vids, uid, next);
-				},
-				tags: function(next) {
-					Votes.getVotesTagsObjects(vids, next);
 				}
 			}, function(err, results) {
 				if (err) {
@@ -182,7 +176,6 @@ var async = require('async'),
 					if (votes[i]) {
 						votes[i].user = users[votes[i].uid];
 						votes[i].teaser = results.teasers[i];
-						votes[i].tags = results.tags[i];
 
 						votes[i].isOwner = parseInt(votes[i].uid, 10) === parseInt(uid, 10);
 						votes[i].pinned = parseInt(votes[i].pinned, 10) === 1;
@@ -209,7 +202,6 @@ var async = require('async'),
 			async.parallel({
 				posts: async.apply(getMainPostAndReplies, voteData, set, uid, start, end, reverse),
 				threadTools: async.apply(plugins.fireHook, 'filter:vote.thread_tools', {vote: voteData, uid: uid, tools: []}),
-				tags: async.apply(Votes.getVoteTagsObjects, vid),
 				isFollowing: async.apply(Votes.isFollowing, [vid], uid)
 			}, function(err, results) {
 				if (err) {
@@ -218,7 +210,6 @@ var async = require('async'),
 
 				voteData.posts = results.posts;
 				voteData.thread_tools = results.threadTools.tools;
-				voteData.tags = results.tags;
 				voteData.isFollowing = results.isFollowing[0];
 
 				voteData.unreplied = parseInt(voteData.postcount, 10) === 1;

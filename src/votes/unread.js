@@ -165,7 +165,7 @@ module.exports = function(Votes) {
 			}
 
 			var now = Date.now();
-			var scores = vids.map(function(vid) {
+			var scores = vids.map(function() {
 				return now;
 			});
 
