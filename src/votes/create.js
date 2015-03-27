@@ -252,11 +252,7 @@ module.exports = function (Votes) {
 					Votes.notifyFollowers(postData, uid);
 				}
 
-				if (postData.index > 0) {
-					plugins.fireHook('action:vote.reply', postData);
-				}
-
-				postData.vote.title = validator.escape(postData.vote.title);
+				postData.vote.username = validator.escape(postData.vote.username);
 				next(null, postData);
 			}
 		], callback);
