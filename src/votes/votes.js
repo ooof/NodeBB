@@ -13,9 +13,6 @@ module.exports = function(Votes) {
 			isAdmin: function(next) {
 				user.isAdministrator(data.uid, next);
 			},
-			isModerator: function(next) {
-				user.isModerator(data.uid, data.cid, next);
-			},
 			votes: function(next) {
 				async.waterfall([
 					function(next) {
@@ -47,9 +44,8 @@ module.exports = function(Votes) {
 			if (err) {
 				return callback(err);
 			}
-			var isAdminOrMod = results.isAdmin || results.isModerator;
 			results.votes = results.votes.filter(function(vote) {
-				return (!vote.deleted || isAdminOrMod || vote.isOwner);
+				return (!vote.deleted || results.isAdmin || vote.isOwner);
 			});
 
 			callback(null, {votes: results.votes, nextStart: data.stop + 1});

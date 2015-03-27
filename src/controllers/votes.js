@@ -76,9 +76,43 @@ votesController.list = function (req, res, next) {
 				uid: uid
 			});
 		},
-		function (setting, next) {
-			var data = {};
+		function (data, next) {
+			//votes.getVotes(data, next)
+			next(null, {});
+		},
+		function (data, next) {
+			res.locals.metaTags = [
+				{
+					name: 'title',
+					content: '[[global:header.votes]]'
+				},
+				{
+					property: 'og:title',
+					content: '[[global:header.votes]]'
+				},
+				{
+					property: "og:type",
+					content: 'website'
+				}
+			];
+
+			res.locals.linkTags = [
+				{
+					rel: 'alternate',
+					type: 'application/rss+xml',
+					href: nconf.get('url') + '/votes.rss'
+				},
+				{
+					rel: 'up',
+					href: nconf.get('url')
+				}
+			];
+
+			next(null, data);
+		},
+		function (data, next) {
 			data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[global:header.votes]]', url: '/votes'}]);
+
 			next(null, data)
 		}
 	], function (err, data) {
