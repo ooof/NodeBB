@@ -516,13 +516,13 @@ define('composer', [
 				emailEl = postContainer.find('#email'),
 				email = emailEl.val();
 			if (usernameEl.val().length < parseInt(config.minimumUsernameLength, 10)) {
-				return composerAlert('[[error:username-too-short, ' + config.minimumTitleLength + ']]');
+				return composerAlert(post_uuid, '[[error:username-too-short, ' + config.minimumTitleLength + ']]');
 			} else if (emailEl.val().length < 1) {
-				return composerAlert('[[error:invalid-email]]');
+				return composerAlert(post_uuid, '[[error:invalid-email]]');
 			} else if (emailEl.val()) {
 				var isEmail = typeof email === 'string' && email.length && email.indexOf('@') !== -1;
 				if (!isEmail) {
-					return composerAlert('[[error:invalid-email, ' + config.minimumTitleLength + ']]');
+					return composerAlert(post_uuid, '[[error:invalid-email, ' + config.minimumTitleLength + ']]');
 				}
 			}
 		} else {
