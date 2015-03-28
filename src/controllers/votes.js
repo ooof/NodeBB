@@ -162,7 +162,7 @@ votesController.details = function (req, res, next) {
 			var pageCount = Math.max(1, Math.ceil((postCount - 1) / settings.postsPerPage));
 
 			if (utils.isNumber(req.params.post_index) && (req.params.post_index < 1 || req.params.post_index > postCount)) {
-				return helpers.redirect(res, '/vote/' + req.params.vote_id + '/' + req.params.slug + (req.params.post_index > postCount ? '/' + postCount : ''));
+				return helpers.redirect(res, '/votes/' + req.params.vote_id + '/' + req.params.slug + (req.params.post_index > postCount ? '/' + postCount : ''));
 			}
 
 			if (settings.usePagination && (req.query.page < 1 || req.query.page > pageCount)) {
@@ -302,7 +302,7 @@ votesController.details = function (req, res, next) {
 				},
 				{
 					property: "og:url",
-					content: nconf.get('url') + '/topic/' + voteData.slug
+					content: nconf.get('url') + '/votes/' + voteData.slug
 				},
 				{
 					property: 'og:image',
@@ -345,7 +345,7 @@ votesController.details = function (req, res, next) {
 		data['reputation:disabled'] = parseInt(meta.config['reputation:disabled'], 10);
 		data['downvote:disabled'] = parseInt(meta.config['downvote:disabled'], 10);
 		data['feeds:disabledRSS'] = parseInt(meta.config['feeds:disabledRSS'], 10);
-		data['rssFeedUrl'] = nconf.get('relative_path') + '/vote/' + '' + data.vid + '.rss';
+		data['rssFeedUrl'] = nconf.get('relative_path') + '/votes/' + '' + data.vid + '.rss';
 
 		data.pagination = pagination.create(data.currentPage, data.pageCount);
 		data.pagination.rel.forEach(function (rel) {
@@ -354,13 +354,7 @@ votesController.details = function (req, res, next) {
 
 		votes.increaseViewCount(vid);
 
-		plugins.fireHook('filter:vote.build', {req: req, res: req, templateData: data}, function (err, data) {
-			if (err) {
-				return next(err);
-			}
-
-			res.render('votes/details', data.templateData);
-		});
+		res.render('votes/details', data);
 	});
 };
 
