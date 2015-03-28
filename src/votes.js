@@ -129,8 +129,8 @@ var async = require('async'),
 			function(next) {
 				privileges.votes.filter('read', tids, uid, next);
 			},
-			function(tids, next) {
-				Votes.getVotesByVids(tids, uid, next);
+			function(vids, next) {
+				Votes.getVotesByVids(vids, uid, next);
 			}
 		], callback);
 	};
@@ -186,9 +186,7 @@ var async = require('async'),
 					}
 				}
 
-				plugins.fireHook('filter:votes.get', {votes: votes, uid: uid}, function(err, voteData) {
-					callback(err, voteData.votes);
-				});
+				callback(err, votes);
 			});
 		});
 	};

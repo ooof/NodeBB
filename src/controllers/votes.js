@@ -8,14 +8,12 @@ var votesController = {},
 	qs = require('querystring'),
 	user = require('../user'),
 	meta = require('../meta'),
-	topics = require('../topics'),
 	posts = require('../posts'),
 	privileges = require('../privileges'),
 	plugins = require('../plugins'),
 	helpers = require('./helpers'),
 	pagination = require('../pagination'),
 	utils = require('../../public/src/utils'),
-
 	db = require('../database'),
 	votes = require('../votes');
 
@@ -41,7 +39,7 @@ votesController.list = function (req, res, next) {
 			var voteCount = parseInt(results.voteCount, 10);
 
 			if (voteIndex < 0 || voteIndex > Math.max(voteCount - 1, 0)) {
-				return helpers.redirect(res, '/vote' + (voteIndex > voteCount ? '/' + voteCount : ''));
+				return helpers.redirect(res, '/votes' + (voteIndex > voteCount ? '/' + voteCount : ''));
 			}
 
 			var settings = results.userSettings;
@@ -68,7 +66,6 @@ votesController.list = function (req, res, next) {
 				end = start + settings.topicsPerPage - 1;
 
 			next(null, {
-				vid: 1,
 				set: set,
 				reverse: reverse,
 				start: start,
@@ -77,8 +74,8 @@ votesController.list = function (req, res, next) {
 			});
 		},
 		function (data, next) {
-			//votes.getVotes(data, next)
-			next(null, {});
+			data.stop = data.end;
+			votes.list.getVotes(data, next);
 		},
 		function (data, next) {
 			res.locals.metaTags = [

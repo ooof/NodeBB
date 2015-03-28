@@ -17,10 +17,7 @@ module.exports = function (Votes) {
 			votes: function (next) {
 				async.waterfall([
 					function (next) {
-						plugins.fireHook('filter:votes.prepare', data, next);
-					},
-					function (data, next) {
-						Votes.getVoteIds(data.set, data.reverse, data.start, data.stop, next);
+						Votes.list.getVoteIds(data.set, data.reverse, data.start, data.stop, next);
 					},
 					function (vids, next) {
 						votes.getVotesByVids(vids, data.uid, next);
@@ -33,11 +30,7 @@ module.exports = function (Votes) {
 						for (var i = 0; i < votes.length; ++i) {
 							votes[i].index = data.start + i;
 						}
-
-						plugins.fireHook('filter:votes.get', {votes: votes, uid: data.uid}, next);
-					},
-					function (results, next) {
-						next(null, results.votes);
+						next(null, votes);
 					}
 				], next);
 			}
