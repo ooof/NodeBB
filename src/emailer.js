@@ -63,7 +63,8 @@ var	fs = require('fs'),
 						template: template,
 						uid: uid,
 						pid: params.pid,
-						fromUid: params.fromUid
+						fromUid: params.fromUid,
+						fromname: '社区邀请'
 					});
 					callback();
 				} else {

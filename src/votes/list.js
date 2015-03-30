@@ -24,7 +24,7 @@ module.exports = function (Votes) {
 					},
 					function (votes, next) {
 						if (!Array.isArray(votes) || !votes.length) {
-							return next(null, {votes: [], uid: data.uid});
+							return next(null, []);
 						}
 
 						for (var i = 0; i < votes.length; ++i) {
