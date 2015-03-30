@@ -264,7 +264,7 @@ $(document).ready(function() {
 
 					if (url === '') {
 						return;
-					} else if (this.pathname !== '/login' && !config.loggedIn) {
+					} else if (this.pathname !== '/login' && this.pathname !== '/register' && !config.loggedIn) {
 						return e.preventDefault();
 					}
 
