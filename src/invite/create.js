@@ -78,7 +78,7 @@ module.exports = function (Invite) {
 						db.incrObjectField('global', 'inviteCount', next);
 					},
 					function (next) {
-						Invite.inviteUser(iid, 1, next);
+						Invite.inviteUser(uid, iid, 1, next);
 					}
 				], function (err) {
 					if (err) {

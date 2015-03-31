@@ -5,6 +5,7 @@ var db = require('../database'),
 	async = require('async'),
 	meta = require('../meta'),
 	utils = require('../../public/src/utils'),
+	plugins = require('../plugins'),
 	emailer = require('../emailer');
 
 module.exports = function (Invite) {
@@ -18,7 +19,7 @@ module.exports = function (Invite) {
 		});
 	};
 
-	Invite.inviteUser = function (iid, count, callback) {
+	Invite.inviteUser = function (uid, iid, count, callback) {
 		db.getObjectField('global', 'nextUid', function (err, userCount) {
 			if (err) {
 				return callback(err);
@@ -27,11 +28,10 @@ module.exports = function (Invite) {
 			count = parseInt(count, 10);
 			userCount = parseInt(userCount, 10);
 
-			var percent = count / userCount > .5;
+			var percent = count / userCount >= .5;
 
-			console.log(percent);
 			if (percent) {
-				return Invite.sendUser(iid, function () {
+				return Invite.sendUser(uid, iid, function () {
 					db.setObjectField('invite:' + iid, 'invited', 1, callback)
 				});
 			}
@@ -39,7 +39,7 @@ module.exports = function (Invite) {
 		});
 	};
 
-	Invite.sendUser = function (iid, callback) {
+	Invite.sendUser = function (uid, iid, callback) {
 		var userData,
 			invite_code = utils.generateUUID(),
 			invite_link = nconf.get('url') + '/register?code=' + invite_code;
@@ -64,15 +64,16 @@ module.exports = function (Invite) {
 			}
 
 			var params = {
-				username: userData.username,
 				email: userData.email,
 				invite_link: invite_link,
-				subject: 'no-reply',
-				template: 'invite'
+				subject: userData.username + ', 有朋友邀请您进入一个社区',
+				fromname: 'Inviting',
+				template: 'invite',
+				site_title: meta.config.title || 'NodeBB',
+				username: userData.username
 			};
 			if (plugins.hasListeners('action:email.send')) {
-				emailer.sendInvite('invite', params);
-				callback();
+				emailer.sendInvite('invite', uid, params, callback);
 			} else {
 				callback(new Error('[[error:no-emailers-configured]]'));
 			}

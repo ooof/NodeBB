@@ -74,35 +74,54 @@ var	fs = require('fs'),
 		});
 	};
 
-	Emailer.sendInvite = function(template, params, callback) {
-		callback = callback || function(){};
+	Emailer.sendInvite = function(template, uid, params, callback) {
+		if (!callback) { callback = function() {}; }
+		if (!app) {
+			winston.warn('[emailer] App not ready!');
+			return callback();
+		}
+
 		async.parallel({
-			html: function (next) {
+			html: function(next) {
 				app.render('emails/' + template, params, next);
 			},
-			plaintext: function (next) {
-				app.render('emails/' + template + '_plaintext', params, next)
-			}
-		}, function (err, results) {
+			plaintext: function(next) {
+				app.render('emails/' + template + '_plaintext', params, next);
+			},
+			settings: async.apply(User.getSettings, uid)
+		}, function(err, results) {
 			if (err) {
-				winston.error(err.message);
+				winston.error('[emailer] Error sending digest : ' + err.stack);
 				return callback(err);
 			}
-
-			if (Plugins.hasListeners('action:email.send')) {
-				Plugins.fireHook('action:email.send', {
-					to: params.email,
-					from: meta.config['email:from'] || 'no-reply@localhost.lan',
-					subject: params.subject,
-					html: results.html,
-					plaintext: results.plaintext,
-					template: template,
-					uid: null,
-					site_title: meta.config.title || 'NodeBB',
-					fromname: params.username + ' , 有朋友邀请你进入一个社区'
+			async.map([results.html, results.plaintext, params.subject], function(raw, next) {
+				translator.translate(raw, results.settings.userLang || meta.config.defaultLang || 'en_GB', function(translated) {
+					next(undefined, translated);
 				});
-			}
+			}, function(err, translated) {
+				if (err) {
+					winston.error(err.message);
+					return callback(err);
+				}
 
+				if (Plugins.hasListeners('action:email.send')) {
+					Plugins.fireHook('action:email.send', {
+						to: params.email,
+						from: meta.config['email:from'] || 'no-reply@localhost.lan',
+						subject: translated[2],
+						html: translated[0],
+						plaintext: translated[1],
+						template: template,
+						uid: uid,
+						fromUid: params.fromUid,
+						fromname: params.fromname
+					});
+					callback();
+				} else {
+					winston.warn('[emailer] No active email plugin found!');
+					callback();
+				}
+			});
 		});
 	};
 }(module.exports));

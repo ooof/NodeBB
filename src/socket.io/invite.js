@@ -154,10 +154,6 @@ SocketInvite.enter = function (socket, tid, callback) {
 };
 
 SocketInvite.upvote = function (socket, data, callback) {
-	favouriteCommand(socket, data, callback);
-};
-
-function favouriteCommand(socket, data, callback) {
 	if (!data || !data.iid || !data.room_id) {
 		return callback(new Error('[[error:invalid-data]]'));
 	}
@@ -177,11 +173,11 @@ function favouriteCommand(socket, data, callback) {
 			return callback(new Error('[[error:post-deleted]]'));
 		}
 
-		executeFavouriteCommand(socket, data, callback);
+		executeUpvote(socket, data, callback);
 	});
-}
+};
 
-function executeFavouriteCommand(socket, data, callback) {
+function executeUpvote(socket, data, callback) {
 	var iid = data.iid,
 		uid = socket.uid;
 
@@ -220,7 +216,7 @@ function executeFavouriteCommand(socket, data, callback) {
 				return callback(err);
 			}
 
-			invite.inviteUser(iid, count, callback);
+			invite.inviteUser(uid, iid, count, callback);
 		});
 	});
 }
