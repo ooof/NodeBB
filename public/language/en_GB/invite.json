@@ -1,0 +1,19 @@
+{
+  "invite_count": "Votes",
+
+  "joined": "Already Joined",
+  "no_joined": "Not Joined Yet!",
+
+  "voted_ago": "voted %1",
+
+  "composer.new_invite": "Inviting",
+  "composer.invite_username": "Invite UserName",
+  "composer.invite_email": "Invite Email",
+  "composer.invite_reason": "Invite Reason",
+  "composer.type_username": "Type UserName",
+  "composer.type_email": "Type Email",
+
+  "error.already-voted": "You Are Already Invited！",
+
+  "email.welcome.cta": "Click here to register you account!"
+}

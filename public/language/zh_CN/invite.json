@@ -1,0 +1,19 @@
+{
+  "invite_count": "票数",
+
+  "joined": "已加入!",
+  "no_joined": "尚未加入!",
+
+  "voted_ago": "投票于 %1",
+
+  "composer.new_invite": "邀请",
+  "composer.invite_username": "邀请人姓名",
+  "composer.invite_email": "邀请人邮箱",
+  "composer.invite_reason": "邀请理由",
+  "composer.type_username": "请输入姓名",
+  "composer.type_email": "请输入邮箱",
+
+  "error.already-voted": "您已经投过票！",
+
+  "email.welcome.cta": "点击这里注册您的帐号"
+}
