@@ -47,6 +47,8 @@ module.exports = function (Invite) {
 				'slug': slug,
 				'timestamp': timestamp,
 				'lastvotetime': 0,
+				'joinedTime': 0,
+				'invitedTime': 0,
 				'viewcount': 0,
 				'invitecount': 1,
 				'locked': 0,

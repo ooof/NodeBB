@@ -115,12 +115,22 @@ inviteController.details = function (req, res, next) {
 					return helpers.notFound(req, res);
 				}
 
+				inviteData.joined = parseInt(inviteData.joined, 10) === 1;
+				inviteData.invited = parseInt(inviteData.invited, 10) === 1;
 				inviteData.deleted = parseInt(inviteData.deleted, 10) === 1;
 				inviteData.pinned = parseInt(inviteData.pinned, 10) === 1;
 				inviteData.locked = parseInt(inviteData.locked, 10) === 1;
 				inviteData.user = userData;
 				inviteData.user.banned = parseInt(userData.banned, 10) === 1;
 				inviteData.display_moderator_tools = userPrivileges.editable;
+				if (inviteData.joined) {
+					var date = new Date(parseInt(inviteData.joinedTime, 10));
+					inviteData.joinedTime = date.getFullYear() + '.' + date.getMonth() + '.' + date.getDate();
+				}
+				if (inviteData.invitedTime) {
+					date = new Date(parseInt(inviteData.invitedTime, 10));
+					inviteData.invitedTime = date.getFullYear() + '.' + date.getMonth() + '.' + date.getDate();
+				}
 
 				next(null, inviteData);
 			});
