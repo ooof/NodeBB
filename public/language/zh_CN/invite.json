@@ -13,7 +13,8 @@
   "composer.type_username": "请输入姓名",
   "composer.type_email": "请输入邮箱",
 
-  "error.already-voted": "您已经投过票！",
+  "error.already-voted": "您已经投过票",
+  "error.invalid-iid": "无效的邀请贴",
 
   "email.welcome.cta": "点击这里注册您的帐号"
 }

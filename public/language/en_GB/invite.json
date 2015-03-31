@@ -14,6 +14,7 @@
   "composer.type_email": "Type Email",
 
   "error.already-voted": "You Are Already Invited！",
+  "error.invalid-iid": "Invalid Invite ID",
 
   "email.welcome.cta": "Click here to register you account!"
 }
