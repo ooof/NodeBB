@@ -16,5 +16,6 @@
   "error.already-voted": "您已经投过票",
   "error.invalid-iid": "无效的邀请贴",
 
-  "email.welcome.cta": "点击这里注册您的帐号"
+  "email.invite_click": "点击进入！",
+  "email.invite_body": "您的朋友邀请您进入一个有趣的社区！"
 }
