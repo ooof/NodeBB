@@ -430,6 +430,7 @@ function enableDefaultPlugins(next) {
 		'nodebb-plugin-mentions',
 		'nodebb-widget-essentials',
 		'nodebb-rewards-essentials',
+		'nodebb-plugin-emailer-sendgrid',
 		'nodebb-plugin-soundpack-default'
 	];
 	var	db = require('./database');
