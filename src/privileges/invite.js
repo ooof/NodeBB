@@ -17,7 +17,6 @@ module.exports = function (privileges) {
 			async.apply(invite.getInviteFields, iid, ['uid', 'joined', 'invited']),
 			function (vote, next) {
 				async.parallel({
-					manage_vote: async.apply(helpers.hasEnoughReputationFor, 'privileges:manage_vote', uid),
 					isAdministrator: async.apply(user.isAdministrator, uid),
 					invite: function (next) {
 						next(null, vote)
@@ -40,7 +39,7 @@ module.exports = function (privileges) {
 					joined: !!parseInt(invite.joined, 10),
 					editable: editable,
 					deletable: deletable,
-					view_deleted: isAdmin || results.manage_vote || results.isOwner,
+					view_deleted: isAdmin || results.isOwner,
 					iid: iid,
 					uid: uid
 				};
@@ -53,9 +52,6 @@ module.exports = function (privileges) {
 		helpers.some([
 			function (next) {
 				invite.isOwner(iid, uid, next);
-			},
-			function (next) {
-				helpers.hasEnoughReputationFor('privileges:manage_vote', uid, next);
 			},
 			function (next) {
 				isAdminOrMod(iid, uid, next);
