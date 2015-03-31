@@ -102,7 +102,7 @@ define('composer', [
 
 		translator.translate('[[topic:composer.new_topic]],[[invite:composer.new_invite]]', function (data) {
 			data = data.split(',');
-			var title = post.invite ? data[1] : post.title ? post.title : data[0];
+			var title = post.invite || post.iid ? data[1] : post.title ? post.title : data[0];
 
 			taskbar.push('composer', uuid, {
 				title: title
