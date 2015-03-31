@@ -121,7 +121,7 @@ module.exports = function (Invite) {
 				db.setObjectField('invite:' + iid, 'invitedTime', Date.now(), next);
 			},
 			function (next) {
-				db.expireAt('confirm:' + invite_code, Math.floor(Date.now() / 1000 + 60 * 60 * 2), next);
+				db.expireAt('confirm:' + invite_code, Math.floor(Date.now() / 1000 + 60 * 60 * 24), next);
 			}
 		], function (err) {
 			if (err) {
