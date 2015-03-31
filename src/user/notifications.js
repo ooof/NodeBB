@@ -315,9 +315,9 @@ var async = require('async'),
 		});
 	};
 
-	UserNotifications.sendInviteNotificationToAll = function(inviteData, uid) {
+	UserNotifications.sendInviteNotificationToOther = function(uid, inviteData) {
 		var path = nconf.get('relative_path') + '/invite/' + inviteData.slug,
-			bodyShort = '请投票是否支持邀请' + inviteData.username;
+			bodyShort = '请投票是否支持邀请' + inviteData.username + '加入社区';
 
 		user.getUidsFromHash('username:uid', function (err, uids) {
 			if (err || !Array.isArray(uids) || !uids.length) {

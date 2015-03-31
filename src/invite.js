@@ -13,15 +13,9 @@ var async = require('async'),
 
 (function (Invite) {
 	require('./invite/create')(Invite);
-	//require('./invite/delete')(Invite);
+	require('./invite/delete')(Invite);
 	require('./invite/unread')(Invite);
-	//require('./invite/recent')(Invite);
-	//require('./invite/popular')(Invite);
 	require('./invite/user')(Invite);
-	//require('./invite/fork')(Invite);
-	//require('./invite/follow')(Invite);
-	//require('./invite/teaser')(Invite);
-	//require('./invite/suggested')(Invite);
 
 	Invite.exists = function (vid, callback) {
 		db.isSortedSetMember('invite:iid', vid, callback);
@@ -200,6 +194,10 @@ var async = require('async'),
 
 	Invite.setInviteField = function (iid, field, value, callback) {
 		db.setObjectField('invite:' + iid, field, value, callback);
+	};
+
+	Invite.setInviteFields = function (iid, data, callback) {
+		db.setObject('invite:' + iid, data, callback);
 	};
 
 	Invite.increaseViewCount = function(iid, callback) {

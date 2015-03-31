@@ -9,6 +9,7 @@ var	nconf = require('nconf'),
 	posts = require('../posts'),
 	postTools = require('../postTools'),
 	topics = require('../topics'),
+	invite = require('../invite'),
 	meta = require('../meta'),
 	Messaging = require('../messaging'),
 	user = require('../user'),
@@ -25,6 +26,17 @@ var	nconf = require('nconf'),
 		sounds: {},
 		settings: {}
 	};
+
+/* Invite Composer */
+
+SocketModules.composer.pushInvite = function (socket, iid, callback) {
+	invite.getInviteFields(iid, ['content', 'email', 'username'], function (err, inviteData) {
+		if (err || (!inviteData && !inviteData.content)) {
+			return callback(err || new Error('[[invite:error.invalid-iid]]'));
+		}
+		callback(null, inviteData);
+	});
+};
 
 /* Posts Composer */
 

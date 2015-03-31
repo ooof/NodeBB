@@ -4,7 +4,9 @@ define('forum/invite/events', [], function () {
 	var Events = {};
 
 	var events = {
-		'invite.upvote': updatePostVotes
+		'event:invite_edited': onInviteEdited,
+
+		'event:invite_upvote': updatePostVotes
 	};
 
 	Events.init = function () {
@@ -30,5 +32,23 @@ define('forum/invite/events', [], function () {
 		votesEl.text(data).attr('data-votes', data);
 	}
 
+	function onInviteEdited(data) {
+		var contentEl = components.get('invite/content', data.iid),
+			usernameEl = components.get('invite/header', data.iid);
+
+		if (usernameEl.length) {
+			usernameEl.fadeOut(250, function() {
+				usernameEl.html(data.username).fadeIn(250);
+			});
+		}
+
+		contentEl.fadeOut(250, function() {
+			contentEl.html(data.content);
+			contentEl.find('img').addClass('img-responsive');
+			contentEl.fadeIn(250);
+
+			$(window).trigger('action:invite.edited', data);
+		});
+	}
 	return Events;
 });
