@@ -551,18 +551,17 @@ define('composer', [
 		options = options || {};
 
 		if (isInvite || isInviteEdit) {
-			var usernameEl = postContainer.find('#username'),
-				emailEl = postContainer.find('#email'),
-				email = emailEl.val();
-			if (usernameEl.val().length < parseInt(config.minimumUsernameLength, 10)) {
-				return composerAlert(post_uuid, '[[error:username-too-short, ' + config.minimumTitleLength + ']]');
-			} else if (emailEl.val().length < 1) {
+			var username = postContainer.find('#username').val(),
+				email = postContainer.find('#email').val();
+
+			if (username.length < config.minimumUsernameLength) {
+				return composerAlert(post_uuid, '[[error:username-too-short]]');
+			} else if (username.length > config.maximumUsernameLength) {
+				return composerAlert(post_uuid, '[[error:username-too-long]]');
+			} else if (!utils.isUserNameValid(username) || !utils.slugify(username)) {
+				return composerAlert(post_uuid, '[[error:invalid-username]]');
+			} else if (!email || email.length < 1 || !utils.isEmailValid(email)) {
 				return composerAlert(post_uuid, '[[error:invalid-email]]');
-			} else if (emailEl.val()) {
-				var isEmail = typeof email === 'string' && email.length && email.indexOf('@') !== -1;
-				if (!isEmail) {
-					return composerAlert(post_uuid, '[[error:invalid-email, ' + config.minimumTitleLength + ']]');
-				}
 			}
 		} else {
 			titleEl.val(titleEl.val().trim());
@@ -628,7 +627,7 @@ define('composer', [
 			composerData = {
 				content: bodyEl.val(),
 				email: email,
-				username: usernameEl.val()
+				username: username
 			};
 		} else if (isInviteEdit) {
 			action = 'invite.edit';
@@ -636,7 +635,7 @@ define('composer', [
 				iid: parseInt(postData.iid, 10),
 				content: bodyEl.val(),
 				email: email,
-				username: usernameEl.val()
+				username: username
 			};
 		}
 

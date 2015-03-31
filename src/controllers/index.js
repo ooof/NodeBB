@@ -4,12 +4,13 @@ var async = require('async'),
 	nconf = require('nconf'),
 	validator = require('validator'),
 	winston = require('winston'),
-
+	db = require('../database'),
 	auth = require('../routes/authentication'),
 	meta = require('../meta'),
 	user = require('../user'),
 	posts = require('../posts'),
 	topics = require('../topics'),
+	invite = require('../invite'),
 	plugins = require('../plugins'),
 	categories = require('../categories'),
 	privileges = require('../privileges'),
@@ -94,41 +95,46 @@ Controllers.login = function(req, res, next) {
 };
 
 Controllers.register = function(req, res, next) {
+	var code = req.query.code ? req.query.code : null;
+
+	if(req.query.code === undefined || req.query.code === null) {
+		return res.redirect(nconf.get('relative_path') + '/403');
+	}
+
 	if(meta.config.allowRegistration !== undefined && parseInt(meta.config.allowRegistration, 10) === 0) {
 		return res.redirect(nconf.get('relative_path') + '/403');
 	}
 
-	var data = {},
-		loginStrategies = auth.getLoginStrategies();
-
-	if (loginStrategies.length === 0) {
-		data = {
-			'register_window:spansize': 'col-md-12',
-			'alternate_logins': false
-		};
-	} else {
-		data = {
-			'register_window:spansize': 'col-md-6',
-			'alternate_logins': true
-		};
-	}
-
-	data.authentication = loginStrategies;
-
-	data.minimumUsernameLength = meta.config.minimumUsernameLength;
-	data.maximumUsernameLength = meta.config.maximumUsernameLength;
-	data.minimumPasswordLength = meta.config.minimumPasswordLength;
-	data.termsOfUse = meta.config.termsOfUse;
-	data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[register:register]]'}]);
-	data.regFormEntry = [];
-	data.error = req.flash('error')[0];
-
-	plugins.fireHook('filter:register.build', {req: req, res: res, templateData: data}, function(err, data) {
-		if (err && process.env === 'development') {
-			winston.warn(JSON.stringify(err));
+	async.waterfall([
+		function(next) {
+			db.getObject('confirm:' + code, next);
+		},
+		function(inviteData, next) {
+			if (!inviteData) {
+				return res.redirect(nconf.get('relative_path') + '/403');
+			}
+			next(null, inviteData);
+		}
+	], function(err, data) {
+		if (err) {
 			return next(err);
 		}
-		res.render('register', data.templateData);
+
+		data.minimumUsernameLength = meta.config.minimumUsernameLength;
+		data.maximumUsernameLength = meta.config.maximumUsernameLength;
+		data.minimumPasswordLength = meta.config.minimumPasswordLength;
+		data.termsOfUse = meta.config.termsOfUse;
+		data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[register:register]]'}]);
+		data.regFormEntry = [];
+		data.error = req.flash('error')[0];
+
+		plugins.fireHook('filter:register.build', {req: req, res: res, templateData: data}, function(err, data) {
+			if (err && process.env === 'development') {
+				winston.warn(JSON.stringify(err));
+				return next(err);
+			}
+			res.render('register', data.templateData);
+		});
 	});
 };
 

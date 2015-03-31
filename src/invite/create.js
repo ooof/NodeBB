@@ -77,6 +77,15 @@ module.exports = function (Invite) {
 					function (next) {
 						db.incrObjectField('global', 'inviteCount', next);
 					},
+					function(next) {
+						db.setObjectField('username:iid', username, iid, next);
+					},
+					function(next) {
+						db.setObjectField('userslug:iid', slug, iid, next);
+					},
+					function(next) {
+						db.setObjectField('email:iid', email, iid, next);
+					},
 					function (next) {
 						Invite.inviteUser(uid, iid, 1, next);
 					}
@@ -96,25 +105,51 @@ module.exports = function (Invite) {
 			email = data.email,
 			content = data.content;
 
-		if (username) {
-			username = username.trim();
-		}
-
-		if (!username || username.length < parseInt(meta.config.minimumUsernameLength, 10)) {
-			return callback(new Error('[[error:username-too-short, ' + meta.config.minimumUsernameLength + ']]'));
-		} else if (username.length > parseInt(meta.config.maximumUsernameLength, 10)) {
-			return callback(new Error('[[error:username-too-long, ' + meta.config.maximumUsernameLength + ']]'));
-		}
-
-		if (email) {
-			email = email.trim();
-		}
-
-		if (!email || email.length < 1 || !utils.isEmailValid(email)) {
-			return callback(new Error('[[error:invalid-email]]'));
-		}
-
 		async.waterfall([
+			function (next) {
+				if (username) {
+					username = username.trim();
+				}
+
+				if (!username || username.length < parseInt(meta.config.minimumUsernameLength, 10)) {
+					return callback(new Error('[[error:username-too-short, ' + meta.config.minimumUsernameLength + ']]'));
+				} else if (username.length > parseInt(meta.config.maximumUsernameLength, 10)) {
+					return callback(new Error('[[error:username-too-long, ' + meta.config.maximumUsernameLength + ']]'));
+				}
+
+				Invite.usernameExists(username, function (err, exist) {
+					if (err) {
+						return next(err);
+					}
+
+					if (exist) {
+						return next(new Error('[[error:username-taken]]'));
+					}
+
+					next();
+				})
+			},
+			function (next) {
+				if (email) {
+					email = email.trim();
+				}
+
+				if (!email || email.length < 1 || !utils.isEmailValid(email)) {
+					return callback(new Error('[[error:invalid-email]]'));
+				}
+
+				Invite.emailExists(email, function (err, exist) {
+					if (err) {
+						return next(err);
+					}
+
+					if (exist) {
+						return callback(new Error('[[error:email-taken]]'));
+					}
+
+					next();
+				})
+			},
 			function (next) {
 				checkContentLength(content, next);
 			},
