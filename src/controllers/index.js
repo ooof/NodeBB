@@ -17,7 +17,7 @@ var async = require('async'),
 
 var Controllers = {
 	welcome: require('./welcome'),
-	votes: require('./votes'),
+	invite: require('./invite'),
 	posts: require('./posts'),
 	topics: require('./topics'),
 	categories: require('./categories'),

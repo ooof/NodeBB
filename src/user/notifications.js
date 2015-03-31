@@ -315,6 +315,31 @@ var async = require('async'),
 		});
 	};
 
+	UserNotifications.sendInviteNotificationToAll = function(inviteData, uid) {
+		var path = nconf.get('relative_path') + '/invite/' + inviteData.slug,
+			bodyShort = '请投票是否支持邀请' + inviteData.username;
+
+		user.getUidsFromHash('username:uid', function (err, uids) {
+			if (err || !Array.isArray(uids) || !uids.length) {
+				return;
+			}
+
+			uids = uids.filter(function (val) {
+				return val !== uid;
+			});
+
+			notifications.create({
+				bodyShort: bodyShort,
+				path: path,
+				nid: 'invite_' + inviteData.iid
+			}, function(err, notification) {
+				if (!err && notification) {
+					notifications.push(notification, uids);
+				}
+			});
+		});
+	};
+
 	UserNotifications.sendWelcomeNotification = function(uid) {
 		if (!meta.config.welcomeNotification) {
 			return;

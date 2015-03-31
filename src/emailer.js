@@ -63,8 +63,7 @@ var	fs = require('fs'),
 						template: template,
 						uid: uid,
 						pid: params.pid,
-						fromUid: params.fromUid,
-						fromname: '社区邀请'
+						fromUid: params.fromUid
 					});
 					callback();
 				} else {
@@ -72,6 +71,38 @@ var	fs = require('fs'),
 					callback();
 				}
 			});
+		});
+	};
+
+	Emailer.sendInvite = function(template, params, callback) {
+		callback = callback || function(){};
+		async.parallel({
+			html: function (next) {
+				app.render('emails/' + template, params, next);
+			},
+			plaintext: function (next) {
+				app.render('emails/' + template + '_plaintext', params, next)
+			}
+		}, function (err, results) {
+			if (err) {
+				winston.error(err.message);
+				return callback(err);
+			}
+
+			if (Plugins.hasListeners('action:email.send')) {
+				Plugins.fireHook('action:email.send', {
+					to: params.email,
+					from: meta.config['email:from'] || 'no-reply@localhost.lan',
+					subject: params.subject,
+					html: results.html,
+					plaintext: results.plaintext,
+					template: template,
+					uid: null,
+					site_title: meta.config.title || 'NodeBB',
+					fromname: params.username + ' , 有朋友邀请你进入一个社区'
+				});
+			}
+
 		});
 	};
 }(module.exports));

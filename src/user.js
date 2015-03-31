@@ -228,6 +228,21 @@ var	async = require('async'),
 		}
 	};
 
+	User.getUidsFromHash = function (key, callback) {
+		db.getObject(key, function (err, value) {
+			if (err) {
+				return callback(err);
+			}
+
+			var uids = [];
+			Object.keys(value).map(function (val) {
+				uids.push(parseInt(value[val], 10));
+			});
+
+			callback(null, uids)
+		});
+	};
+
 	User.getUsersFromSet = function(set, uid, start, stop, callback) {
 		async.waterfall([
 			function(next) {
@@ -321,10 +336,10 @@ var	async = require('async'),
 		], callback);
 	};
 
-	User.addVoteIdToUser = function(uid, vid, timestamp, callback) {
+	User.addInviteIdToUser = function(uid, iid, timestamp, callback) {
 		async.parallel([
-			async.apply(db.sortedSetAdd, 'uid:' + uid + ':votes', timestamp, vid),
-			async.apply(User.incrementUserFieldBy, uid, 'votecount', 1)
+			async.apply(db.sortedSetAdd, 'uid:' + uid + ':invite', timestamp, iid),
+			async.apply(User.incrementUserFieldBy, uid, 'invitecount', 1)
 		], callback);
 	};
 

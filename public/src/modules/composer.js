@@ -49,8 +49,8 @@ define('composer', [
 		ajaxify.go('topic/' + data.data.slug);
 	});
 
-	$(window).on('action:composer.votes.post', function(ev, data) {
-		ajaxify.go('votes/' + data.data.slug);
+	$(window).on('action:composer.invite.post', function(ev, data) {
+		ajaxify.go('invite/' + data.data.slug);
 	});
 
 	// Query server for formatting options
@@ -72,6 +72,8 @@ define('composer', [
 			type = 'cid';
 		} else if (post.hasOwnProperty('tid')) {
 			type = 'tid';
+		} else if (post.hasOwnProperty('vid')) {
+			type = 'vid';
 		} else if (post.hasOwnProperty('pid')) {
 			type = 'pid';
 		}
@@ -98,9 +100,12 @@ define('composer', [
 			return composer.load(existingUUID);
 		}
 
-		translator.translate('[[topic:composer.new_topic]]', function(newTopicStr) {
+		translator.translate('[[topic:composer.new_topic]],[[invite:composer.new_invite]]', function (data) {
+			data = data.split(',');
+			var title = post.invite ? data[1] : post.title ? post.title : data[0];
+
 			taskbar.push('composer', uuid, {
-				title: post.title ? post.title : newTopicStr
+				title: title
 			});
 		});
 
@@ -112,8 +117,8 @@ define('composer', [
 				post.save_id = ['composer', app.user.uid, 'tid', post.tid].join(':');
 			} else if (post.hasOwnProperty('pid')) {
 				post.save_id = ['composer', app.user.uid, 'pid', post.pid].join(':');
-			} else if (post.hasOwnProperty('vid')) {
-				post.save_id = ['composer', app.user.uid, 'vid', post.vid].join(':');
+			} else if (post.hasOwnProperty('invite')) {
+				post.save_id = ['composer', app.user.uid, 'invite', post.invite].join(':');
 			}
 		}
 
@@ -158,9 +163,10 @@ define('composer', [
 		});
 	};
 
-	composer.newVote = function() {
+	// invite:1 用来判断当前所创建的是邀请帖
+	composer.newInvite = function() {
 		push({
-			vid: 1,
+			invite: 1,
 			body: '',
 			modified: false,
 			isMain: true
@@ -284,7 +290,7 @@ define('composer', [
 
 		var allowTopicsThumbnail = config.allowTopicsThumbnail && postData.isMain && (config.hasImageUploadPlugin || config.allowFileUploads),
 			isTopic = postData ? !!postData.cid : false,
-			isVote = postData ? !!postData.vid : false,
+			isInvite = postData ? !!postData.invite : false,
 			isMain = postData ? !!postData.isMain : false,
 			isEditing = postData ? !!postData.pid : false,
 			isGuestPost = postData ? parseInt(postData.uid, 10) === 0 : false;
@@ -297,7 +303,7 @@ define('composer', [
 			showTags: isTopic || isMain,
 			minimumTagLength: config.minimumTagLength,
 			maximumTagLength: config.maximumTagLength,
-			isVote: isVote,
+			isInvite: isInvite,
 			isTopic: isTopic,
 			isEditing: isEditing,
 			showHandleInput:  config.allowGuestHandles && (app.user.uid === 0 || (isEditing && isGuestPost && app.user.isAdmin)),
@@ -307,7 +313,7 @@ define('composer', [
 		};
 
 
-		var composerTemplate = isVote ? 'votes/composer' : 'composer';
+		var composerTemplate = isInvite ? 'invite/composer' : 'composer';
 
 		parseAndTranslate(composerTemplate, data, function(composerTemplate) {
 			if ($('#cmp-uuid-' + post_uuid).length) {
@@ -507,11 +513,11 @@ define('composer', [
 			bodyEl = postContainer.find('textarea'),
 			thumbEl = postContainer.find('input#topic-thumb-url');
 
-		var isVid = !!parseInt(postData.vid, 10);
+		var isInvite = !!parseInt(postData.invite, 10);
 
 		options = options || {};
 
-		if (isVid) {
+		if (isInvite) {
 			var usernameEl = postContainer.find('#username'),
 				emailEl = postContainer.find('#email'),
 				email = emailEl.val();
@@ -534,7 +540,7 @@ define('composer', [
 		}
 
 		var checkTitle = parseInt(postData.cid, 10) || parseInt(postData.pid, 10);
-		if (isVid) {
+		if (isInvite) {
 			checkTitle = false;
 		}
 
@@ -584,10 +590,9 @@ define('composer', [
 				topic_thumb: thumbEl.val() || '',
 				tags: tags.getTags(post_uuid)
 			};
-		} else if (parseInt(postData.vid, 10) > 0) {
-			action = 'votes.post';
+		} else if (isInvite) {
+			action = 'invite.post';
 			composerData = {
-				handle: handleEl ? handleEl.val() : undefined,
 				content: bodyEl.val(),
 				email: email,
 				username: usernameEl.val()

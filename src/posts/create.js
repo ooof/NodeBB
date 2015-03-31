@@ -7,7 +7,7 @@ var async = require('async'),
 	plugins = require('../plugins'),
 	user = require('../user'),
 	topics = require('../topics'),
-	votes = require('../votes'),
+	votes = require('../invite'),
 	categories = require('../categories');
 
 
