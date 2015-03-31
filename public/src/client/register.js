@@ -94,6 +94,9 @@ define('forum/register', ['csrf'], function(csrf) {
 
 			register.attr('disabled', 'disabled');
 		}
+
+		username.blur();
+		email.blur();
 	};
 
 	function validateEmail(email, callback) {
