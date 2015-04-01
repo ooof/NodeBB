@@ -463,7 +463,7 @@ function setCopyrightWidget(next) {
 }
 
 function setSendgirdConfig (next) {
-	require('./database').setObject('settings:sendgird', {
+	require('./database').setObject('settings:sendgrid', {
 		apiUser: 'cismous',
 		apiKey: 'xhPnlHbo0GPxzge82Gp2'
 	}, next)
