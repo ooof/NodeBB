@@ -28,5 +28,8 @@
   "account.is_inviter_no": "与我没有邀请关系！",
   "account.invite_number": "票数",
 
+  "notification.joined": "已经接受邀请进入社区！",
+  "notification.invited": "对 %1 的邀请达到票数，已邀请加入社区！",
+
   "password.simple": "密码太简单！"
 }

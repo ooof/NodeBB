@@ -27,5 +27,8 @@
   "account.is_inviter_no": "No relation with me!",
   "account.invite_number": "Voted number!",
 
+  "notification.joined": "Had joined community!",
+  "notification.invited": "The number of inviting %1 votes reaching number, have been invited to join the community!",
+
   "password.simple": "Password too simple!"
 }
