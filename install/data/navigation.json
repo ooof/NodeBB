@@ -19,17 +19,6 @@
 		"textClass": "visible-xs-inline",
 		"text": "\\[\\[global:header.recent\\]\\]"
 	},
-    {
-        "route": "/invite",
-        "title": "\\[\\[global:header.invite\\]\\]",
-        "enabled": true,
-        "iconClass": "fa-flag",
-        "textClass": "visible-xs-inline",
-        "text": "\\[\\[global:header.invite\\]\\]",
-        "properties": {
-            "loggedIn": true
-        }
-    },
 	{
 		"route": "/tags",
 		"title": "\\[\\[global:header.tags\\]\\]",
@@ -46,6 +35,17 @@
 		"textClass": "visible-xs-inline",
 		"text": "\\[\\[global:header.popular\\]\\]"
 	},
+    {
+        "route": "/invite",
+        "title": "\\[\\[global:header.invite\\]\\]",
+        "enabled": true,
+        "iconClass": "fa-user-plus",
+        "textClass": "visible-xs-inline",
+        "text": "\\[\\[global:header.invite\\]\\]",
+        "properties": {
+          	"loggedIn": true
+        }
+    },
 	{
 		"route": "/users",
 		"title": "\\[\\[global:header.users\\]\\]",
