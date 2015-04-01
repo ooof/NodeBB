@@ -26,7 +26,7 @@
   "account.is_inviter_me": "邀请过我！",
   "account.is_inviter_yes": "是我邀请加入的！",
   "account.is_inviter_no": "与我没有邀请关系！",
-  "account.invite_number": "准入得票数",
+  "account.invite_number": "票数",
 
   "password.simple": "密码太简单！"
 }
