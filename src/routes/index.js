@@ -140,7 +140,7 @@ module.exports = function(app, middleware) {
 		'chats/?*',
 		'users/?*',
 		'groups/?*',
-		'votes/?*',
+		'invite/?*',
 		'api/category/?*',
 		'api/topic/?*',
 		'admin/?*'
