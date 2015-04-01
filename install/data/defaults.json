@@ -94,5 +94,9 @@
     {
         "field": "requireEmailConfirmation",
         "value": 0
+    },
+    {
+        "field": "defaultLang",
+        "value": "zh_CN"
     }
 ]
