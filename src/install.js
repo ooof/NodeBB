@@ -462,6 +462,13 @@ function setCopyrightWidget(next) {
 	});
 }
 
+function setSendgirdConfig (next) {
+	require('./database').setObject('settings:sendgird', {
+		apiUser: 'cismous',
+		apiKey: 'xhPnlHbo0GPxzge82Gp2'
+	}, next)
+}
+
 install.setup = function (callback) {
 	async.series([
 		checkSetupFlag,
@@ -475,6 +482,7 @@ install.setup = function (callback) {
 		createWelcomePost,
 		enableDefaultPlugins,
 		setCopyrightWidget,
+		setSendgirdConfig,
 		function (next) {
 			require('./upgrade').upgrade(next);
 		}
