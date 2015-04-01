@@ -51,7 +51,7 @@ module.exports = function (Invite) {
 				'joinedTime': 0,
 				'invitedTime': 0,
 				'viewcount': 0,
-				'invitecount': 1,
+				'inviteCount': 0,
 				'locked': 0,
 				'deleted': 0,
 				'pinned': 0
@@ -62,20 +62,16 @@ module.exports = function (Invite) {
 					return callback(err);
 				}
 
-				// invite:uid:{uid}:iids 存放不同用户支持了哪些邀请贴
-				// invite:iid 存放所有的邀请贴
+				// invite:posts:iid 所有的邀请贴 iid
+				// username:iid 邀请贴对应的用户名
+				// userslug:iid 邀请贴对应的url标识符
+				// email:iid 邀请贴对应的邮箱
 				async.parallel([
 					function (next) {
-						db.sortedSetsAdd([
-							'invite:iid',
-							'invite:uid:' + uid + ':iids'
-						], timestamp, iid, next);
+						db.sortedSetAdd('invite:posts:iid', timestamp, iid, next);
 					},
 					function (next) {
 						user.addInviteIdToUser(uid, iid, timestamp, next);
-					},
-					function (next) {
-						db.setAdd('invite:' + iid + ':by', uid, next);
 					},
 					function (next) {
 						db.incrObjectField('global', 'inviteCount', next);
@@ -90,7 +86,7 @@ module.exports = function (Invite) {
 						db.setObjectField('email:iid', email, iid, next);
 					},
 					function (next) {
-						Invite.inviteUser(uid, iid, 1, next);
+						Invite.upVote(iid, uid, next);
 					}
 				], function (err) {
 					if (err) {
@@ -163,30 +159,11 @@ module.exports = function (Invite) {
 				Invite.create({uid: uid, username: data.username, content: content, email: data.email}, next);
 			},
 			function (inviteData, next) {
-				async.parallel({
-					inviteData: function (next) {
-						next(null, inviteData);
-					},
-					settings: function (next) {
-						user.getSettings(uid, function (err, settings) {
-							if (err) {
-								return next(err);
-							}
-							if (settings.followVotesOnCreate) {
-								Invite.follow(inviteData.iid, uid, next);
-							} else {
-								next();
-							}
-						});
-					}
-				}, next);
-			},
-			function (data, next) {
 				if (parseInt(uid, 10)) {
-					user.notifications.sendInviteNotificationToOther(uid, data.inviteData);
+					user.notifications.sendInviteNotificationToOther(uid, inviteData);
 				}
 
-				next(null, data.inviteData);
+				next(null, inviteData);
 			}
 		], callback);
 	};

@@ -223,6 +223,32 @@
 		var uid;
 		async.waterfall([
 			function(next) {
+				db.getObject('confirm:' + userData.code, function (err, data) {
+					if (err) {
+						return next(err);
+					}
+					if (userData.email !== data.email) {
+						return next(new Error('[[error:invalid-email]]'));
+					}
+					if (userData.username !== data.username) {
+						return next(new Error('[[error:invalid-username]]'));
+					}
+					next();
+				});
+			},
+			function (next) {
+				db.getObjectField("email:iid", userData.email, function (err, iid) {
+					userData.iid = iid;
+					next(null, iid)
+				});
+			},
+			function (iid, next) {
+				db.getObjectField("invite:" + iid, 'uid', function (err, uid) {
+					userData.uid = uid;
+					next();
+				});
+			},
+			function(next) {
 				if (!userData.email) {
 					return next(new Error('[[error:invalid-email]]'));
 				}
@@ -250,6 +276,46 @@
 			function(_uid, next) {
 				uid = _uid;
 				req.login({uid: uid}, next);
+			},
+			function(next) {
+				db.setObjectField('invite:' + userData.iid, 'invitedTime', Date.now(), next);
+			},
+			function(next) {
+				db.setObjectField("user:" + uid, 'invitedBy', userData.uid, next)
+			},
+			// user:{uid}:invited 某个用户邀请并已加入的用户
+			function(next) {
+				db.setAdd("user:" + userData.uid + ":invited", uid, next)
+			},
+			function(next) {
+				async.waterfall([
+					function (next) {
+						db.delete("confirm:" + userData.code, next);
+					},
+					function (next) {
+						db.getObjectField("email:iid", userData.email, next);
+					},
+					function (iid, next) {
+                        async.series([
+                            function (next) {
+                                db.setObjectField("invite:" + iid, 'joined', 1, next);
+                            },
+                            function (next) {
+                                db.setObjectField('invite:' + iid, 'invitedTime', Date.now(), next);
+                            }
+                        ], function (err) {
+                            if (err) {
+                                return next(err);
+                            }
+                            next();
+                        });
+					}
+				], function (err) {
+					if (err) {
+						return next(err);
+					}
+					next();
+				});
 			},
 			function(next) {
 				user.logIP(uid, req.ip);

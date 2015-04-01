@@ -79,7 +79,7 @@ module.exports = function (Invite) {
 	};
 
 	Invite.inviteUser = function (uid, iid, count, callback) {
-		db.getObjectField('global', 'nextUid', function (err, userCount) {
+		db.getObjectField('global', 'userCount', function (err, userCount) {
 			if (err) {
 				return callback(err);
 			}
@@ -90,7 +90,7 @@ module.exports = function (Invite) {
 			var percent = count / userCount >= .5;
 
 			if (percent) {
-				db.getObjectFields('invite:' + iid, ['slug', 'username'], function (err, inviteData) {
+				return db.getObjectFields('invite:' + iid, ['slug', 'username'], function (err, inviteData) {
 					if (err) {
 						return callback(err);
 					}

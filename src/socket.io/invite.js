@@ -173,52 +173,8 @@ SocketInvite.upvote = function (socket, data, callback) {
 			return callback(new Error('[[error:post-deleted]]'));
 		}
 
-		executeUpvote(socket, data, callback);
+		invite.upVote(socket.iid, socket.uid, true, callback);
 	});
 };
-
-function executeUpvote(socket, data, callback) {
-	var iid = data.iid,
-		uid = socket.uid;
-
-	if (parseInt(meta.config['reputation:disabled'], 10) === 1) {
-		return callback(new Error('[[error:reputation-system-disabled]]'));
-	}
-
-	db.isSetMember('invite:' + iid + ':by', uid, function (err, value) {
-		if (err) {
-			return callback(err);
-		}
-
-		if (value) {
-			return callback(new Error('[[invite:error.already-voted]]'));
-		}
-
-		var now = Date.now();
-		async.waterfall([
-			function (next) {
-				db.sortedSetAdd('invite:uid:' + uid + ':iids', now, iid, next);
-			},
-			function (next) {
-				db.setAdd('invite:' + iid + ':by', uid, next);
-			},
-			function (next) {
-				db.incrObjectField('invite:' + iid, 'invitecount', function (err, count) {
-					if (err) {
-						return callback(err);
-					}
-					websockets.in('invite_' + data.iid).emit('event:invite_upvote', count);
-					next(null, count);
-				});
-			}
-		], function (err, count) {
-			if (err) {
-				return callback(err);
-			}
-
-			invite.inviteUser(uid, iid, count, callback);
-		});
-	});
-}
 
 module.exports = SocketInvite;

@@ -155,7 +155,7 @@ var cache = LRU({
 					return next(new Error('[[error:post-already-restored]]'));
 				}
 
-				privileges.posts.canEdit(pid, uid, next);
+				require('./privileges').posts.canEdit(pid, uid, next);
 			},
 			function(canEdit, next) {
 				if (!canEdit) {
