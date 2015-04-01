@@ -3,7 +3,7 @@
 /* globals define, app, utils, socket, config, translator */
 
 
-define('forum/register', ['csrf'], function(csrf) {
+define('forum/register', ['csrf', 'password'], function(csrf, passwordComplex) {
 	var Register = {},
 		validationError = false,
 		successIcon = '<i class="fa fa-check"></i>';
@@ -160,13 +160,17 @@ define('forum/register', ['csrf'], function(csrf) {
 		var password_notify = $('#password-notify'),
 			password_confirm_notify = $('#password-confirm-notify');
 
-		if (password.length < config.minimumPasswordLength) {
-			showError(password_notify, '[[user:change_password_error_length]]');
-		} else if (!utils.isPasswordValid(password)) {
-			showError(password_notify, '[[user:change_password_error]]');
-		} else {
-			showSuccess(password_notify, successIcon);
-		}
+		passwordComplex(password, function (complex) {
+			if (complex < 10 && password.length >= config.minimumPasswordLength) {
+				showError(password_notify, '[[invite:password_simple]]');
+			} else if (password.length < config.minimumPasswordLength) {
+				showError(password_notify, '[[user:change_password_error_length]]');
+			} else if (!utils.isPasswordValid(password)) {
+				showError(password_notify, '[[user:change_password_error]]');
+			} else {
+				showSuccess(password_notify, successIcon);
+			}
+		});
 
 		if (password !== password_confirm && password_confirm !== '') {
 			showError(password_confirm_notify, '[[user:change_password_error_match]]');
