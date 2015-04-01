@@ -87,6 +87,8 @@ module.exports = function(User) {
 					},
 					function(uid, next) {
 						userData.uid = uid;
+						userData.picture = '/images/avatar/' + uid + '.png';
+						userData.uploadedpicture = userData.picture;
 						db.setObject('user:' + uid, userData, next);
 					}
 				], function(err) {
