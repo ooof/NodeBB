@@ -19,7 +19,7 @@ var async = require('async'),
 	require('./invite/upvote')(Invite);
 
 	Invite.exists = function (vid, callback) {
-		db.isSortedSetMember('invite:iid', vid, callback);
+		db.isSortedSetMember('invite:posts:iid', vid, callback);
 	};
 
 	Invite.getInviteData = function (iid, callback) {
@@ -77,7 +77,7 @@ var async = require('async'),
 			invite: function (next) {
 				async.waterfall([
 					function (next) {
-						Invite.getInviteIds(data.set, data.reverse, data.start, data.stop, next);
+						Invite.getInviteIds(data.setKey, data.reverse, data.start, data.stop, next);
 					},
 					function (iids, next) {
 						Invite.getInviteByIids(iids, data.uid, next);
@@ -106,11 +106,11 @@ var async = require('async'),
 		});
 	};
 
-	Invite.getInviteIds = function (set, reverse, start, stop, callback) {
+	Invite.getInviteIds = function (setKey, reverse, start, stop, callback) {
 		if (reverse) {
-			db.getSortedSetRevRange(set, start, stop, callback);
+			db.getSortedSetRevRange(setKey, start, stop, callback);
 		} else {
-			db.getSortedSetRange(set, start, stop, callback);
+			db.getSortedSetRange(setKey, start, stop, callback);
 		}
 	};
 

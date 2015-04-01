@@ -49,14 +49,14 @@ inviteController.list = function (req, res, next) {
 				inviteIndex = 0;
 			}
 
-			var set = 'invite:iid',
+			var setKey = 'invite:posts:iid',
 				reverse = false;
 
 			var start = (page - 1) * settings.topicsPerPage + inviteIndex,
 				end = start + settings.topicsPerPage - 1;
 
 			next(null, {
-				set: set,
+				setKey: setKey,
 				reverse: reverse,
 				start: start,
 				end: end,
@@ -115,6 +115,7 @@ inviteController.details = function (req, res, next) {
 					return helpers.notFound(req, res);
 				}
 
+				inviteData.isSelf = parseInt(inviteData.uid, 10) === parseInt(uid, 10);
 				inviteData.joined = parseInt(inviteData.joined, 10) === 1;
 				inviteData.invited = parseInt(inviteData.invited, 10) === 1;
 				inviteData.deleted = parseInt(inviteData.deleted, 10) === 1;

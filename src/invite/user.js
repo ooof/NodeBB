@@ -95,12 +95,11 @@ module.exports = function (Invite) {
 						return callback(err);
 					}
 
-					var tempData = {};
-					tempData.path = nconf.get('relative_path') + '/invite/' + inviteData.slug;
-					tempData.bodyShort = '对' + inviteData.username + '的邀请达到票数，已邀请加入社区';
-					tempData.iid = iid;
-
-					user.notifications.sendInviteNotificationToOther(uid, tempData);
+					user.notifications.sendNotification({
+						bodyShort: '[[invite:notification.invited, ' + inviteData.username + ']]',
+						path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
+						nid: 'upvote:uid:' + uid + ':iid:' + iid
+					});
 
 					return Invite.sendUser(uid, iid, function () {
 						db.setObjectField('invite:' + iid, 'invited', 1, callback)

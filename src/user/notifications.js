@@ -315,21 +315,23 @@ var async = require('async'),
 		});
 	};
 
-	UserNotifications.sendInviteNotificationToOther = function(uid, data) {
+	UserNotifications.sendNotification = function(data) {
 		user.getUidsFromHash('username:uid', function (err, uids) {
 			if (err || !Array.isArray(uids) || !uids.length) {
 				return;
 			}
 
-			uids = uids.filter(function (val) {
-				return val !== uid;
-			});
+			var score = data.score ?  data.score : 'all';
+			if (data.score) delete data.score;
 
-			notifications.create({
-				bodyShort: data.bodyShort,
-				path: data.path,
-				nid: 'invite_' + data.iid
-			}, function(err, notification) {
+			if (score === 'other') {
+				uids = uids.filter(function (uid) {
+					return uid !== data.uid;
+				});
+				delete data.uid;
+			}
+
+			notifications.create(data, function(err, notification) {
 				if (!err && notification) {
 					notifications.push(notification, uids);
 				}

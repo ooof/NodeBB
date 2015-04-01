@@ -4,9 +4,9 @@ define('forum/invite/events', [], function () {
 	var Events = {};
 
 	var events = {
-		'event:invite_edited': onInviteEdited,
+		'event:invite_edited': onEditInvite,
 
-		'event:invite_upvote': updatePostVotes
+		'event:invite_upvote': onUpvoteInvite
 	};
 
 	Events.init = function () {
@@ -26,13 +26,13 @@ define('forum/invite/events', [], function () {
 		}
 	};
 
-	function updatePostVotes(data) {
+	function onUpvoteInvite(data) {
 		var votesEl = components.get('invite/vote-count');
 
 		votesEl.text(data).attr('data-votes', data);
 	}
 
-	function onInviteEdited(data) {
+	function onEditInvite(data) {
 		var contentEl = components.get('invite/content', data.iid),
 			usernameEl = components.get('invite/header', data.iid);
 

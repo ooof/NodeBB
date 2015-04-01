@@ -66,6 +66,7 @@ module.exports = function (Invite) {
 				// username:iid 邀请贴对应的用户名
 				// userslug:iid 邀请贴对应的url标识符
 				// email:iid 邀请贴对应的邮箱
+
 				async.parallel([
 					function (next) {
 						db.sortedSetAdd('invite:posts:iid', timestamp, iid, next);
@@ -86,7 +87,7 @@ module.exports = function (Invite) {
 						db.setObjectField('email:iid', email, iid, next);
 					},
 					function (next) {
-						Invite.upVote(iid, uid, next);
+						Invite.upVote(uid, iid, next);
 					}
 				], function (err) {
 					if (err) {
@@ -160,7 +161,13 @@ module.exports = function (Invite) {
 			},
 			function (inviteData, next) {
 				if (parseInt(uid, 10)) {
-					user.notifications.sendInviteNotificationToOther(uid, inviteData);
+					user.notifications.sendNotification({
+						bodyShort: username + ' [[invite:notification.inviting]]',
+						path: nconf.get('relative_path') + '/invite/' + inviteData.userslug,
+						nid: 'inviting:' + inviteData.iid,
+						uid: uid,
+						score: 'other'
+					});
 				}
 
 				next(null, inviteData);

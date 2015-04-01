@@ -173,7 +173,7 @@ SocketInvite.upvote = function (socket, data, callback) {
 			return callback(new Error('[[error:post-deleted]]'));
 		}
 
-		invite.upVote(socket.iid, socket.uid, true, callback);
+		invite.upVote(socket.uid, data.iid, true, callback);
 	});
 };
 

@@ -29,11 +29,11 @@ define('forum/invite/details', ['composer', 'forum/invite/events'], function (co
 		var postContainer = components.get('invite');
 
 		postContainer.on('click', '[component="invite/upvote"]', function () {
-			return upvote(iid);
+			return upvoteInvite(iid);
 		});
 
 		postContainer.on('click', '[component="invite/edit"]', function () {
-			composer.editInvite(getData($(this), 'data-iid'));
+			composer.editInvite(iid);
 		});
 
 		postContainer.on('click', '[component="invite/delete"]', function () {
@@ -41,7 +41,7 @@ define('forum/invite/details', ['composer', 'forum/invite/events'], function (co
 		});
 	}
 
-	function upvote(iid) {
+	function upvoteInvite(iid) {
 		socket.emit('invite.upvote', {
 			iid: iid,
 			room_id: app.currentRoom
@@ -52,10 +52,6 @@ define('forum/invite/details', ['composer', 'forum/invite/events'], function (co
 		});
 
 		return false;
-	}
-
-	function getData(button, data) {
-		return button.parents('[data-iid]').attr(data);
 	}
 
 	function deleteInvite(iid) {

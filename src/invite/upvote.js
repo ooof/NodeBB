@@ -9,10 +9,10 @@ module.exports = function (Invite) {
 		var argLength = arguments.length;
 		callback = argLength === 4 ? arguments[argLength-1] : callback;
 
-		// invite:posts:uid:{uid}:iid 不同用户创建并默认投票支持了所有邀请贴 iid
-		// invite:posts:{iid}:upvote:by 不同邀请贴被投票支持的所有用户 uid
+		// invite:posts:uid:{uid}:iid 创建并默认投票该邀请贴
+		// invite:posts:{iid}:upvote:by 投票支持邀请贴的所有用户
 
-		db.isSetMember('invite:posts:upvote:' + iid + ':by', uid, function (err, value) {
+		db.isSetMember('invite:posts:' + iid + ':upvote:by', uid, function (err, value) {
 			if (err) {
 				return callback(err);
 			}
@@ -27,7 +27,7 @@ module.exports = function (Invite) {
 					db.sortedSetAdd('invite:posts:uid:' + uid + ':iid', now, iid, next);
 				},
 				function (next) {
-					db.setAdd('invite:posts:' + iid + 'upvote:by', uid, next);
+					db.setAdd('invite:posts:' + iid + ':upvote:by', uid, next);
 				},
 				function (next) {
 					db.incrObjectField('invite:' + iid, 'inviteCount', function (err, count) {
