@@ -315,10 +315,7 @@ var async = require('async'),
 		});
 	};
 
-	UserNotifications.sendInviteNotificationToOther = function(uid, inviteData) {
-		var path = nconf.get('relative_path') + '/invite/' + inviteData.slug,
-			bodyShort = '请投票是否支持邀请' + inviteData.username + '加入社区';
-
+	UserNotifications.sendInviteNotificationToOther = function(uid, data) {
 		user.getUidsFromHash('username:uid', function (err, uids) {
 			if (err || !Array.isArray(uids) || !uids.length) {
 				return;
@@ -329,9 +326,9 @@ var async = require('async'),
 			});
 
 			notifications.create({
-				bodyShort: bodyShort,
-				path: path,
-				nid: 'invite_' + inviteData.iid
+				bodyShort: data.bodyShort,
+				path: data.path,
+				nid: 'invite_' + data.iid
 			}, function(err, notification) {
 				if (!err && notification) {
 					notifications.push(notification, uids);
