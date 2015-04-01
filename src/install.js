@@ -411,7 +411,7 @@ function createWelcomePost(next) {
 			Topics.post({
 				uid: 1,
 				cid: 2,
-				title: 'Welcome to your NodeBB!',
+				title: '欢迎来到您的社区！',
 				content: content.toString()
 			}, next);
 		} else {
