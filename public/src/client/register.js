@@ -64,6 +64,13 @@ define('forum/register', ['csrf', 'password'], function(csrf, passwordComplex) {
 					registerBtn.addClass('disabled');
 
 					registerBtn.parents('form').ajaxSubmit({
+						beforeSubmit: function (data) {
+							data.push({
+								name: "code",
+								value: config.code
+							});
+							return true;
+						},
 						headers: {
 							'x-csrf-token': csrf.get()
 						},
@@ -162,7 +169,7 @@ define('forum/register', ['csrf', 'password'], function(csrf, passwordComplex) {
 
 		passwordComplex(password, function (complex) {
 			if (complex < 10 && password.length >= config.minimumPasswordLength) {
-				showError(password_notify, '[[invite:password_simple]]');
+				showError(password_notify, '[[invite:password.simple]]');
 			} else if (password.length < config.minimumPasswordLength) {
 				showError(password_notify, '[[user:change_password_error_length]]');
 			} else if (!utils.isPasswordValid(password)) {

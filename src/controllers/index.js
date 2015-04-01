@@ -96,6 +96,7 @@ Controllers.login = function(req, res, next) {
 
 Controllers.register = function(req, res, next) {
 	var code = req.query.code ? req.query.code : null;
+	res.locals.config.code = code;
 
 	if(req.query.code === undefined || req.query.code === null) {
 		return res.redirect(nconf.get('relative_path') + '/403');
