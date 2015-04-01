@@ -15,11 +15,12 @@ module.exports = function (privileges) {
 	privileges.invite.get = function (iid, uid, callback) {
 		async.waterfall([
 			async.apply(invite.getInviteFields, iid, ['uid', 'joined', 'invited']),
-			function (vote, next) {
+			function (inviteData, next) {
 				async.parallel({
 					isAdministrator: async.apply(user.isAdministrator, uid),
+					isOwner: async.apply(invite.isOwner, iid, uid),
 					invite: function (next) {
-						next(null, vote)
+						next(null, inviteData)
 					}
 				}, next);
 			}
@@ -29,9 +30,9 @@ module.exports = function (privileges) {
 			}
 
 			var invite = results.invite,
-				isOwner = parseInt(uid, 10) === parseInt(invite.uid, 10),
+				isOwner = results.isOwner,
 				isAdmin = results.isAdministrator,
-				editable = isAdmin || results.manage_vote,
+				editable = isAdmin,
 				deletable = isAdmin || isOwner,
 
 				data = {
@@ -39,7 +40,7 @@ module.exports = function (privileges) {
 					joined: !!parseInt(invite.joined, 10),
 					editable: editable,
 					deletable: deletable,
-					view_deleted: isAdmin || results.isOwner,
+					view_deleted: isAdmin || isOwner,
 					iid: iid,
 					uid: uid
 				};
@@ -54,25 +55,13 @@ module.exports = function (privileges) {
 				invite.isOwner(iid, uid, next);
 			},
 			function (next) {
-				isAdminOrMod(iid, uid, next);
+				isAdmin(uid, next);
 			}
 		], callback);
 	};
 
-	privileges.invite.canMove = function (tid, uid, callback) {
-		isAdminOrMod(tid, uid, callback);
-	};
-
-	function isAdminOrMod(tid, uid, callback) {
+	function isAdmin(uid, callback) {
 		helpers.some([
-			function (next) {
-				invite.getVoteField(tid, 'cid', function (err, cid) {
-					if (err) {
-						return next(err);
-					}
-					user.isModerator(uid, cid, next);
-				});
-			},
 			function (next) {
 				user.isAdministrator(uid, next);
 			}
