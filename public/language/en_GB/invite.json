@@ -16,6 +16,6 @@
   "error.already-voted": "You Are Already Invited！",
   "error.invalid-iid": "Invalid Invite ID",
 
-  "email.welcome.cta": "Click here!",
+  "email.invite_click": "Click here!",
   "email.invite_body": "You friend invited you join a community！"
 }
