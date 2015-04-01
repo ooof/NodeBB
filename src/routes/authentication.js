@@ -281,6 +281,9 @@
 				db.setObjectField('invite:' + userData.iid, 'invitedTime', Date.now(), next);
 			},
 			function(next) {
+				db.setObjectField("user:" + uid, 'iid', userData.iid, next)
+			},
+			function(next) {
 				db.setObjectField("user:" + uid, 'invitedBy', userData.uid, next)
 			},
 			// user:{uid}:invited 某个用户邀请并已加入的用户
