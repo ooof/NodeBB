@@ -13,9 +13,11 @@
   "composer.type_username": "Type UserName",
   "composer.type_email": "Type Email",
 
-  "error.already-voted": "You Are Already Invited！",
+  "error.already-voted": "You Are Already Invited!",
   "error.invalid-iid": "Invalid Invite ID",
 
   "email.invite_click": "Click here!",
-  "email.invite_body": "You friend invited you join a community！"
+  "email.invite_body": "You friend invited you join a community!",
+
+  "password.simple.": "Password too simple!"
 }

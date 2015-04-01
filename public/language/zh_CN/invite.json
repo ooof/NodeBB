@@ -17,5 +17,7 @@
   "error.invalid-iid": "无效的邀请贴",
 
   "email.invite_click": "点击进入！",
-  "email.invite_body": "您的朋友邀请您进入一个有趣的社区！"
+  "email.invite_body": "您的朋友邀请您进入一个有趣的社区！",
+
+  "password.simple.": "密码太简单！"
 }
