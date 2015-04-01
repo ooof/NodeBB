@@ -102,6 +102,7 @@ Controllers.register = function(req, res, next) {
 		return res.redirect(nconf.get('relative_path') + '/403');
 	}
 
+
 	if(meta.config.allowRegistration !== undefined && parseInt(meta.config.allowRegistration, 10) === 0) {
 		return res.redirect(nconf.get('relative_path') + '/403');
 	}
@@ -167,9 +168,7 @@ Controllers.robots = function (req, res) {
 	if (meta.config["robots.txt"]) {
 		res.send(meta.config["robots.txt"]);
 	} else {
-		res.send("User-agent: *\n" +
-			"Disallow: " + nconf.get('relative_path') + "/admin/\n" +
-			"Sitemap: " + nconf.get('url') + "/sitemap.xml");
+		res.send("User-agent: *\n" + "Disallow:/");
 	}
 };
 
