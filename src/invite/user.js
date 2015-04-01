@@ -90,8 +90,21 @@ module.exports = function (Invite) {
 			var percent = count / userCount >= .5;
 
 			if (percent) {
-				return Invite.sendUser(uid, iid, function () {
-					db.setObjectField('invite:' + iid, 'invited', 1, callback)
+				db.getObjectFields('invite:' + iid, ['slug', 'username'], function (err, inviteData) {
+					if (err) {
+						return callback(err);
+					}
+
+					var tempData = {};
+					tempData.path = nconf.get('relative_path') + '/invite/' + inviteData.slug;
+					tempData.bodyShort = '对' + inviteData.username + '的邀请达到票数，已邀请加入社区';
+					tempData.iid = iid;
+
+					user.notifications.sendInviteNotificationToOther(uid, tempData);
+
+					return Invite.sendUser(uid, iid, function () {
+						db.setObjectField('invite:' + iid, 'invited', 1, callback)
+					});
 				});
 			}
 			callback();

@@ -2,6 +2,7 @@
 
 var async = require('async'),
 	validator = require('validator'),
+	nconf = require('nconf'),
 	db = require('../database'),
 	utils = require('../../public/src/utils'),
 	plugins = require('../plugins'),

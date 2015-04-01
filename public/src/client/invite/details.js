@@ -37,7 +37,7 @@ define('forum/invite/details', ['composer', 'forum/invite/events'], function (co
 		});
 
 		postContainer.on('click', '[component="invite/delete"]', function () {
-			deletePost($(this), iid);
+			deleteInvite(iid);
 		});
 	}
 
@@ -58,16 +58,15 @@ define('forum/invite/details', ['composer', 'forum/invite/events'], function (co
 		return button.parents('[data-iid]').attr(data);
 	}
 
-	function postAction(action, pid, tid) {
-		translator.translate('[[topic:post_' + action + '_confirm]]', function(msg) {
+	function deleteInvite(iid) {
+		translator.translate('[[topic:post_delete_confirm]]', function(msg) {
 			bootbox.confirm(msg, function(confirm) {
 				if (!confirm) {
 					return;
 				}
 
-				socket.emit('posts.' + action, {
-					pid: pid,
-					tid: tid
+				socket.emit('invite.delete', {
+					iid: iid
 				}, function(err) {
 					if(err) {
 						app.alertError(err.message);
@@ -75,14 +74,6 @@ define('forum/invite/details', ['composer', 'forum/invite/events'], function (co
 				});
 			});
 		});
-	}
-
-	function deletePost(button, tid) {
-		var pid = getData(button, 'data-pid'),
-			postEl = components.get('post', 'pid', pid),
-			action = !postEl.hasClass('deleted') ? 'delete' : 'restore';
-
-		postAction(action, pid, tid);
 	}
 
 	return InviteDetails;

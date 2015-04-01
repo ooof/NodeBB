@@ -97,8 +97,8 @@ var async = require('async'),
 			if (err) {
 				return callback(err);
 			}
-			results.invite = results.invite.filter(function (vote) {
-				return (!vote.deleted || results.isAdmin || vote.isOwner);
+			results.invite = results.invite.filter(function (data) {
+				return (!data.deleted || results.isAdmin || data.isOwner);
 			});
 
 			callback(null, {invite: results.invite, nextStart: data.stop + 1});
