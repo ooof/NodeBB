@@ -34,7 +34,7 @@ var Controllers = {
 
 
 Controllers.home = function(req, res, next) {
-	if (!req.user || parseInt(req.user.uid, 10) === 0) {
+	if (!req.uid) {
 		return Controllers.welcome.home(req, res);
 	}
 
@@ -95,40 +95,50 @@ Controllers.login = function(req, res, next) {
 };
 
 Controllers.register = function(req, res, next) {
-	var code = req.query.code ? req.query.code : null;
-	res.locals.config.code = code;
-
-	if(req.query.code === undefined || req.query.code === null) {
-		return res.redirect(nconf.get('relative_path') + '/403');
-	}
-
-
 	if(meta.config.allowRegistration !== undefined && parseInt(meta.config.allowRegistration, 10) === 0) {
 		return res.redirect(nconf.get('relative_path') + '/403');
 	}
 
-	async.waterfall([
-		function(next) {
-			db.getObject('confirm:' + code, next);
-		},
-		function(inviteData, next) {
-			if (!inviteData) {
-				return res.redirect(nconf.get('relative_path') + '/403');
-			}
-			next(null, inviteData);
-		}
-	], function(err, data) {
+	var data = {},
+		loginStrategies = auth.getLoginStrategies();
+
+	if (loginStrategies.length === 0) {
+		data = {
+			'register_window:spansize': 'col-md-12',
+			'alternate_logins': false
+		};
+	} else {
+		data = {
+			'register_window:spansize': 'col-md-6',
+			'alternate_logins': true
+		};
+	}
+
+	data.minimumUsernameLength = meta.config.minimumUsernameLength;
+	data.maximumUsernameLength = meta.config.maximumUsernameLength;
+	data.minimumPasswordLength = meta.config.minimumPasswordLength;
+	data.termsOfUse = meta.config.termsOfUse;
+	data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[register:register]]'}]);
+	data.regFormEntry = [];
+	data.error = req.flash('error')[0];
+
+	if(req.query.code === undefined || req.query.code === null) {
+		return res.redirect(nconf.get('relative_path') + '/403');
+	}
+	var code = req.query.code ? req.query.code : null;
+	res.locals.config.code = code;
+
+	db.getObject('confirm:' + code, function (err, inviteData) {
 		if (err) {
 			return next(err);
 		}
 
-		data.minimumUsernameLength = meta.config.minimumUsernameLength;
-		data.maximumUsernameLength = meta.config.maximumUsernameLength;
-		data.minimumPasswordLength = meta.config.minimumPasswordLength;
-		data.termsOfUse = meta.config.termsOfUse;
-		data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[register:register]]'}]);
-		data.regFormEntry = [];
-		data.error = req.flash('error')[0];
+		if (!inviteData) {
+			return res.redirect(nconf.get('relative_path') + '/403');
+		}
+
+		data.username = inviteData.username;
+		data.email = inviteData.email;
 
 		plugins.fireHook('filter:register.build', {req: req, res: res, templateData: data}, function(err, data) {
 			if (err && process.env === 'development') {

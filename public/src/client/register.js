@@ -1,9 +1,9 @@
 'use strict';
 
-/* globals define, app, utils, socket, config, translator */
+/* globals define, app, utils, socket, config */
 
 
-define('forum/register', ['csrf', 'password'], function(csrf, passwordComplex) {
+define('forum/register', ['csrf', 'translator','password'], function(csrf, translator, passwordComplex) {
 	var Register = {},
 		validationError = false,
 		successIcon = '<i class="fa fa-check"></i>';

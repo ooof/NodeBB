@@ -4,7 +4,7 @@ var nconf = require('nconf'),
 	async = require('async'),
 	validator = require('validator'),
 
-	translator = require('../../public/src/translator'),
+	translator = require('../../public/src/modules/translator'),
 	categories = require('../categories'),
 	plugins = require('../plugins'),
 	meta = require('../meta');
@@ -26,13 +26,11 @@ helpers.notFound = function(req, res, error) {
 };
 
 helpers.notAllowed = function(req, res, error) {
-	var uid = req.user ? req.user.uid : 0;
-
-	if (uid) {
+	if (req.uid) {
 		if (res.locals.isAPI) {
-			res.status(403).json({path: req.path.replace(/^\/api/, ''), loggedIn: !!uid, error: error});
+			res.status(403).json({path: req.path.replace(/^\/api/, ''), loggedIn: !!req.uid, error: error});
 		} else {
-			res.status(403).render('403', {path: req.path, loggedIn: !!uid, error: error});
+			res.status(403).render('403', {path: req.path, loggedIn: !!req.uid, error: error});
 		}
 	} else {
 		if (res.locals.isAPI) {

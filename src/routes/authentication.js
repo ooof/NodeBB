@@ -23,6 +23,11 @@
 		app.use(passport.initialize());
 		app.use(passport.session());
 
+		app.use(function(req, res, next) {
+			req.uid = req.user ? parseInt(req.user.uid) : 0;
+			next();
+		});
+
 		Auth.app = app;
 		Auth.middleware = middleware;
 	};
@@ -299,19 +304,19 @@
 						db.getObjectField("email:iid", userData.email, next);
 					},
 					function (iid, next) {
-                        async.series([
-                            function (next) {
-                                db.setObjectField("invite:" + iid, 'joined', 1, next);
-                            },
-                            function (next) {
-                                db.setObjectField('invite:' + iid, 'invitedTime', Date.now(), next);
-                            }
-                        ], function (err) {
-                            if (err) {
-                                return next(err);
-                            }
-                            next();
-                        });
+						async.series([
+							function (next) {
+								db.setObjectField("invite:" + iid, 'joined', 1, next);
+							},
+							function (next) {
+								db.setObjectField('invite:' + iid, 'invitedTime', Date.now(), next);
+							}
+						], function (err) {
+							if (err) {
+								return next(err);
+							}
+							next();
+						});
 					}
 				], function (err) {
 					if (err) {

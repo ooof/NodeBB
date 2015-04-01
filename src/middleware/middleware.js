@@ -14,7 +14,7 @@ var app,
 	plugins = require('./../plugins'),
 	navigation = require('./../navigation'),
 	meta = require('./../meta'),
-	translator = require('./../../public/src/translator'),
+	translator = require('./../../public/src/modules/translator'),
 	user = require('./../user'),
 	groups = require('./../groups'),
 	db = require('./../database'),
@@ -53,7 +53,7 @@ middleware.pageView = function(req, res, next) {
 };
 
 middleware.redirectToHomeIfGuest = function(req, res, next) {
-	if (!req.user || parseInt(req.user.uid, 10) === 0) {
+	if (!req.uid) {
 		return res.redirect(nconf.get('relative_path') + '/');
 	} else {
 		next();
@@ -64,7 +64,7 @@ middleware.redirectToAccountIfLoggedIn = function(req, res, next) {
 	if (!req.user) {
 		return next();
 	}
-	user.getUserField(req.user.uid, 'userslug', function (err, userslug) {
+	user.getUserField(req.uid, 'userslug', function (err, userslug) {
 		if (err) {
 			return next(err);
 		}
@@ -73,7 +73,7 @@ middleware.redirectToAccountIfLoggedIn = function(req, res, next) {
 };
 
 middleware.redirectToLoginIfGuest = function(req, res, next) {
-	if (!req.user || parseInt(req.user.uid, 10) === 0) {
+	if (!req.uid) {
 		req.session.returnTo = nconf.get('relative_path') + req.url.replace(/^\/api/, '');
 		return controllers.helpers.redirect(res, '/login');
 	} else {
@@ -132,9 +132,7 @@ middleware.checkGlobalPrivacySettings = function(req, res, next) {
 
 middleware.checkAccountPermissions = function(req, res, next) {
 	// This middleware ensures that only the requested user and admins can pass
-	var callerUID = req.user ? parseInt(req.user.uid, 10) : 0;
-
-	if (callerUID === 0) {
+	if (!req.uid) {
 		return controllers.helpers.notAllowed(req, res);
 	}
 
@@ -147,11 +145,11 @@ middleware.checkAccountPermissions = function(req, res, next) {
 			return controllers.helpers.notFound(req, res);
 		}
 
-		if (parseInt(uid, 10) === callerUID) {
+		if (parseInt(uid, 10) === req.uid) {
 			return next();
 		}
 
-		user.isAdministrator(callerUID, function(err, isAdmin) {
+		user.isAdministrator(req.uid, function(err, isAdmin) {
 			if (err || isAdmin) {
 				return next(err);
 			}
@@ -214,8 +212,6 @@ middleware.buildHeader = function(req, res, next) {
 };
 
 middleware.renderHeader = function(req, res, callback) {
-	var uid = req.user ? parseInt(req.user.uid, 10) : 0;
-
 	navigation.get(function(err, menuItems) {
 		if (err) {
 			return callback(err);
@@ -297,8 +293,8 @@ middleware.renderHeader = function(req, res, callback) {
 				next(null, templateValues.useCustomJS ? meta.config.customJS : '');
 			},
 			title: function(next) {
-				if (uid) {
-					user.getSettings(uid, function(err, settings) {
+				if (req.uid) {
+					user.getSettings(req.uid, function(err, settings) {
 						if (err) {
 							return next(err);
 						}
@@ -309,11 +305,11 @@ middleware.renderHeader = function(req, res, callback) {
 				}
 			},
 			isAdmin: function(next) {
-				user.isAdministrator(uid, next);
+				user.isAdministrator(req.uid, next);
 			},
 			user: function(next) {
-				if (uid) {
-					user.getUserFields(uid, ['username', 'userslug', 'email', 'picture', 'status', 'email:confirmed', 'banned'], next);
+				if (req.uid) {
+					user.getUserFields(req.uid, ['username', 'userslug', 'email', 'picture', 'status', 'email:confirmed', 'banned'], next);
 				} else {
 					next(null, {
 						username: '[[global:guest]]',
@@ -351,7 +347,7 @@ middleware.renderHeader = function(req, res, callback) {
 			templateValues.template[res.locals.template] = true;
 
 			var templateUrl;
-			if (uid === 0 && req.path === '/') {
+			if (req.uid === 0 && req.path === '/') {
 				templateUrl = 'welcome/header';
 			} else {
 				templateUrl = 'header';
@@ -547,7 +543,7 @@ middleware.exposeUid = function(req, res, next) {
 
 			res.locals.uid = uid;
 			next();
-		})
+		});
 	} else {
 		next();
 	}

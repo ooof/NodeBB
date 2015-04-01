@@ -1,8 +1,8 @@
 'use strict';
 
-/* globals define, socket, app, ajaxify, templates, translator*/
+/* globals define, socket, app, ajaxify, templates */
 
-define('forum/users', function() {
+define('forum/users', ['translator'], function(translator) {
 	var	Users = {};
 
 	var loadingMoreUsers = false;
@@ -171,7 +171,7 @@ define('forum/users', function() {
 
 	function onUserStatusChange(data) {
 		var section = getActiveSection();
-		if((section.indexOf('online') === 0 || section.indexOf('users') === 0)) {
+		if ((section.startsWith('online') || section.startsWith('users'))) {
 			updateUser(data);
 		}
 	}

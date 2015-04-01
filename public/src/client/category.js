@@ -1,5 +1,5 @@
 "use strict";
-/* global define, config, templates, app, utils, ajaxify, socket, translator */
+/* global define, config, templates, app, utils, ajaxify, socket */
 
 define('forum/category', [
 	'composer',
@@ -8,8 +8,10 @@ define('forum/category', [
 	'share',
 	'navigator',
 	'forum/categoryTools',
-	'sort'
-], function(composer, pagination, infinitescroll, share, navigator, categoryTools, sort) {
+	'sort',
+	'components',
+	'translator'
+], function(composer, pagination, infinitescroll, share, navigator, categoryTools, sort, components, translator) {
 	var Category = {};
 
 	$(window).on('action:ajaxify.start', function(ev, data) {
@@ -31,10 +33,6 @@ define('forum/category', [
 		app.enterRoom('category_' + cid);
 
 		share.addShareHandlers(ajaxify.variables.get('category_name'));
-
-		$('#new_post').on('click', function () {
-			composer.newTopic(cid);
-		});
 
 		socket.removeListener('event:new_topic', Category.onNewTopic);
 		socket.on('event:new_topic', Category.onNewTopic);
@@ -94,7 +92,7 @@ define('forum/category', [
 	};
 
 	$(window).on('action:popstate', function(ev, data) {
-		if (data.url.indexOf('category/') === 0) {
+		if (data.url.startsWith('category/')) {
 			var cid = data.url.match(/^category\/(\d+)/);
 			if (cid && cid[1]) {
 				cid = cid[1];

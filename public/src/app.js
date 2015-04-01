@@ -1,5 +1,5 @@
 "use strict";
-/*global io, templates, translator, ajaxify, utils, bootbox, RELATIVE_PATH, config, Visibility*/
+/*global io, templates, ajaxify, utils, bootbox, RELATIVE_PATH, config, Visibility*/
 
 var	socket,
 	app = app || {};
@@ -310,18 +310,20 @@ app.cacheBuster = null;
 				titleObj.titles[0] = window.document.title;
 			}
 
-			translator.translate(title, function(translated) {
-				titleObj.titles[1] = translated;
-				if (titleObj.interval) {
-					clearInterval(titleObj.interval);
-				}
-
-				titleObj.interval = setInterval(function() {
-					var title = titleObj.titles[titleObj.titles.indexOf(window.document.title) ^ 1];
-					if (title) {
-						window.document.title = $('<div/>').html(title).text();
+			require(['translator'], function(translator) {
+				translator.translate(title, function(translated) {
+					titleObj.titles[1] = translated;
+					if (titleObj.interval) {
+						clearInterval(titleObj.interval);
 					}
-				}, 2000);
+
+					titleObj.interval = setInterval(function() {
+						var title = titleObj.titles[titleObj.titles.indexOf(window.document.title) ^ 1];
+						if (title) {
+							window.document.title = $('<div/>').html(title).text();
+						}
+					}, 2000);
+				});
 			});
 		} else {
 			if (titleObj.interval) {
@@ -471,6 +473,26 @@ app.cacheBuster = null;
 		});
 	}
 
+	function handleNewTopic() {
+		$('#content').on('click', '#new_topic', function() {
+			require(['composer'], function(composer) {
+				var cid = ajaxify.variables.get('category_id');
+				if (cid) {
+					composer.newTopic(cid);
+				} else {
+					socket.emit('categories.getCategoriesByPrivilege', 'topics:create', function(err, categories) {
+						if (err) {
+							return app.alertError(err.message);
+						}
+						if (categories.length) {
+							composer.newTopic(categories[0].cid);
+						}
+					});
+				}
+			});
+		});
+	}
+
 	app.load = function() {
 		$('document').ready(function () {
 			var url = ajaxify.start(window.location.pathname.slice(1), true, window.location.search);
@@ -481,6 +503,8 @@ app.cacheBuster = null;
 			if (config.searchEnabled) {
 				handleSearch();
 			}
+
+			handleNewTopic();
 
 			$('#logout-link').on('click', app.logout);
 
