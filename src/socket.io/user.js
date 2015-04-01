@@ -185,6 +185,7 @@ SocketUser.updateProfile = function(socket, data, callback) {
 					oldUsername: oldUserData.username,
 					newUsername: userData.username
 				});
+				delete userData.username;
 			}
 			callback(null, userData);
 		}
