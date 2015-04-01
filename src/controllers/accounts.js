@@ -145,11 +145,11 @@ accountsController.getAccount = function(req, res, next) {
 
 		async.parallel({
 			isInviterMe: function (next) {
-				db.isSetMember('user:' + userData.uid + ':invited', callerUID, next);
+				db.isSetMember('user:' + userData.uid + ':invited', req.uid, next);
 			},
 			inviteData: function (next) {
 				db.getObjectFields('invite:' + userData.iid, ['uid', 'inviteCount'], function (err, data) {
-					data.isInviter = callerUID === parseInt(data.uid, 10);
+					data.isInviter = req.uid === parseInt(data.uid, 10);
 					next(null, data);
 				});
 			},
