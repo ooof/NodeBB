@@ -18,6 +18,8 @@
 
   "email.invite_click": "点击进入！",
   "email.invite_body": "您的朋友邀请您进入一个有趣的社区！",
+  "email.invited": "邀请邮件已发出！",
+  "email.joined": "被邀请者已加入！",
 
-  "password.simple.": "密码太简单！"
+  "password.simple": "密码太简单！"
 }

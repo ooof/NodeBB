@@ -18,6 +18,8 @@
 
   "email.invite_click": "Click here!",
   "email.invite_body": "You friend invited you join a community!",
+  "email.invited": "Invite email already send!",
+  "email.joined": "Invited people already joined!",
 
-  "password.simple.": "Password too simple!"
+  "password.simple": "Password too simple!"
 }
