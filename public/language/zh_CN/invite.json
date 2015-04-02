@@ -1,8 +1,8 @@
 {
   "invite_count": "票数",
 
-  "joined": "已加入!",
-  "no_joined": "尚未加入!",
+  "list.joined": "已加入",
+  "list.no_joined": "尚未加入",
 
   "voted_ago": "投票于 %1",
 

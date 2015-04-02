@@ -1,8 +1,8 @@
 {
   "invite_count": "Votes",
 
-  "joined": "Already Joined",
-  "no_joined": "Not Joined Yet!",
+  "list.joined": "Already Joined",
+  "list.no_joined": "Not Joined Yet",
 
   "voted_ago": "voted %1",
 
