@@ -295,7 +295,7 @@
 				req.login({uid: uid}, next);
 			},
 			function(next) {
-				db.setObjectField('invite:' + userData.iid, 'invitedTime', Date.now(), next);
+				db.setObjectField('invite:' + userData.iid, 'joinedTime', Date.now(), next);
 			},
 			function(next) {
 				db.setObjectField("user:" + uid, 'iid', userData.iid, next)
