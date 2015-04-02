@@ -162,8 +162,8 @@ module.exports = function (Invite) {
 			function (inviteData, next) {
 				if (parseInt(uid, 10)) {
 					user.notifications.sendNotification({
-						bodyShort: username + ' [[invite:notification.inviting]]',
-						path: nconf.get('relative_path') + '/invite/' + inviteData.userslug,
+						bodyShort: '[[invite:notification.inviting, ' + username + ']]',
+						path: nconf.get('relative_path') + '/invite/' + utils.slugify(inviteData.username),
 						nid: 'inviting:' + inviteData.iid,
 						uid: uid,
 						score: 'other'
