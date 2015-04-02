@@ -56,7 +56,7 @@ module.exports = function (Invite) {
 						return next(null, exists)
 					}
 
-					Invite.getIidBySlug(utils.slugify(username), function(err, exists) {
+					Invite.getIidByUsername(username, function(err, exists) {
 						callback(err, !!exists);
 					});
 				}
@@ -74,8 +74,8 @@ module.exports = function (Invite) {
 		db.getObjectField('email:iid', email.toLowerCase(), callback);
 	};
 
-	Invite.getIidBySlug = function(slug, callback) {
-		db.getObjectField('userslug:iid', slug, callback);
+	Invite.getIidByUsername = function(username, callback) {
+		db.getObjectField('username:iid', username, callback);
 	};
 
 	Invite.inviteUser = function (uid, iid, count, callback) {
