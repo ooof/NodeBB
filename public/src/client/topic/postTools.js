@@ -20,7 +20,7 @@ define('forum/topic/postTools', ['share', 'navigator', 'components', 'translator
 	PostTools.toggle = function(pid, isDeleted) {
 		var postEl = components.get('post', 'pid', pid);
 
-		postEl.find('[component="post/quote"], [component="post/favourite"], [component="post/reply"], [component="post/flag"], [component="user/chat"]')
+		postEl.find('[component="post/quote"], [component="post/favourite"], [component="post/reply"], [component="post/flag"], [component="post/chat"]')
 			.toggleClass('hidden', isDeleted);
 
 		postEl.find('[component="post/purge"]').toggleClass('hidden', !isDeleted);

@@ -49,8 +49,9 @@ inviteController.list = function (req, res, next) {
 				inviteIndex = 0;
 			}
 
+			// reverse = true 时对应排序为从新到旧
 			var setKey = 'invite:posts:iid',
-				reverse = false;
+				reverse = true;
 
 			var start = (page - 1) * settings.topicsPerPage + inviteIndex,
 				end = start + settings.topicsPerPage - 1;
