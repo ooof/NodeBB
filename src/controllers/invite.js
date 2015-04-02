@@ -69,6 +69,9 @@ inviteController.list = function (req, res, next) {
 			invite.getInvite(data, next);
 		},
 		function (data, next) {
+			data.invite.map(function (value, index) {
+				data.invite[index].joined = parseInt(value.joined, 10);
+			});
 			data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[global:header.invite]]', url: '/invite'}]);
 
 			next(null, data);
