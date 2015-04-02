@@ -83,14 +83,13 @@ inviteController.list = function (req, res, next) {
 
 inviteController.details = function (req, res, next) {
 	var iid = req.params.invite_id,
-		uid = req.user ? req.user.uid : 0,
 		userPrivileges;
 
 	async.waterfall([
 		function (next) {
 			async.parallel({
 				privileges: function (next) {
-					privileges.invite.get(iid, uid, next);
+					privileges.invite.get(iid, req.uid, next);
 				},
 				inviteData: function (next) {
 					invite.getInviteData(iid, next)
@@ -115,13 +114,15 @@ inviteController.details = function (req, res, next) {
 					return helpers.notFound(req, res);
 				}
 
-				inviteData.isSelf = parseInt(inviteData.uid, 10) === parseInt(uid, 10);
+				inviteData.isSelf = parseInt(inviteData.uid, 10) === parseInt(req.uid, 10);
 				inviteData.joined = parseInt(inviteData.joined, 10) === 1;
 				inviteData.invited = parseInt(inviteData.invited, 10) === 1;
 				inviteData.deleted = parseInt(inviteData.deleted, 10) === 1;
 				inviteData.pinned = parseInt(inviteData.pinned, 10) === 1;
 				inviteData.locked = parseInt(inviteData.locked, 10) === 1;
 				inviteData.user = userData;
+				inviteData.yourid = req.uid;
+				inviteData.theirid = inviteData.uid;
 				inviteData.user.banned = parseInt(userData.banned, 10) === 1;
 				inviteData.display_moderator_tools = userPrivileges.editable;
 				if (inviteData.joined) {
