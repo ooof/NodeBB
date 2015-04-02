@@ -1,6 +1,6 @@
 "use strict";
 
-define('forum/invite/details', ['composer', 'forum/invite/events'], function (composer, events) {
+define('forum/invite/details', ['composer', 'components', 'forum/invite/events'], function (composer, components, events) {
 	var InviteDetails = {};
 
 	$(window).on('action:ajaxify.start', function(ev, data) {
@@ -14,30 +14,38 @@ define('forum/invite/details', ['composer', 'forum/invite/events'], function (co
 	});
 
 	InviteDetails.init = function () {
-		var iid = ajaxify.variables.get('invite_id');
+		var data = {
+			iid: ajaxify.variables.get('invite_id'),
+			yourid: ajaxify.variables.get('yourid'),
+			theirid: ajaxify.variables.get('theirid')
+		};
 
 		$(window).trigger('action:vote.loading');
 
-		app.enterRoom('invite_' + iid);
+		app.enterRoom('invite_' + data.iid);
 
-		addPostHandlers(iid);
+		addHandlers(data);
 
 		events.init();
 	};
 
-	function addPostHandlers(iid) {
+	function addHandlers(data) {
 		var postContainer = components.get('invite');
 
 		postContainer.on('click', '[component="invite/upvote"]', function () {
-			return upvoteInvite(iid);
+			return upvoteInvite(data.iid);
 		});
 
 		postContainer.on('click', '[component="invite/edit"]', function () {
-			composer.editInvite(iid);
+			composer.editInvite(data.iid);
 		});
 
 		postContainer.on('click', '[component="invite/delete"]', function () {
-			deleteInvite(iid);
+			deleteInvite(data.iid);
+		});
+
+		postContainer.on('click', '[component="invite/chat"]', function () {
+			app.openChat($('.username a').html(), data.theirid);
 		});
 	}
 
