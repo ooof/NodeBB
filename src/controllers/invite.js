@@ -121,6 +121,7 @@ inviteController.details = function (req, res, next) {
 				inviteData.deleted = parseInt(inviteData.deleted, 10) === 1;
 				inviteData.pinned = parseInt(inviteData.pinned, 10) === 1;
 				inviteData.locked = parseInt(inviteData.locked, 10) === 1;
+				inviteData.canEdit = inviteData.invited || parseInt(inviteData.inviteCount, 10) > 1 ? false : true;
 				inviteData.user = userData;
 				inviteData.yourid = req.uid;
 				inviteData.theirid = inviteData.uid;
@@ -130,7 +131,7 @@ inviteController.details = function (req, res, next) {
 					var date = new Date(parseInt(inviteData.joinedTime, 10));
 					inviteData.joinedTime = date.getFullYear() + '.' + date.getMonth() + '.' + date.getDate();
 				}
-				if (inviteData.invitedTime) {
+				if (inviteData.invited) {
 					date = new Date(parseInt(inviteData.invitedTime, 10));
 					inviteData.invitedTime = date.getFullYear() + '.' + date.getMonth() + '.' + date.getDate();
 				}
