@@ -30,17 +30,18 @@ module.exports = function (privileges) {
 			}
 
 			var invite = results.invite,
-				isOwner = results.isOwner,
+				isSelf = results.isOwner,
 				isAdmin = results.isAdministrator,
 				editable = isAdmin,
-				deletable = isAdmin || isOwner,
+				deletable = isAdmin || isSelf,
 
 				data = {
 					invited: !!parseInt(invite.joined, 10),
 					joined: !!parseInt(invite.joined, 10),
 					editable: editable,
+					isSelf: isSelf,
 					deletable: deletable,
-					view_deleted: isAdmin || isOwner,
+					view_deleted: isAdmin || isSelf,
 					iid: iid,
 					uid: uid
 				};

@@ -115,13 +115,12 @@ inviteController.details = function (req, res, next) {
 					return helpers.notFound(req, res);
 				}
 
-				inviteData.isSelf = parseInt(inviteData.uid, 10) === parseInt(req.uid, 10);
+				inviteData.isSelf = userPrivileges.isSelf;
 				inviteData.joined = parseInt(inviteData.joined, 10) === 1;
 				inviteData.invited = parseInt(inviteData.invited, 10) === 1;
 				inviteData.deleted = parseInt(inviteData.deleted, 10) === 1;
 				inviteData.pinned = parseInt(inviteData.pinned, 10) === 1;
 				inviteData.locked = parseInt(inviteData.locked, 10) === 1;
-				inviteData.canEdit = inviteData.invited || parseInt(inviteData.inviteCount, 10) > 1 ? false : true;
 				inviteData.user = userData;
 				inviteData.yourid = req.uid;
 				inviteData.theirid = inviteData.uid;
