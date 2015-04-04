@@ -1,19 +1,17 @@
 "use strict";
 
-define('forum/invite/list', ['composer', 'navigator'], function (composer, navigator) {
+define('forum/invite/list', ['forum/invite/events', 'composer', 'components', 'navigator'], function (events, composer, components, navigator) {
 	var Invite = {};
 
 	$(window).on('action:ajaxify.start', function (ev, data) {
-		if (data && data.tpl_url !== 'invite') {
+		if (ajaxify.currentPage !== data.url) {
 			navigator.hide();
+			components.get('navbar/title').find('span').text('').hide();
+			app.removeAlert('bookmark');
 
-			removeListeners();
+			events.removeListeners();
 		}
 	});
-
-	function removeListeners() {
-		socket.removeListener('event:new_vote', Invite.onNewInvite);
-	}
 
 	Invite.init = function () {
 		app.enterRoom('invite_list');
