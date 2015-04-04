@@ -18,8 +18,8 @@ var async = require('async'),
 	require('./invite/user')(Invite);
 	require('./invite/upvote')(Invite);
 
-	Invite.exists = function (vid, callback) {
-		db.isSortedSetMember('invite:posts:iid', vid, callback);
+	Invite.exists = function (iid, callback) {
+		db.isSortedSetMember('invite:posts:iid', iid, callback);
 	};
 
 	Invite.getInviteData = function (iid, callback) {

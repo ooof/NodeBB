@@ -6,15 +6,76 @@ var async = require('async'),
 	user = require('../user'),
 	plugins = require('../plugins');
 
-module.exports = function(Invite) {
-	Invite.delete = function(iid, callback) {
-		async.parallel([
-			function(next) {
-				Invite.setInviteField(iid, 'deleted', 1, next);
+module.exports = function (Invite) {
+	Invite.restore = function (iid, callback) {
+		Invite.getInviteField(iid, 'viewcount', function (err, count) {
+			if (err) {
+				return callback(err);
+			}
+
+			async.parallel([
+				function (next) {
+					Invite.setInviteField(iid, 'deleted', 0, next);
+				},
+				function (next) {
+					db.sortedSetAdd('invite:views', count, iid, next);
+				}
+			], callback);
+		});
+	};
+
+	Invite.delete = function (iid, callback) {
+		var inviteData = {};
+		async.waterfall([
+			function (next) {
+				db.sortedSetRemove('invite:views', iid, next);
 			},
-			function(next) {
-				db.sortedSetsRemove(['invite:recent', 'invite:views'], iid, next);
+			function (next) {
+				db.sortedSetRemove('invite:posts:iid', iid, next);
+			},
+			function (next) {
+				db.getSetMembers('invite:posts:' + iid + ':upvote:by', function (err, uids) {
+					if (err) {
+						return next(err);
+					}
+					async.map(uids, function (uid, callback) {
+						db.sortedSetRemove('invite:posts:uid:' + uid + ':iid', iid, callback);
+					}, next);
+				});
+			},
+			function (data, next) {
+				db.getObject('invite:' + iid, next);
+			},
+			function (data, next) {
+				inviteData = data;
+				db.deleteObjectField('username:iid', inviteData.username, next);
+			},
+			function (next) {
+				db.deleteObjectField('userslug:iid', inviteData.slug, next);
+			},
+			function (next) {
+				db.deleteObjectField('email:iid', inviteData.email, next);
+			},
+			function (next) {
+				reduceCounters(next);
+			}
+		], function (err) {
+			if (err) {
+				return callback(err);
+			}
+			db.deleteAll([
+				'invite:posts:' + iid + ':upvote:by',
+				'invite:' + iid
+			], callback);
+		});
+	};
+
+	function reduceCounters(callback) {
+		var incr = -1;
+		async.parallel([
+			function (next) {
+				db.incrObjectFieldBy('global', 'inviteCount', incr, next);
 			}
 		], callback);
-	};
+	}
 };

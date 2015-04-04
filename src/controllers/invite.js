@@ -91,6 +91,12 @@ inviteController.details = function (req, res, next) {
 
 	async.waterfall([
 		function (next) {
+			invite.exists(iid, next);
+		},
+		function (exits, next) {
+			if (!exits) {
+				return helpers.notFound(req, res);
+			}
 			async.parallel({
 				privileges: function (next) {
 					privileges.invite.get(iid, req.uid, next);

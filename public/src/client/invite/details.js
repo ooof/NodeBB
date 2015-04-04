@@ -1,6 +1,6 @@
 "use strict";
 
-define('forum/invite/details', ['composer', 'components', 'forum/invite/events'], function (composer, components, events) {
+define('forum/invite/details', ['composer', 'components', 'translator', 'forum/invite/events'], function (composer, components, translator, events) {
 	var InviteDetails = {};
 
 	$(window).on('action:ajaxify.start', function(ev, data) {

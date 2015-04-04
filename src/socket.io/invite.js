@@ -15,14 +15,7 @@ var nconf = require('nconf'),
 	meta = require('../meta'),
 	events = require('../events'),
 	utils = require('../../public/src/utils'),
-	LRU = require('lru-cache'),
 	SocketInvite = {};
-
-var cache = LRU({
-	max: 1048576,
-	length: function (n) { return n.length; },
-	maxAge: 1000 * 60 * 60
-});
 
 SocketInvite.post = function (socket, data, callback) {
 	if (!data) {
@@ -84,18 +77,24 @@ SocketInvite.edit = function (socket, data, callback) {
 };
 
 SocketInvite.delete = function(socket, data, callback) {
+	callback = callback || function () {};
+
+	if (!socket.uid) {
+		return;
+	}
+
 	if (!data) {
 		return callback(new Error('[[error:invalid-data]]'));
 	}
 
-	inviteDelete(socket.uid, data.iid, function (err, inviteData) {
+	invite.delete(data.iid, function (err, callback) {
+		callback = callback || function () {}
+
 		if (err) {
 			return callback(err);
 		}
 
-		var eventName = 'event:invite_deleted' ;
-
-		websockets.in('invite_' + data.iid).emit(eventName, inviteData);
+		websockets.in('invite_' + data.iid).emit('event:invite_deleted');
 
 		events.log({
 			type: 'invite-delete',
@@ -106,35 +105,6 @@ SocketInvite.delete = function(socket, data, callback) {
 
 		callback();
 	});
-
-
-	function inviteDelete(uid, iid, callback) {
-		async.waterfall([
-			function(next) {
-				invite.getInviteField(iid, 'deleted', next);
-			},
-			function(deleted, next) {
-				if(parseInt(deleted, 10) === 1) {
-					return next(new Error('[[error:post-already-deleted]]'));
-				}
-
-				privileges.invite.canEdit(iid, uid, next);
-			},
-			function(canEdit, next) {
-				if (!canEdit) {
-					return next(new Error('[[error:no-privileges]]'));
-				}
-				next();
-			}
-		], function(err) {
-			if (err) {
-				return callback(err);
-			}
-
-			cache.del(iid);
-			invite.delete(iid, callback);
-		});
-	}
 };
 
 SocketInvite.enter = function (socket, tid, callback) {
