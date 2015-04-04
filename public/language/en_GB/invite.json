@@ -4,6 +4,8 @@
   "list.joined": "Already Joined",
   "list.no_joined": "Not Joined Yet",
 
+  "detail.deleted_message": "This invite has been deleted.",
+
   "voted_ago": "voted %1",
 
   "composer.new_invite": "Inviting",

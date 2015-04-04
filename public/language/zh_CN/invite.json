@@ -4,6 +4,8 @@
   "list.joined": "已加入",
   "list.no_joined": "尚未加入",
 
+  "detail.deleted_message": "此贴已被删除。",
+
   "voted_ago": "投票于 %1",
 
   "composer.new_invite": "邀请",
