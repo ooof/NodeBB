@@ -34,5 +34,8 @@
   "notification.joined": "已经接受邀请进入社区！",
   "notification.invited": "对 %1 的邀请达到票数，已邀请加入社区！",
 
+  "error.has-invited": "已发出邀请",
+  "error.has-joined": "被邀请人已加入",
+
   "password.simple": "密码太简单！"
 }
