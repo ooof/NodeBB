@@ -22,6 +22,10 @@ var async = require('async'),
 		db.isSortedSetMember('invite:posts:iid', iid, callback);
 	};
 
+	Invite.isInvited = function (iid, callback) {
+		db.getObjectFields('invite:' + iid, ['invited', 'joined'], callback);
+	};
+
 	Invite.getInviteData = function (iid, callback) {
 		db.getObject('invite:' + iid, function (err, invite) {
 			if (err || !invite) {

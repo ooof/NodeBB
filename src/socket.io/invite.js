@@ -131,12 +131,24 @@ SocketInvite.upvote = function (socket, data, callback) {
 		exists: function (next) {
 			invite.exists(data.iid, next);
 		},
+		isInvited: function (next) {
+			invite.isInvited(data.iid, next);
+		},
 		deleted: function (next) {
 			invite.getInviteField(data.iid, 'deleted', next);
 		}
 	}, function (err, results) {
+		console.log(results.isInvited);
 		if (err || !results.exists) {
 			return callback(err || new Error('[[error:invalid-pid]]'));
+		}
+
+		if (results.isInvited.invited) {
+			return callback(err || new Error('[[invite:error.has-invited]]'));
+		}
+
+		if (results.isInvited.joined) {
+			return callback(err || new Error('[[invite:error.has-joined]]'));
 		}
 
 		if (parseInt(results.deleted, 10) === 1) {
