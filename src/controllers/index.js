@@ -8,6 +8,7 @@ var async = require('async'),
 	auth = require('../routes/authentication'),
 	meta = require('../meta'),
 	user = require('../user'),
+	randomName = require('random-name'),
 	posts = require('../posts'),
 	topics = require('../topics'),
 	invite = require('../invite'),
@@ -140,7 +141,7 @@ Controllers.register = function(req, res, next) {
 			return res.redirect(nconf.get('relative_path') + '/403');
 		}
 
-		data.username = inviteData.username;
+		data.username = randomName.first();
 		data.email = inviteData.email;
 
 		plugins.fireHook('filter:register.build', {req: req, res: res, templateData: data}, function(err, data) {

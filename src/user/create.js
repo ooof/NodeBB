@@ -104,6 +104,9 @@ module.exports = function(User) {
 							db.setObjectField('username:uid', userData.username, userData.uid, next);
 						},
 						function(next) {
+							db.setObjectField('username:iid', userData.username, data.iid, next);
+						},
+						function(next) {
 							db.setObjectField('userslug:uid', userData.userslug, userData.uid, next);
 						},
 						function(next) {

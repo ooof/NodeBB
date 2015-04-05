@@ -138,16 +138,15 @@ SocketInvite.upvote = function (socket, data, callback) {
 			invite.getInviteField(data.iid, 'deleted', next);
 		}
 	}, function (err, results) {
-		console.log(results.isInvited);
 		if (err || !results.exists) {
 			return callback(err || new Error('[[error:invalid-pid]]'));
 		}
 
-		if (results.isInvited.invited) {
+		if (parseInt(results.isInvited.invited, 10)) {
 			return callback(err || new Error('[[invite:error.has-invited]]'));
 		}
 
-		if (results.isInvited.joined) {
+		if (parseInt(results.isInvited.joined, 10)) {
 			return callback(err || new Error('[[invite:error.has-joined]]'));
 		}
 

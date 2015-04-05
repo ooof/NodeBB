@@ -247,9 +247,6 @@
 					if (userData.email !== data.email) {
 						return next(new Error('[[error:invalid-email]]'));
 					}
-					if (userData.username !== data.username) {
-						return next(new Error('[[error:invalid-username]]'));
-					}
 					next();
 				});
 			},

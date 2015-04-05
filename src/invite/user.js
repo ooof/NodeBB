@@ -75,7 +75,7 @@ module.exports = function (Invite) {
 	};
 
 	Invite.getIidByUsername = function(username, callback) {
-		db.getObjectField('username:iid', username, callback);
+		db.getObjectField('username:iid:invite', username, callback);
 	};
 
 	Invite.inviteUser = function (uid, iid, count, callback) {

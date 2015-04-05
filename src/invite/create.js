@@ -78,7 +78,7 @@ module.exports = function (Invite) {
 						db.incrObjectField('global', 'inviteCount', next);
 					},
 					function(next) {
-						db.setObjectField('username:iid', username, iid, next);
+						db.setObjectField('username:iid:invite', username, iid, next);
 					},
 					function(next) {
 						db.setObjectField('userslug:iid', slug, iid, next);
