@@ -137,11 +137,11 @@ inviteController.details = function (req, res, next) {
 				inviteData.display_moderator_tools = userPrivileges.editable;
 				if (inviteData.joined) {
 					var date = new Date(parseInt(inviteData.joinedTime, 10));
-					inviteData.joinedTime = date.getFullYear() + '.' + date.getMonth() + '.' + date.getDate();
+					inviteData.joinedTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' ' + date.getHours() + '.' + date.getMinutes();
 				}
 				if (inviteData.invited) {
 					date = new Date(parseInt(inviteData.invitedTime, 10));
-					inviteData.invitedTime = date.getFullYear() + '.' + date.getMonth() + '.' + date.getDate();
+					inviteData.invitedTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' ' + date.getHours() + '.' + date.getMinutes();
 				}
 
 				next(null, inviteData);
