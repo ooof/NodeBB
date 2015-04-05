@@ -2,7 +2,8 @@
   "invite_count": "票数",
 
   "list.joined": "已加入",
-  "list.no_joined": "尚未加入",
+  "list.voting": "投票中",
+  "list.invited": "已邀请",
 
   "detail.deleted_message": "此贴已被删除。",
 
@@ -34,8 +35,8 @@
   "notification.joined": "已经接受邀请进入社区！",
   "notification.invited": "对 %1 的邀请达到票数，已邀请加入社区！",
 
-  "error.has-invited": "已发出邀请",
-  "error.has-joined": "被邀请人已加入",
+  "error.has-invited": "该邀请已发出，投票已关闭！",
+  "error.has-joined": "被邀请人已加入，投票已关闭！",
 
   "password.simple": "密码太简单！"
 }

@@ -2,7 +2,8 @@
   "invite_count": "Votes",
 
   "list.joined": "Already Joined",
-  "list.no_joined": "Not Joined Yet",
+  "list.voting": "Voting",
+  "list.invited": "Has voted",
 
   "detail.deleted_message": "This invite has been deleted.",
 
@@ -33,8 +34,8 @@
   "notification.joined": "Had joined community!",
   "notification.invited": "The number of inviting %1 votes reaching number, have been invited to join the community!",
 
-  "error.has-invited": "Has send invite!",
-  "error.has-joined": "Has joined!",
+  "error.has-invited": "The invite has send, vote closed!",
+  "error.has-joined": "User has joined, vote closed!",
 
   "password.simple": "Password too simple!"
 }
