@@ -161,9 +161,6 @@ $(document).ready(function() {
 		});
 
 		$(window).trigger('action:ajaxify.contentLoaded', {url: url});
-		if(($('.navbar-collapse').attr('aria-expanded'))==='true') {
-			$('.navbar-toggle').trigger('click');
-		}
 
 		app.processPage();
 	};
