@@ -1,9 +1,9 @@
 "use strict";
 
-define('forum/invite/details', ['composer', 'components', 'translator', 'forum/invite/events'], function (composer, components, translator, events) {
+define('forum/invite/details', ['composer', 'components', 'navigator', 'translator', 'forum/invite/events'], function (composer, components, navigator, translator, events) {
 	var InviteDetails = {};
 
-	$(window).on('action:ajaxify.start', function(ev, data) {
+	$(window).on('action:ajaxify.start', function (ev, data) {
 		if (ajaxify.currentPage !== data.url) {
 			navigator.hide();
 			components.get('navbar/title').find('span').text('').hide();
@@ -63,16 +63,16 @@ define('forum/invite/details', ['composer', 'components', 'translator', 'forum/i
 	}
 
 	function deleteInvite(iid) {
-		translator.translate('[[topic:post_delete_confirm]]', function(msg) {
-			bootbox.confirm(msg, function(confirm) {
+		translator.translate('[[topic:post_delete_confirm]]', function (msg) {
+			bootbox.confirm(msg, function (confirm) {
 				if (!confirm) {
 					return;
 				}
 
 				socket.emit('invite.delete', {
 					iid: iid
-				}, function(err) {
-					if(err) {
+				}, function (err) {
+					if (err) {
 						app.alertError(err.message);
 					}
 				});
