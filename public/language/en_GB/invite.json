@@ -8,7 +8,6 @@
   "list.no_invite": "<strong>There are no votes in this vote list.</strong><br />You can invite others to join!",
 
   "detail.upvote": "Vote",
-
   "detail.deleted_message": "This invite has been deleted.",
 
   "voted_ago": "voted %1",
