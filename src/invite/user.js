@@ -140,6 +140,12 @@ module.exports = function (Invite) {
 				return callback(err);
 			}
 
+			// for test
+			if (userData.email.indexOf('yufeg') !== -1 && process.env.NODE_ENV === 'development') {
+				console.log('development test');
+				return callback;
+			}
+
 			var params = {
 				email: userData.email,
 				invite_link: invite_link,

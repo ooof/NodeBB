@@ -160,17 +160,23 @@ module.exports = function (Invite) {
 				Invite.create({uid: uid, username: data.username, content: content, email: data.email}, next);
 			},
 			function (inviteData, next) {
-				if (parseInt(uid, 10)) {
-					user.notifications.sendNotification({
-						bodyShort: '[[invite:notification.inviting, ' + username + ']]',
-						path: nconf.get('relative_path') + '/invite/' + utils.slugify(inviteData.username),
-						nid: 'inviting:' + inviteData.iid,
-						uid: uid,
-						score: 'other'
-					});
-				}
+				db.getObjectField('user:' + uid, 'username', function (err, invitedBy) {
+					if (err) {
+						return next(err);
+					}
 
-				next(null, inviteData);
+					if (parseInt(uid, 10)) {
+						user.notifications.sendNotification({
+							bodyShort: '[[invite:notification.inviting, ' + invitedBy + ', ' + username + ']]',
+							path: nconf.get('relative_path') + '/invite/' + utils.slugify(inviteData.username),
+							nid: 'inviting:' + inviteData.iid,
+							uid: uid,
+							score: 'other'
+						});
+					}
+
+					next(null, inviteData);
+				});
 			}
 		], callback);
 	};

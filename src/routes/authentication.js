@@ -247,6 +247,7 @@
 					if (userData.email !== data.email) {
 						return next(new Error('[[error:invalid-email]]'));
 					}
+					userData.inviteUsername = data.username;
 					next();
 				});
 			},
@@ -257,8 +258,15 @@
 				});
 			},
 			function (iid, next) {
-				db.getObjectField("invite:" + iid, 'uid', function (err, uid) {
-					userData.uid = uid;
+				db.getObjectField("invite:" + iid, 'uid', next);
+			},
+			function (uid, next) {
+				userData.uid = uid;
+				db.getObjectField("user:" + uid, 'username', function (err, invitedBy) {
+					if (err) {
+						return next(err);
+					}
+					userData.invitedBy = invitedBy;
 					next();
 				});
 			},
@@ -338,7 +346,7 @@
 				user.logIP(uid, req.ip);
 
 				user.notifications.sendNotification({
-					bodyShort: userData.username + ' [[invite:notification.joined]]',
+					bodyShort: '[[invite:notification.joined, ' + userData.invitedBy + ', ' + userData.inviteUsername + ']]',
 					path: nconf.get('relative_path') + '/user/' + utils.slugify(userData.username),
 					uid: uid,
 					score: 'other',
