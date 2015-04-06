@@ -4,31 +4,33 @@
   "list.joined": "Already Joined",
   "list.voting": "Voting",
   "list.invited": "Has voted",
+  "list.new": "Inviting",
+  "list.no_invite": "<strong>There are no votes in this vote list.</strong><br />You can invite others to join!",
+
+  "detail.upvote": "Vote",
 
   "detail.deleted_message": "This invite has been deleted.",
 
   "voted_ago": "voted %1",
 
   "composer.new_invite": "Inviting",
-  "composer.invite_username": "Invite UserName",
-  "composer.invite_email": "Invite Email",
-  "composer.invite_reason": "Invite Reason",
   "composer.type_username": "Type UserName",
   "composer.type_email": "Type Email",
+  "composer.type_reason": "Invite Reason",
 
   "error.already-voted": "You Are Already Invited!",
   "error.invalid-iid": "Invalid Invite ID",
 
   "email.invite_click": "Click here!",
   "email.invite_body": "You friend invited you join a community!",
-  "email.invited": "Invite email already send!",
-  "email.joined": "Invited people already joined!",
+  "email.invited": "Invite email already send",
+  "email.joined": "The people already joined sometimes",
 
-  "account.is_inviter_vote": "I had voted!",
-  "account.is_inviter_me": "Had invited me!",
-  "account.is_inviter_yes": "Invited by me!",
-  "account.is_inviter_no": "No relation with me!",
-  "account.invite_number": "Voted number!",
+  "account.is_inviter_vote": "I had voted",
+  "account.is_inviter_me": "Had invited me",
+  "account.is_inviter_yes": "Invited by me",
+  "account.is_inviter_no": "No relation with me",
+  "account.invite_number": "Voted number",
 
   "notification.inviting": "%1 inviting %2, please vote！",
   "notification.joined": "The user %2 invited by %1, have joined community!",
