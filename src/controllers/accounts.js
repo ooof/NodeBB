@@ -153,6 +153,18 @@ accountsController.getAccount = function(req, res, next) {
 					next(null, data);
 				});
 			},
+			isVoteHe: function (next) {
+				db.isSetMember('invite:posts:' + userData.iid + ':upvote:by', req.uid, next);
+			},
+			isVoteMe: function (next) {
+				db.getObjectField('user:' + req.uid, 'iid', function (err, callerIid) {
+					if (err) {
+						return next(err);
+					}
+
+					db.isSetMember('invite:posts:' + callerIid + ':upvote:by', userData.uid, next);
+				});
+			},
 			isFollowing: function(next) {
 				user.isFollowing(req.uid, userData.theirid, next);
 			},
@@ -179,6 +191,10 @@ accountsController.getAccount = function(req, res, next) {
 				userData.inviterText += 'yes';
 			} else if (results.isInviterMe) {
 				userData.inviterText += 'me';
+			} else if (results.isVoteHe) {
+				userData.inviterText += 'vote_he';
+			} else if (results.isVoteMe) {
+				userData.inviterText += 'vote_me';
 			} else if (!results.inviteData.isInviter) {
 				userData.inviterText += 'no';
 			} else {
