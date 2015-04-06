@@ -41,7 +41,7 @@ define('forum/invite/events', ['components', 'translator'], function (components
 
 			votesEl.removeClass('btn-primary').addClass('btn-danger');
 			translator.translate('[[invite:email.invited]]', function(translated) {
-				var timeEl = $('<hr><div class="invited"><span class="time"> ' + invitedTime + '</span><span>：' + translated + '</span></div>');
+				var timeEl = $('<hr><div class="invited"><span class="time"> ' + invitedTime + '</span><span> ' + translated + '</span></div>');
 
 				timeEl.insertAfter(reasonEl).css('display', 'none').fadeIn(500);
 			});
