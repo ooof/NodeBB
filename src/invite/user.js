@@ -79,35 +79,44 @@ module.exports = function (Invite) {
 	};
 
 	Invite.inviteUser = function (uid, iid, count, callback) {
-		db.getObjectField('global', 'userCount', function (err, userCount) {
-			if (err) {
-				return callback(err);
-			}
+		async.waterfall([
+			function (next) {
+				db.getObjectField('global', 'userCount', next);
+			},
+			function (userCount, next) {
+				count = parseInt(count, 10);
+				userCount = parseInt(userCount, 10);
 
-			count = parseInt(count, 10);
-			userCount = parseInt(userCount, 10);
+				var invitePercent = count / userCount >= .5;
+				next(null, invitePercent);
+			},
+			function (invitePercent, next) {
+				if (invitePercent) {
+					return db.getObjectFields('invite:' + iid, ['slug', 'username'], function (err, inviteData) {
+						if (err) {
+							return callback(err);
+						}
 
-			var percent = count / userCount >= .5;
+						user.notifications.sendNotification({
+							bodyShort: '[[invite:notification.invited, ' + inviteData.username + ']]',
+							path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
+							score: 'votedUids',
+							uid: uid,
+							iid: iid,
+							nid: 'upvote:uid:' + uid + ':iid:' + iid
+						});
 
-			if (percent) {
-				return db.getObjectFields('invite:' + iid, ['slug', 'username'], function (err, inviteData) {
-					if (err) {
-						return callback(err);
-					}
-
-					user.notifications.sendNotification({
-						bodyShort: '[[invite:notification.invited, ' + inviteData.username + ']]',
-						path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-						nid: 'upvote:uid:' + uid + ':iid:' + iid
+						Invite.sendUser(uid, iid, function (err) {
+							if (err) {
+								return next(err);
+							}
+							db.setObjectField('invite:' + iid, 'invited', 1, next)
+						});
 					});
-
-					return Invite.sendUser(uid, iid, function () {
-						db.setObjectField('invite:' + iid, 'invited', 1, callback)
-					});
-				});
+				}
+				next();
 			}
-			callback();
-		});
+		], callback);
 	};
 
 	Invite.sendUser = function (uid, iid, callback) {
@@ -141,7 +150,7 @@ module.exports = function (Invite) {
 			}
 
 			// for test
-			if (userData.email.indexOf('yufeg') !== -1 && process.env.NODE_ENV === 'development') {
+			if ((userData.email.indexOf('yufeg.com') !== -1 || userData.email.indexOf('test') !== -1) && process.env.NODE_ENV === 'development') {
 				console.log('development test');
 				return callback;
 			}

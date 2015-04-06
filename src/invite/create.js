@@ -103,7 +103,8 @@ module.exports = function (Invite) {
 		var uid = data.uid,
 			username = data.username,
 			email = data.email,
-			content = data.content;
+			content = data.content,
+			inviteData;
 
 		async.waterfall([
 			function (next) {
@@ -159,24 +160,32 @@ module.exports = function (Invite) {
 			function (next) {
 				Invite.create({uid: uid, username: data.username, content: content, email: data.email}, next);
 			},
-			function (inviteData, next) {
-				db.getObjectField('user:' + uid, 'username', function (err, invitedBy) {
-					if (err) {
-						return next(err);
-					}
+			function (data, next) {
+				inviteData = data;
+				db.getObjectField('user:' + uid, 'username', next);
+			},
+			function (invitedBy, next) {
+				inviteData.invitedBy = invitedBy;
+				Invite.getInviteField(inviteData.iid, 'inviteCount', next);
+			},
+			function (inviteCount, next) {
+				inviteData.inviteCount = inviteCount;
+				db.getObjectField('global', 'userCount', next);
+			},
+			function (userCount, next) {
+				var invitePercent = inviteData.inviteCount / userCount >= .5;
+				if (!invitePercent && parseInt(uid, 10)) {
+					// 发送提名通知给用户
+					user.notifications.sendNotification({
+						bodyShort: '[[invite:notification.inviting, ' + inviteData.invitedBy + ', ' + username + ']]',
+						path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
+						nid: 'inviting:' + inviteData.iid,
+						uid: uid,
+						score: 'other'
+					});
+				}
 
-					if (parseInt(uid, 10)) {
-						user.notifications.sendNotification({
-							bodyShort: '[[invite:notification.inviting, ' + invitedBy + ', ' + username + ']]',
-							path: nconf.get('relative_path') + '/invite/' + utils.slugify(inviteData.username),
-							nid: 'inviting:' + inviteData.iid,
-							uid: uid,
-							score: 'other'
-						});
-					}
-
-					next(null, inviteData);
-				});
+				next(null, inviteData);
 			}
 		], callback);
 	};

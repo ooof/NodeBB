@@ -349,7 +349,8 @@
 					bodyShort: '[[invite:notification.joined, ' + userData.invitedBy + ', ' + userData.inviteUsername + ']]',
 					path: nconf.get('relative_path') + '/user/' + utils.slugify(userData.username),
 					uid: uid,
-					score: 'other',
+					score: 'votedUids',
+					iid: userData.iid,
 					nid: 'joined:' + uid
 				});
 

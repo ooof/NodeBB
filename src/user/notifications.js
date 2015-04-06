@@ -315,7 +315,9 @@ var async = require('async'),
 		});
 	};
 
-	UserNotifications.sendNotification = function(data) {
+	UserNotifications.sendNotification = function(data, next) {
+		next = next || function() {};
+
 		user.getUidsFromHash('username:uid', function (err, uids) {
 			if (err || !Array.isArray(uids) || !uids.length) {
 				return;
@@ -329,6 +331,16 @@ var async = require('async'),
 					return uid !== data.uid;
 				});
 				delete data.uid;
+			} else if (score === 'votedUids') {
+				db.getSetMembers('invite:posts:' + data.iid + ':upvote:by', function (err, votedUids) {
+					if (err) {
+						return next(err);
+					}
+					uids = votedUids.filter(function (uid) {
+						return parseInt(uid, 10) !== parseInt(data.uid, 10);
+					});
+					delete data.uid;
+				});
 			}
 
 			notifications.create(data, function(err, notification) {
