@@ -78,20 +78,20 @@ module.exports = function (Invite) {
 		db.getObjectField('username:iid:invite', username, callback);
 	};
 
-	Invite.inviteUser = function (uid, iid, count, callback) {
+	Invite.inviteUser = function (uid, iid, voteCount, callback) {
 		async.waterfall([
 			function (next) {
 				db.getObjectField('global', 'userCount', next);
 			},
 			function (userCount, next) {
-				count = parseInt(count, 10);
+				voteCount = parseInt(voteCount, 10);
 				userCount = parseInt(userCount, 10);
 
-				var invitePercent = count / userCount >= .5;
-				next(null, invitePercent);
+				var votePercent = voteCount / userCount >= .5;
+				next(null, votePercent);
 			},
-			function (invitePercent, next) {
-				if (invitePercent) {
+			function (votePercent, next) {
+				if (votePercent) {
 					return db.getObjectFields('invite:' + iid, ['slug', 'username'], function (err, inviteData) {
 						if (err) {
 							return callback(err);
@@ -152,7 +152,7 @@ module.exports = function (Invite) {
 			// for test
 			if ((userData.email.indexOf('yufeg.com') !== -1 || userData.email.indexOf('test') !== -1) && process.env.NODE_ENV === 'development') {
 				console.log('development test');
-				return callback;
+				return callback();
 			}
 
 			var params = {

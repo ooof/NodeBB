@@ -6,9 +6,6 @@ var async = require('async'),
 
 module.exports = function (Invite) {
 	Invite.upVote = function (uid, iid, callback) {
-		var argLength = arguments.length;
-		callback = argLength === 4 ? arguments[argLength-1] : callback;
-
 		// invite:posts:uid:{uid}:iid 创建并默认投票该邀请贴
 		// invite:posts:{iid}:upvote:by 投票支持邀请贴的所有用户
 
@@ -21,7 +18,8 @@ module.exports = function (Invite) {
 				return callback(new Error('[[invite:error.already-voted]]'));
 			}
 
-			var now = Date.now();
+			var now = Date.now(),
+				voteCount;
 			async.waterfall([
 				function (next) {
 					db.sortedSetAdd('invite:posts:uid:' + uid + ':iid', now, iid, next);
@@ -30,23 +28,25 @@ module.exports = function (Invite) {
 					db.setAdd('invite:posts:' + iid + ':upvote:by', uid, next);
 				},
 				function (next) {
-					db.incrObjectField('invite:' + iid, 'inviteCount', function (err, count) {
-						if (err) {
-							return callback(err);
-						}
-						if (argLength === 4) {
-							websockets.in('invite_' + iid).emit('event:invite_upvote', count);
-						}
-
-						next(null, count);
-					});
+					db.incrObjectField('invite:' + iid, 'inviteCount', next);
+				},
+				function (count, next) {
+					voteCount = count;
+					Invite.inviteUser(uid, iid, count, next);
+				},
+				function (next) {
+					db.getObjectField('invite:' + iid, 'invited', next);
 				}
-			], function (err, count) {
+			], function (err, isInvited) {
 				if (err) {
 					return callback(err);
 				}
-
-				Invite.inviteUser(uid, iid, count, callback);
+				var data = {
+					inviteCount: voteCount,
+					isInvited: !!parseInt(isInvited, 10)
+				};
+				websockets.in('invite_' + iid).emit('event:invite_upvote', data);
+				callback();
 			});
 		});
 	};

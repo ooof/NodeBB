@@ -27,9 +27,25 @@ define('forum/invite/events', ['components', 'translator'], function (components
 	};
 
 	function onUpvoteInvite(data) {
-		var votesEl = components.get('invite/vote-count');
+		var votesEl = components.get('invite/upvote'),
+			voteCountEl = components.get('invite/vote-count'),
+			reasonEl = components.get('invite/reason');
 
-		votesEl.text(data).attr('data-votes', data);
+		voteCountEl.text(data.inviteCount).attr('data-votes', data.inviteCount);
+
+		if (data.isInvited) {
+			var date = new Date(),
+				minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
+				hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours(),
+				invitedTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
+
+			votesEl.removeClass('btn-primary').addClass('btn-danger');
+			translator.translate('[[invite:email.invited]]', function(translated) {
+				var timeEl = $('<hr><div class="invited"><span class="time"> ' + invitedTime + '</span><span>：' + translated + '</span></div>');
+
+				timeEl.insertAfter(reasonEl).css('display', 'none').fadeIn(500);
+			});
+		}
 	}
 
 	function onEditInvite(data) {
