@@ -136,16 +136,10 @@ inviteController.details = function (req, res, next) {
 				inviteData.theirid = inviteData.uid;
 				inviteData.user.banned = parseInt(userData.banned, 10) === 1;
 				inviteData.display_moderator_tools = userPrivileges.editable;
-				if (inviteData.joined) {
-					var date = new Date(parseInt(inviteData.joinedTime, 10)),
-						minutes = date.getMinutes().length < 2 ? '0' + date.getMinutes() : date.getMinutes(),
-						hours = date.getHours().length < 2 ? '0' + date.getHours() : date.getHours();
-					inviteData.joinedTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
-				}
 				if (inviteData.invited) {
-					date = new Date(parseInt(inviteData.invitedTime, 10));
-					minutes = date.getMinutes().length < 2 ? '0' + date.getMinutes() : date.getMinutes();
-					hours = date.getHours().length < 2 ? '0' + date.getHours() : date.getHours();
+					var date = new Date(parseInt(inviteData.invitedTime, 10)),
+						minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
+						hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
 					inviteData.invitedTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 				}
 
