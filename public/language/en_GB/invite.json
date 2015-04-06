@@ -30,9 +30,9 @@
   "account.is_inviter_no": "No relation with me!",
   "account.invite_number": "Voted number!",
 
-  "notification.inviting": "Inviting %1 join community，please vote!",
-  "notification.joined": "Had joined community!",
-  "notification.invited": "The number of inviting %1 votes reaching number, have been invited to join the community!",
+  "notification.inviting": "%1 inviting %2, please vote！",
+  "notification.joined": "The user %2 invited by %1, have joined community!",
+  "notification.invited": "The number of inviting %1 votes reaching number, have been invited to join!",
 
   "error.has-invited": "The invite has send, vote closed!",
   "error.has-joined": "User has joined, vote closed!",

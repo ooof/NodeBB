@@ -31,9 +31,9 @@
   "account.is_inviter_no": "与我没有邀请关系！",
   "account.invite_number": "票数",
 
-  "notification.inviting": "邀请 %1 进入社区，请自行表决！",
-  "notification.joined": "已经接受邀请进入社区！",
-  "notification.invited": "对 %1 的邀请达到票数，已邀请加入社区！",
+  "notification.inviting": "%1 邀请 %2，请投票表决！",
+  "notification.joined": "%1 题名邀请的 %2 已经加入！",
+  "notification.invited": "对 %1 的邀请达到票数，已邀请加入！",
 
   "error.has-invited": "该邀请已发出，投票已关闭！",
   "error.has-joined": "被邀请人已加入，投票已关闭！",
