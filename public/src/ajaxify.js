@@ -260,7 +260,7 @@ $(document).ready(function() {
 
 					if (url === '') {
 						return;
-					} else if (this.pathname !== '/login' && this.pathname !== '/register' && !config.loggedIn) {
+					} else if (this.pathname !== '/login' && this.pathname !== '/register' && this.pathname !== '/reset' && !config.loggedIn) {
 						return e.preventDefault();
 					}
 

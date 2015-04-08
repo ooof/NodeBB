@@ -127,7 +127,6 @@ module.exports = function(app, middleware) {
 		'confirm/?*',
 		'outgoing',
 		'search/?*',
-		'reset/?*',
 		'tos',
 		'topic/?*',
 		'tags/?*',

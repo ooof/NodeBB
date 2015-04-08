@@ -211,14 +211,7 @@
 						plugins.fireHook('action:user.loggedIn', userData.uid);
 					}
 
-					if (!req.session.returnTo) {
-						res.status(200).send(nconf.get('relative_path') + '/');
-					} else {
-						var next = req.session.returnTo;
-						delete req.session.returnTo;
-
-						res.status(200).send(next);
-					}
+					res.status(200).send(nconf.get('relative_path') + '/');
 				});
 			}
 		})(req, res, next);
