@@ -25,11 +25,13 @@
   "email.invited": "Invite email already send",
   "email.joined": "The people already joined sometimes",
 
-  "account.is_inviter_vote": "I had voted",
+  "account.is_inviter_vote_he": "I voted he",
+  "account.is_inviter_vote_me": "Had voted me",
   "account.is_inviter_me": "Had invited me",
   "account.is_inviter_yes": "Invited by me",
   "account.is_inviter_no": "No relation with me",
   "account.invite_number": "Voted number",
+  "account.joined": "Joined",
 
   "notification.inviting": "%1 inviting %2, please vote！",
   "notification.joined": "The user %2 invited by %1, have joined community!",
