@@ -21,6 +21,7 @@
 				<div class="sidebar-nav">
 					<ul class="nav nav-list">
 						<li class="nav-header"><i class="fa fa-fw fa-cogs"></i> Settings</li>
+						<li><a href="{relative_path}/admin/settings/invite">提名通过比例</a></li>
 						<li><a href="{relative_path}/admin/settings/general">General</a></li>
 						<li><a href="{relative_path}/admin/settings/reputation">Reputation</a></li>
 						<li><a href="{relative_path}/admin/settings/email">Email</a></li>

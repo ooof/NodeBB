@@ -87,7 +87,7 @@ module.exports = function (Invite) {
 				voteCount = parseInt(voteCount, 10);
 				userCount = parseInt(userCount, 10);
 
-				var votePercent = voteCount / userCount >= .5;
+				var votePercent = voteCount / userCount >= (meta.config.votePercent ? meta.config.votePercent/100 : 0.5);
 				next(null, votePercent);
 			},
 			function (votePercent, next) {

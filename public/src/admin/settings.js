@@ -35,6 +35,7 @@ define('admin/settings', ['uploader', 'sounds'], function(uploader, sounds) {
 					case 'hidden':
 					case 'password':
 					case 'textarea':
+					case 'range':
 					case 'number':
 						field.val(app.config[key]);
 						break;
@@ -138,6 +139,7 @@ define('admin/settings', ['uploader', 'sounds'], function(uploader, sounds) {
 				case 'password':
 				case 'hidden':
 				case 'textarea':
+				case 'range':
 				case 'number':
 					value = field.val();
 					break;
