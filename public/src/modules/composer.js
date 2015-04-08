@@ -325,9 +325,10 @@ define('composer', [
 		composer.bsEnvironment = utils.findBootstrapEnvironment();
 
 		var data = {
+			title: postData.title,
 			mobile: composer.bsEnvironment === 'xs' || composer.bsEnvironment === 'sm',
 			allowTopicsThumbnail: allowTopicsThumbnail,
-			showTags: isTopic || isMain,
+			isTopicOrMain: isTopic || isMain,
 			minimumTagLength: config.minimumTagLength,
 			maximumTagLength: config.maximumTagLength,
 			isInvite: isInvite,
@@ -562,7 +563,7 @@ define('composer', [
 			thumbEl.val(thumbEl.val().trim());
 		}
 
-		var checkTitle = parseInt(postData.cid, 10) || parseInt(postData.pid, 10);
+		var checkTitle = (parseInt(postData.cid, 10) || parseInt(postData.pid, 10)) && postContainer.find('input.title').length;
 		if (isInvite || isInviteEdit) {
 			checkTitle = false;
 		}

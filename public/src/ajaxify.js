@@ -31,7 +31,7 @@ $(document).ready(function() {
 	ajaxify.currentPage = null;
 
 	ajaxify.go = function (url, callback, quiet) {
-		if (ajaxify.handleACPRedirect(url) || ajaxify.handleNonAPIRoutes(url)) {
+		if (ajaxify.handleRedirects(url)) {
 			return true;
 		}
 
@@ -65,19 +65,11 @@ $(document).ready(function() {
 		return true;
 	};
 
-	ajaxify.handleACPRedirect = function(url) {
-		// If ajaxifying into an admin route from regular site, do a cold load.
-		url = ajaxify.removeRelativePath(url.replace(/\/$/, ''));
-		if (url.startsWith('admin') && window.location.pathname.indexOf(RELATIVE_PATH + '/admin') !== 0) {
-			window.open(RELATIVE_PATH + '/' + url, '_blank');
-			return true;
-		}
-		return false;
-	};
-
-	ajaxify.handleNonAPIRoutes = function(url) {
-		url = ajaxify.removeRelativePath(url.replace(/\/$/, ''));
-		if (url.startsWith('uploads')) {
+	ajaxify.handleRedirects = function(url) {
+		url = ajaxify.removeRelativePath(url.replace(/\/$/, '')).toLowerCase();
+		var isAdminRoute = url.startsWith('admin') && window.location.pathname.indexOf(RELATIVE_PATH + '/admin') !== 0;
+		var uploadsOrApi = url.startsWith('uploads') || url.startsWith('api');
+		if (isAdminRoute || uploadsOrApi) {
 			window.open(RELATIVE_PATH + '/' + url, '_blank');
 			return true;
 		}
