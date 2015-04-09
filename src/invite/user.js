@@ -25,15 +25,6 @@ module.exports = function (Invite) {
 			async.waterfall([
 				function (next) {
 					user.email.exists(email, next);
-				},
-				function (exists, next) {
-					if (exists) {
-						return next(null, exists)
-					}
-
-					Invite.getIidByEmail(email.toLowerCase(), function(err, exists) {
-						callback(err, !!exists);
-					});
 				}
 			], function (err, exists) {
 				if (err) {
@@ -50,15 +41,6 @@ module.exports = function (Invite) {
 			async.waterfall([
 				function (next) {
 					meta.userOrGroupExists(utils.slugify(username), next);
-				},
-				function (exists, next) {
-					if (exists) {
-						return next(null, exists)
-					}
-
-					Invite.getIidByUsername(username, function(err, exists) {
-						callback(err, !!exists);
-					});
 				}
 			], function (err, exists) {
 				if (err) {
