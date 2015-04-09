@@ -174,6 +174,8 @@ define('composer/resize', ['autosize'], function(autosize) {
 
 	function getFormattingHeight(postContainer) {
 		return [
+			postContainer.find('.username-container').outerHeight(true),
+			postContainer.find('.email-container').outerHeight(true),
 			postContainer.find('.title-container').outerHeight(true),
 			postContainer.find('.formatting-bar').outerHeight(true),
 			postContainer.find('.topic-thumb-container').outerHeight(true),
