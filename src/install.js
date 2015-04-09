@@ -431,6 +431,7 @@ function enableDefaultPlugins(next) {
 		'nodebb-widget-essentials',
 		'nodebb-rewards-essentials',
 		'nodebb-plugin-emailer-sendgrid',
+		'nodebb-plugin-poll',
 		'nodebb-plugin-soundpack-default'
 	];
 	var	db = require('./database');
