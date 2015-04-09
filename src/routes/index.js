@@ -103,7 +103,7 @@ function groupRoutes(app, middleware, controllers) {
 function inviteRoutes(app, middleware, controllers) {
 	setupPageRoute(app, '/invite', middleware, [], controllers.invite.list);
 	setupPageRoute(app, '/invite/:invite_index', middleware, [], controllers.invite.list);
-	setupPageRoute(app, '/invite/:invite_id/:slug?', middleware, [middleware.addSlug], controllers.invite.details);
+	setupPageRoute(app, '/invite/:invite_id/:slug?', middleware, [], controllers.invite.details);
 }
 
 module.exports = function(app, middleware) {
