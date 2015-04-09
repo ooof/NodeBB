@@ -54,6 +54,7 @@ define('composer', [
 	$(window).on('action:composer.invite.post', function (ev, data) {
 		ajaxify.go('invite/' + data.data.slug);
 	});
+
 	function removeComposerHistory() {
 		var env = utils.findBootstrapEnvironment();
 		if (env === 'xs' || env ==='sm') {
