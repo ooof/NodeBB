@@ -31,7 +31,7 @@
   "account.is_inviter_yes": "是我邀请加入的",
   "account.is_inviter_no": "与我没有邀请关系",
   "account.invite_number": "票数",
-  "account.joined": "转世时间",
+  "account.joined": "新生时光",
 
   "notification.inviting": "%1 邀请 %2，请投票表决",
   "notification.joined": "%1 提名邀请的 %2 已经加入",
