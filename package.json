@@ -44,7 +44,7 @@
     "nodebb-plugin-emoji-extended": "^0.4.1-4",
     "nodebb-plugin-markdown": "^2.1.0",
     "nodebb-plugin-mentions": "^0.11.0",
-    "nodebb-plugin-poll": "^0.1.1",
+    "nodebb-plugin-poll-plus": "git://github.com/cismous/nodebb-plugin-poll-plus",
     "nodebb-plugin-soundpack-default": "~0.1.1",
     "nodebb-plugin-spam-be-gone": "^0.4.0",
     "nodebb-rewards-essentials": "^0.0.1",
