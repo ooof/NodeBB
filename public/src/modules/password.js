@@ -37,8 +37,9 @@ define('password', function () {
 	}
 
 	return function (password, callback) {
-		var complex = 0;
-		var length = password.length;
+		var complex = 0,
+			passwordMatch = 0,
+			length = password.length;
 
 		var pre = '';
 		var preType = 0;
@@ -54,6 +55,27 @@ define('password', function () {
 			preType = curType;
 		}
 
-		return callback(complex);
+
+		// 检查密码是否包含数字
+		if (/\d/.test(password)) {
+			passwordMatch++;
+		}
+
+		// 检查密码是否包含小写字母
+		if (/[a-z]/.test(password)) {
+			passwordMatch++;
+		}
+
+		// 检查密码是包含大写字母
+		if (/[A-Z]/.test(password)) {
+			passwordMatch++;
+		}
+
+		// 检查密码是否包含特殊字符
+		if (/\W/.test(password)) {
+			passwordMatch++;
+		}
+
+		return callback(complex, passwordMatch);
 	};
 });

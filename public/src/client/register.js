@@ -167,29 +167,7 @@ define('forum/register', ['csrf', 'translator','password'], function(csrf, trans
 		var password_notify = $('#password-notify'),
 			password_confirm_notify = $('#password-confirm-notify');
 
-		passwordComplex(password, function (complex) {
-			var passwordMatch = 0;
-
-			// 检查密码是否包含数字
-			if (/\d/.test(password)) {
-				passwordMatch++;
-			}
-
-			// 检查密码是否包含小写字母
-			if (/[a-z]/.test(password)) {
-				passwordMatch++;
-			}
-
-			// 检查密码是包含大写字母
-			if (/[A-Z]/.test(password)) {
-				passwordMatch++;
-			}
-
-			// 检查密码是否包含特殊字符
-			if (/\W/.test(password)) {
-				passwordMatch++;
-			}
-
+		passwordComplex(password, function (complex, passwordMatch) {
 			if (complex < 10 && password.length >= config.minimumPasswordLength) {
 				// 检查密码强度
 				showError(password_notify, '[[invite:password.simple]]');

@@ -2,7 +2,7 @@
 
 /* globals define, ajaxify, socket, app, config, utils, bootbox */
 
-define('forum/account/edit', ['forum/account/header', 'uploader', 'translator'], function(header, uploader, translator) {
+define('forum/account/edit', ['forum/account/header', 'uploader', 'translator', 'password'], function(header, uploader, translator, passwordComplex) {
 	var AccountEdit = {},
 		gravatarPicture = '',
 		uploadedPicture = '',
@@ -240,16 +240,26 @@ define('forum/account/edit', ['forum/account/header', 'uploader', 'translator'],
 		var successIcon = '<i class="fa fa-check"></i>';
 
 		function onPasswordChanged() {
-			if (password.val().length < config.minimumPasswordLength) {
-				showError(password_notify, '[[user:change_password_error_length]]');
-				passwordvalid = false;
-			} else if (!utils.isPasswordValid(password.val())) {
-				showError(password_notify, '[[user:change_password_error]]');
-				passwordvalid = false;
-			} else {
-				showSuccess(password_notify, successIcon);
-				passwordvalid = true;
-			}
+			var pw = password.val();
+			passwordComplex(pw, function (complex, passwordMatch) {
+				if (complex < 10 && pw.length >= config.minimumPasswordLength) {
+					// 检查密码强度
+					showError(password_notify, '[[invite:password.simple]]');
+					passwordvalid = false;
+				} else if (pw.length < config.minimumPasswordLength) {
+					showError(password_notify, '[[user:change_password_error_length]]');
+					passwordvalid = false;
+				} else if (!utils.isPasswordValid(pw)) {
+					showError(password_notify, '[[user:change_password_error]]');
+					passwordvalid = false;
+				} else if (passwordMatch < 3) {
+					showError(password_notify, '[[invite:password.no_match]]');
+					passwordvalid = false;
+				} else {
+					showSuccess(password_notify, successIcon);
+					passwordvalid = true;
+				}
+			});
 		}
 
 		function onPasswordConfirmChanged() {
@@ -300,7 +310,7 @@ define('forum/account/edit', ['forum/account/header', 'uploader', 'translator'],
 			} else {
 				if (!passwordsmatch) {
 					app.alertError('[[user:change_password_error_match]]');
-				} 
+				}
 
 				if (!passwordvalid) {
 					app.alertError('[[user:change_password_error]]');
