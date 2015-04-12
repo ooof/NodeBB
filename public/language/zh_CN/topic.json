@@ -74,7 +74,7 @@
     "fork_topic_instruction": "点击将分割的帖子",
     "fork_no_pids": "未选中帖子！",
     "fork_success": "成功分割主题! 点这里跳转到分割后的主题。",
-    "composer.title_placeholder": "在此输入您主题的标题...",
+    "composer.title_placeholder": "请在这里输入帖子标题...",
     "composer.handle_placeholder": "姓名",
     "composer.discard": "撤销",
     "composer.submit": "提交",
