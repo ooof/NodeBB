@@ -17,7 +17,10 @@
 		"enabled": true,
 		"iconClass": "fa-clock-o",
 		"textClass": "visible-xs-inline",
-		"text": "\\[\\[global:header.recent\\]\\]"
+		"text": "\\[\\[global:header.recent\\]\\]",
+        "properties": {
+          "loggedIn": true
+        }
 	},
     {
         "route": "/invite",
