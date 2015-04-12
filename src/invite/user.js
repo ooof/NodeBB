@@ -124,7 +124,8 @@ module.exports = function (Invite) {
 				db.setObjectField('invite:' + iid, 'invitedTime', Date.now(), next);
 			},
 			function (next) {
-				db.expireAt('confirm:' + invite_code, Math.floor(Date.now() / 1000 + 60 * 60 * 24), next);
+				// 邀请链接7天到期
+				db.expireAt('confirm:' + invite_code, Math.floor(Date.now() / 1000 + 60 * 60 * 24 * 7), next);
 			}
 		], function (err) {
 			if (err) {
