@@ -63,6 +63,10 @@ function getUserDataByUserSlug(userslug, callerUID, callback) {
 			var isAdmin = results.isAdmin;
 			var self = parseInt(callerUID, 10) === parseInt(userData.uid, 10);
 
+			var date = (Date.now() - parseInt(userData.joindate, 10)) / 1000;
+			var year = parseInt(date / 365 / 60 / 60 / 24, 10);
+			var day = year ? parseInt(date / 365 / 60 / 60 % 24, 10) : parseInt(date / 60 / 60 / 24, 10);
+			userData.joindateText = year ? year + '岁' + day + '天' : '第' + day + '天';
 			userData.joindate = utils.toISOString(userData.joindate);
 			userData.lastonline = userData.lastonline ? utils.toISOString(userData.lastonline) : userData.joindate;
 			userData.age = userData.birthday ? Math.floor((new Date().getTime() - new Date(userData.birthday).getTime()) / 31536000000) : '';
@@ -144,8 +148,8 @@ accountsController.getAccount = function(req, res, next) {
 		}
 
 		async.parallel({
-			isInviterMe: function (next) {
-				db.isSetMember('user:' + userData.uid + ':invited', req.uid, next);
+			voters: function (next) {
+				db.getSetMembers('invite:posts:' + userData.iid + ':upvote:by', next);
 			},
 			inviteData: function (next) {
 				db.getObjectFields('invite:' + userData.iid, ['uid', 'inviteCount'], function (err, data) {
@@ -153,17 +157,38 @@ accountsController.getAccount = function(req, res, next) {
 					next(null, data);
 				});
 			},
+			isInviterMe: function (next) {
+				db.isSetMember('user:' + userData.uid + ':invited', req.uid, next);
+			},
 			isVoteHe: function (next) {
 				db.isSetMember('invite:posts:' + userData.iid + ':upvote:by', req.uid, next);
 			},
-			isVoteMe: function (next) {
-				db.getObjectField('user:' + req.uid, 'iid', function (err, callerIid) {
-					if (err) {
-						return next(err);
+			// 是否提名过我，是否给我投过票
+			isVoteMeOrSame: function (next) {
+				async.waterfall([
+					function (next) {
+						db.getObjectField('user:' + req.uid, 'iid', next)
+					},
+					function (iid, next) {
+						db.getSetMembers('invite:posts:' + iid + ':upvote:by', function (err, voters) {
+							if (err) {
+								return next(err);
+							}
+							next(null, {iid: iid, voters: voters})
+						});
+					},
+					function (data, next) {
+						var isVoteSame = data.voters.filter(function(uid) {
+							return parseInt(uid, 10) === req.uid === parseInt(userData.uid, 10);
+						});
+						db.isSetMember('invite:posts:' + data.iid + ':upvote:by', userData.uid, function (err, isVoteMe) {
+							if (err) {
+								return next(err);
+							}
+							next(null, {isVoteMe: isVoteMe, isVoteSame: isVoteSame})
+						});
 					}
-
-					db.isSetMember('invite:posts:' + callerIid + ':upvote:by', userData.uid, next);
-				});
+				], next);
 			},
 			isFollowing: function(next) {
 				user.isFollowing(req.uid, userData.theirid, next);
@@ -178,6 +203,8 @@ accountsController.getAccount = function(req, res, next) {
 			if(err) {
 				return next(err);
 			}
+			var voters = results.voters,
+				inviteData = results.inviteData;
 
 			userData.posts = results.posts.posts.filter(function (p) {
 				return p && parseInt(p.deleted, 10) !== 1;
@@ -186,17 +213,30 @@ accountsController.getAccount = function(req, res, next) {
 			userData.nextStart = results.posts.nextStart;
 			userData.isFollowing = results.isFollowing;
 			userData.inviteCount = results.inviteData.inviteCount;
+
+			// 投票关系
             if (results.isVoteHe) {
-                userData.voteText = 'invite:account.is_vote_he';
-            } else if (results.isVoteMe) {
-                userData.voteText = 'invite:account.is_vote_me';
+                userData.voteText = '我给 ' + userData.username + ' 投过票';
+            } else if (results.isVoteMeOrSame.isVoteMe) {
+				userData.voteText = userData.username + ' 给我投过票';
             }
-			if (results.inviteData.isInviter) {
-				userData.inviterText = 'invite:account.is_inviter_yes';
+
+			// 提名关系
+			var inviterSame = voters.filter(function (uid) {
+				return parseInt(inviteData.uid, 10) === req.uid === parseInt(uid, 10);
+			});
+			if (inviteData.isInviter) {
+				userData.inviterText = '我是 ' + userData.username + ' 的提名人';
+				// 特殊情况
+				if (inviterSame) {
+					userData.voteText = '并且给他投过票';
+				}
 			} else if (results.isInviterMe) {
-				userData.inviterText = 'invite:account.is_inviter_me';
-			} else if (!results.inviteData.isInviter) {
-				userData.inviterText = 'invite:account.is_inviter_no';
+				userData.inviterText = userData.username + '是我的提名人';
+				// 特殊情况
+				if (results.isVoteMeOrSame.isVoteSame) {
+					userData.voteText = '并且给我投过票';
+				}
 			}
 
 			if (!userData.profileviews) {
