@@ -65,7 +65,7 @@ module.exports = function (Invite) {
 				// invite:posts:iid 所有的邀请贴 iid
 				// invite:time 记录邀请时间和iid 该表用户执行定时任务
 				// username:iid 邀请贴对应的用户名
-				// userslug:iid 邀请贴对应的url标识符
+				// invite:slug:iid 邀请贴对应的url标识符
 				// email:iid 邀请贴对应的邮箱
 
 				async.parallel([
@@ -82,7 +82,7 @@ module.exports = function (Invite) {
 						db.setObjectField('username:iid:invite', username, iid, next);
 					},
 					function(next) {
-						db.setObjectField('userslug:iid', slug, iid, next);
+						db.setObjectField('invite:slug:iid', slug, iid, next);
 					},
 					function(next) {
 						db.setObjectField('email:iid', email, iid, next);
