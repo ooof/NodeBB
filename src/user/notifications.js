@@ -318,6 +318,15 @@ var async = require('async'),
 	UserNotifications.sendNotification = function(data, next) {
 		next = next || function() {};
 
+        if (data.score === 'somebody') {
+			return notifications.create(data, function(err, notification) {
+				if (!err && notification) {
+					notifications.push(notification, data.uid);
+				}
+				next();
+			});
+        }
+
 		user.getUidsFromHash('username:uid', function (err, uids) {
 			if (err || !Array.isArray(uids) || !uids.length) {
 				return;
@@ -347,6 +356,7 @@ var async = require('async'),
 				if (!err && notification) {
 					notifications.push(notification, uids);
 				}
+				next();
 			});
 		});
 	};
