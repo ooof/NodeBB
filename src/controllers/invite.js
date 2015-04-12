@@ -102,6 +102,9 @@ inviteController.details = function (req, res, next) {
 				privileges: function (next) {
 					privileges.invite.get(iid, req.uid, next);
 				},
+				invitedByMe: function (next) {
+					db.isSetMember('invite:posts:' + iid + ':upvote:by', req.uid, next);
+				},
 				inviteData: function (next) {
 					invite.getInviteData(iid, next)
 				}
@@ -137,6 +140,7 @@ inviteController.details = function (req, res, next) {
 				inviteData.user.banned = parseInt(userData.banned, 10) === 1;
 				inviteData.display_moderator_tools = userPrivileges.editable;
 				inviteData.notJoined = (Date.now() - inviteData.invitedTime) > 5*24*60*60*1000;
+				inviteData.invitedByMe = results.invitedByMe;
 				if (inviteData.invited) {
 					var date = new Date(parseInt(inviteData.invitedTime, 10)),
 						minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
