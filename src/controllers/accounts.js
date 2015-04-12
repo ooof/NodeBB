@@ -186,19 +186,17 @@ accountsController.getAccount = function(req, res, next) {
 			userData.nextStart = results.posts.nextStart;
 			userData.isFollowing = results.isFollowing;
 			userData.inviteCount = results.inviteData.inviteCount;
-			userData.inviterText = 'invite:account.is_inviter_';
+            if (results.isVoteHe) {
+                userData.voteText = 'invite:account.is_vote_he';
+            } else if (results.isVoteMe) {
+                userData.voteText = 'invite:account.is_vote_me';
+            }
 			if (results.inviteData.isInviter) {
-				userData.inviterText += 'yes';
+				userData.inviterText = 'invite:account.is_inviter_yes';
 			} else if (results.isInviterMe) {
-				userData.inviterText += 'me';
-			} else if (results.isVoteHe) {
-				userData.inviterText += 'vote_he';
-			} else if (results.isVoteMe) {
-				userData.inviterText += 'vote_me';
+				userData.inviterText = 'invite:account.is_inviter_me';
 			} else if (!results.inviteData.isInviter) {
-				userData.inviterText += 'no';
-			} else {
-				userData.inviterText = false;
+				userData.inviterText = 'invite:account.is_inviter_no';
 			}
 
 			if (!userData.profileviews) {
