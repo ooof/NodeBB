@@ -63,6 +63,7 @@ module.exports = function (Invite) {
 				}
 
 				// invite:posts:iid 所有的邀请贴 iid
+				// invite:time 记录邀请时间和iid 该表用户执行定时任务
 				// username:iid 邀请贴对应的用户名
 				// userslug:iid 邀请贴对应的url标识符
 				// email:iid 邀请贴对应的邮箱
@@ -88,6 +89,9 @@ module.exports = function (Invite) {
 					},
 					function (next) {
 						Invite.upVote(uid, iid, next);
+					},
+					function(next) {
+						db.sortedSetAdd('invite:time', iid, timestamp, next);
 					}
 				], function (err) {
 					if (err) {
