@@ -112,7 +112,8 @@ inviteController.details = function (req, res, next) {
 		},
 		function (results, next) {
 			userPrivileges = results.privileges;
-			var inviteData = results.inviteData;
+			var inviteData = results.inviteData,
+				invitedTime = parseInt(inviteData.invitedTime, 10);
 
 			if (iid + '/' + req.params.slug !== inviteData.slug) {
 				return helpers.notFound(req, res);
@@ -139,7 +140,7 @@ inviteController.details = function (req, res, next) {
 				inviteData.theirid = inviteData.uid;
 				inviteData.user.banned = parseInt(userData.banned, 10) === 1;
 				inviteData.display_moderator_tools = userPrivileges.editable;
-				inviteData.notJoined = (Date.now() - inviteData.invitedTime) > 5*24*60*60*1000;
+				inviteData.notJoined = invitedTime === 0 ? false : Date.now() - inviteData.invitedTime > 1000 * 60 * 60 * 24 * 5;
 				inviteData.invitedByMe = results.invitedByMe;
 				if (inviteData.invited) {
 					var date = new Date(parseInt(inviteData.invitedTime, 10)),

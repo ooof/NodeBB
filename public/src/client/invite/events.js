@@ -29,8 +29,10 @@ define('forum/invite/events', ['components', 'translator'], function (components
 	function onUpvoteInvite(data) {
 		var votesEl = components.get('invite/upvote'),
 			voteCountEl = components.get('invite/vote-count'),
-			reasonEl = components.get('invite/reason');
+			countEl = $('.count');
 
+		// 投票后，隐藏投票按钮
+		votesEl.parent().hide();
 		voteCountEl.text(data.inviteCount).attr('data-votes', data.inviteCount);
 
 		if (data.isInvited) {
@@ -39,12 +41,7 @@ define('forum/invite/events', ['components', 'translator'], function (components
 				hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours(),
 				invitedTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 
-			votesEl.removeClass('btn-primary').addClass('btn-danger');
-			translator.translate('[[invite:email.invited]]', function(translated) {
-				var timeEl = $('<hr><div class="invited"><span class="time"> ' + invitedTime + '</span><span> ' + translated + '</span></div>');
-
-				timeEl.insertAfter(reasonEl).css('display', 'none').fadeIn(500);
-			});
+			$('<div class="small-text invited">' + invitedTime + '，邀请邮件已经发出</div>').insertAfter(countEl).css('display', 'none').fadeIn(500);
 		}
 	}
 
