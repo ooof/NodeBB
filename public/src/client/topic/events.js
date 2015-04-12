@@ -1,7 +1,7 @@
 
 'use strict';
 
-/* globals app, ajaxify, define, socket, templates */
+/* globals config, app, ajaxify, define, socket, templates */
 
 define('forum/topic/events', [
 	'forum/topic/browsing',
@@ -100,7 +100,10 @@ define('forum/topic/events', [
 		var editedPostEl = components.get('post/content', data.pid),
 			topicTitle = components.get('topic/title');
 
-		if (topicTitle.length) {
+		if (topicTitle.length && data.title) {
+			var newUrl = 'topic/' + data.slug + (window.location.search ? window.location.search : '');
+			history.replaceState({url: newUrl}, null, window.location.protocol + '//' + window.location.host + config.relative_path + '/' + newUrl);
+
 			topicTitle.fadeOut(250, function() {
 				topicTitle.html(data.title).fadeIn(250);
 			});
