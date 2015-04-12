@@ -18,6 +18,7 @@ var path = require('path'),
 	routes = require('./routes'),
 	emitter = require('./emitter'),
 
+	schedule = require('./schedule'),
 	helpers = require('./../public/src/modules/helpers'),
 	net;
 
@@ -59,6 +60,7 @@ if(nconf.get('ssl')) {
 
 		middleware = middleware(app);
 		routes(app, middleware);
+		schedule.init();
 
 		// Load server-side template helpers
 		helpers.register();

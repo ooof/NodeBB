@@ -7,6 +7,7 @@ var db = require('../database'),
 	utils = require('../../public/src/utils'),
 	plugins = require('../plugins'),
 	user = require('../user'),
+	jobs = require('../schedule'),
 	emailer = require('../emailer');
 
 module.exports = function (Invite) {
@@ -74,29 +75,28 @@ module.exports = function (Invite) {
 			},
 			function (votePercent, next) {
 				if (votePercent) {
-					return db.getObjectFields('invite:' + iid, ['slug', 'username'], function (err, inviteData) {
-						if (err) {
-							return callback(err);
-						}
-
-						user.notifications.sendNotification({
-							bodyShort: '[[invite:notification.invited, ' + inviteData.username + ']]',
-							path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-							score: 'votedUids',
-							uid: uid,
-							iid: iid,
-							nid: 'upvote:uid:' + uid + ':iid:' + iid
-						});
-
-						Invite.sendUser(uid, iid, function (err) {
-							if (err) {
-								return next(err);
-							}
-							db.setObjectField('invite:' + iid, 'invited', 1, next)
-						});
-					});
+					return db.getObjectFields('invite:' + iid, ['slug', 'username'], next);
 				}
-				next();
+				callback();
+			},
+			function (inviteData, next) {
+				user.notifications.sendNotification({
+					bodyShort: '[[invite:notification.invited, ' + inviteData.username + ']]',
+					path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
+					score: 'votedUids',
+					uid: uid,
+					iid: iid,
+					nid: 'upvote:uid:' + uid + ':iid:' + iid
+				}, next);
+			},
+			function (next) {
+				Invite.sendUser(uid, iid, function (err) {
+					if (err) {
+						return next(err);
+					}
+					jobs.setJob(iid, Date.now());
+					db.setObjectField('invite:' + iid, 'invited', 1, next)
+				});
 			}
 		], callback);
 	};

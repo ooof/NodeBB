@@ -12,6 +12,7 @@
 		Password = require('../password'),
 		meta = require('../meta'),
 		user = require('../user'),
+		jobs = require('../schedule'),
 		plugins = require('../plugins'),
 		db = require('../database'),
 		hotswap = require('../hotswap'),
@@ -334,6 +335,10 @@
 					}
 					next();
 				});
+			},
+			// 取消该提名的监控任务
+			function(next) {
+				jobs.cancelJobsByIid(userData.iid, next);
 			},
 			function(next) {
 				user.logIP(uid, req.ip);

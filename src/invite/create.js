@@ -54,6 +54,7 @@ module.exports = function (Invite) {
 				'inviteCount': 0,
 				'locked': 0,
 				'deleted': 0,
+				'notification': 0,
 				'pinned': 0
 			};
 
