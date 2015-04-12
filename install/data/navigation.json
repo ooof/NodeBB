@@ -23,6 +23,28 @@
         }
 	},
     {
+        "route": "/tags",
+        "title": "\\[\\[global:header.tags\\]\\]",
+        "enabled": true,
+        "iconClass": "fa-tags",
+        "textClass": "visible-xs-inline",
+        "text": "\\[\\[global:header.tags\\]\\]",
+        "properties": {
+            "loggedIn": true
+        }
+    },
+    {
+        "route": "/popular",
+        "title": "\\[\\[global:header.popular\\]\\]",
+        "enabled": true,
+        "iconClass": "fa-fire",
+        "textClass": "visible-xs-inline",
+        "text": "\\[\\[global:header.popular\\]\\]",
+        "properties": {
+            "loggedIn": true
+        }
+    },
+    {
         "route": "/invite",
         "title": "\\[\\[global:header.invite\\]\\]",
         "enabled": true,
@@ -44,6 +66,17 @@
 			"loggedIn": true
 		}
 	},
+    {
+        "route": "/groups",
+        "title": "\\[\\[global:header.groups\\]\\]",
+        "enabled": true,
+        "iconClass": "fa-group",
+        "textClass": "visible-xs-inline",
+        "text": "\\[\\[global:header.groups\\]\\]",
+        "properties": {
+            "loggedIn": true
+        }
+    },
 	{
 		"route": "/admin",
 		"title": "\\[\\[global:header.admin\\]\\]",
