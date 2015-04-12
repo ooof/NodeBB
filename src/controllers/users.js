@@ -71,11 +71,9 @@ usersController.getUsers = function(set, count, req, res, next) {
 			pagination: pagination.create(1, pageCount)
 		};
 		userData['route_' + set] = true;
-		if (req.url === '/users/latest') {
-			userData.users.sort(function (a, b) {
-				return a.username.localeCompare(b.username);
-			})
-		}
+		userData.users.sort(function (a, b) {
+			return a.username.localeCompare(b.username);
+		});
 		res.render('users', userData);
 	});
 };
