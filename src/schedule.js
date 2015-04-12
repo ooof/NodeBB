@@ -50,16 +50,16 @@ Jobs.setSchedule = function (iid) {
 Jobs.setSchedules = function (iids) {
 	for (var i = 0; i < iids.length; i++) {
 		db.getObject('invite:' + iids[i], function (err, inviteData) {
-			var notification = inviteData.notification ? parseInt(inviteData.notification, 10) : 0;
+			var notification = inviteData.notification ? parseInt(inviteData.notification, 10) : 0,
+				inviteTime = parseInt(inviteData.invitedTime, 10),
+				time = Date.now() - inviteTime;
 
 			if (!!parseInt(inviteData.joined, 10) || !parseInt(inviteData.invited, 10) || !!notification) {
 				return false;
-			} else if (!parseInt(inviteData.invited, 10)) {
+			} else if (!inviteTime) {
 				return false;
 			}
 
-			var inviteTime = parseInt(inviteData.invitedTime, 10),
-				time = Date.now() - inviteTime;
 
 			if (time < Jobs.minPlanTime) {
 				Jobs.setJob(inviteData.iid, inviteTime);
