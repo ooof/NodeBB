@@ -253,7 +253,7 @@ define('forum/account/edit', ['forum/account/header', 'uploader', 'translator', 
 					showError(password_notify, '[[user:change_password_error]]');
 					passwordvalid = false;
 				} else if (passwordMatch < 3) {
-					showError(password_notify, '[[invite:password.no_match]]');
+					showError(password_notify, '[[invite:password.help]]');
 					passwordvalid = false;
 				} else {
 					showSuccess(password_notify, successIcon);

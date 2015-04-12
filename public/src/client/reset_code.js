@@ -1,7 +1,7 @@
 "use strict";
 /*globals define, app, ajaxify, socket, RELATIVE_PATH*/
 
-define('forum/reset_code', function() {
+define('forum/reset_code', ['password'], function (passwordComplex) {
 	var	ResetCode = {};
 
 	ResetCode.init = function() {
@@ -13,24 +13,35 @@ define('forum/reset_code', function() {
 			noticeEl = $('#notice');
 
 		resetEl.on('click', function() {
-			if (password.val().length < 6) {
-				app.alertError('[[reset_password:password_too_short]]');
-			} else if (password.val() !== repeat.val()) {
-				app.alertError('[[reset_password:passwords_do_not_match]]');
-			} else {
-				resetEl.prop('disabled', true).html('<i class="fa fa-spin fa-refresh"></i> Changing Password');
-				socket.emit('user.reset.commit', {
-					code: reset_code,
-					password: password.val()
-				}, function(err) {
-					if (err) {
-						ajaxify.refresh();
-						return app.alertError(err.message);
-					}
+			var pw = password.val();
+			passwordComplex(pw, function (complex, passwordMatch) {
+				if (complex < 10 && pw.length >= config.minimumPasswordLength) {
+					// 检查密码强度
+					app.alertError('[[invite:password.simple]]');
+				} else if (pw.length < config.minimumPasswordLength) {
+					app.alertError('[[reset_password:password_too_short]]');
+				} else if (!utils.isPasswordValid(pw)) {
+					app.alertError('[[user:change_password_error]]');
+				} else if (passwordMatch < 3) {
+					app.alertError('[[user:password]]');
+				} else if (password.val() !== repeat.val()) {
+					app.alertError('[[reset_password:passwords_do_not_match]]');
+				} else {
+					resetEl.prop('disabled', true).html('<i class="fa fa-spin fa-refresh"></i> Changing Password');
+					socket.emit('user.reset.commit', {
+						code: reset_code,
+						password: password.val()
+					}, function(err) {
+						if (err) {
+							ajaxify.refresh();
+							return app.alertError(err.message);
+						}
 
-					window.location.href = RELATIVE_PATH + '/login';
-				});
-			}
+						window.location.href = RELATIVE_PATH + '/login';
+					});
+				}
+			});
+
 			return false;
 		});
 	};

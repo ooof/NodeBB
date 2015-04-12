@@ -176,7 +176,7 @@ define('forum/register', ['csrf', 'translator','password'], function(csrf, trans
 			} else if (!utils.isPasswordValid(password)) {
 				showError(password_notify, '[[user:change_password_error]]');
 			} else if (passwordMatch<3) {
-				showError(password_notify, '[[invite:password.no_match]]');
+				showError(password_notify, '[[invite:password.help]]');
 			} else {
 				showSuccess(password_notify, successIcon);
 			}
