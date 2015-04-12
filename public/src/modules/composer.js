@@ -330,10 +330,7 @@ define('composer', [
 		// https://github.com/NodeBB/NodeBB/issues/1951
 		// remove when 1951 is resolved
 
-		var title = postData.title.replace(/%/g, '&#37;').replace(/,/g, '&#44;');
-
 		var data = {
-			title: title,
 			mobile: composer.bsEnvironment === 'xs' || composer.bsEnvironment === 'sm',
 			allowTopicsThumbnail: allowTopicsThumbnail,
 			isTopicOrMain: isTopic || isMain,
@@ -348,6 +345,9 @@ define('composer', [
 			isAdminOrMod: app.user.isAdmin || postData.isMod
 		};
 
+		if (postData.title) {
+			data.title = postData.title.replace(/%/g, '&#37;').replace(/,/g, '&#44;');
+		}
 
 		var composerTemplate = isInvite || isInviteEdit ? 'invite/composer' : 'composer';
 
