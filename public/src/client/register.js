@@ -168,15 +168,12 @@ define('forum/register', ['csrf', 'translator','password'], function(csrf, trans
 			password_confirm_notify = $('#password-confirm-notify');
 
 		passwordComplex(password, function (complex, passwordMatch) {
-			if (complex < 10 && password.length >= config.minimumPasswordLength) {
-				// 检查密码强度
-				showError(password_notify, '[[invite:password.simple]]');
-			} else if (password.length < config.minimumPasswordLength) {
+			if (password.length < config.minimumPasswordLength) {
 				showError(password_notify, '[[user:change_password_error_length]]');
 			} else if (!utils.isPasswordValid(password)) {
 				showError(password_notify, '[[user:change_password_error]]');
 			} else if (passwordMatch<3) {
-				showError(password_notify, '[[invite:password.help]]');
+				showError(password_notify, '[[invite:password.do_not_match]]');
 			} else {
 				showSuccess(password_notify, successIcon);
 			}

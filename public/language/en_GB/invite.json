@@ -41,5 +41,5 @@
   "error.has-joined": "User has joined, vote closed!",
 
   "password.help": "Check below tips",
-  "password.simple": "Password too simple!"
+  "password.do_not_match": "Check below tips"
 }

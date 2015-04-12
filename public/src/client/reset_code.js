@@ -15,15 +15,12 @@ define('forum/reset_code', ['password'], function (passwordComplex) {
 		resetEl.on('click', function() {
 			var pw = password.val();
 			passwordComplex(pw, function (complex, passwordMatch) {
-				if (complex < 10 && pw.length >= config.minimumPasswordLength) {
-					// 检查密码强度
-					app.alertError('[[invite:password.simple]]');
-				} else if (pw.length < config.minimumPasswordLength) {
+				if (pw.length < config.minimumPasswordLength) {
 					app.alertError('[[reset_password:password_too_short]]');
 				} else if (!utils.isPasswordValid(pw)) {
 					app.alertError('[[user:change_password_error]]');
 				} else if (passwordMatch < 3) {
-					app.alertError('[[user:password]]');
+					app.alertError('[[invite:password.do_not_match]]');
 				} else if (password.val() !== repeat.val()) {
 					app.alertError('[[reset_password:passwords_do_not_match]]');
 				} else {

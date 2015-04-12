@@ -242,18 +242,14 @@ define('forum/account/edit', ['forum/account/header', 'uploader', 'translator', 
 		function onPasswordChanged() {
 			var pw = password.val();
 			passwordComplex(pw, function (complex, passwordMatch) {
-				if (complex < 10 && pw.length >= config.minimumPasswordLength) {
-					// 检查密码强度
-					showError(password_notify, '[[invite:password.simple]]');
-					passwordvalid = false;
-				} else if (pw.length < config.minimumPasswordLength) {
+				if (pw.length < config.minimumPasswordLength) {
 					showError(password_notify, '[[user:change_password_error_length]]');
 					passwordvalid = false;
 				} else if (!utils.isPasswordValid(pw)) {
 					showError(password_notify, '[[user:change_password_error]]');
 					passwordvalid = false;
 				} else if (passwordMatch < 3) {
-					showError(password_notify, '[[invite:password.help]]');
+					showError(password_notify, '[[invite:password.do_not_match]]');
 					passwordvalid = false;
 				} else {
 					showSuccess(password_notify, successIcon);

@@ -42,5 +42,5 @@
   "error.has-joined": "被邀请人已加入，投票已关闭！",
 
   "password.help": "请参考下方提示！",
-  "password.simple": "密码太简单！"
+  "password.do_not_match": "密码强度不够，请遵守密码规则改进！"
 }
