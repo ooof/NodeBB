@@ -41,6 +41,6 @@
   "error.has-invited": "该邀请已发出，投票已关闭！",
   "error.has-joined": "被邀请人已加入，投票已关闭！",
 
-  "password.no_match": "需包含数字,大、小写,特殊符号中的三者",
+  "password.help": "请参考下方提示！",
   "password.simple": "密码太简单！"
 }

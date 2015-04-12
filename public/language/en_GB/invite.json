@@ -40,6 +40,6 @@
   "error.has-invited": "The invite has send, vote closed!",
   "error.has-joined": "User has joined, vote closed!",
 
-  "password.no_match": "Need three of 数字,大、小写,特殊符号",
+  "password.help": "Check below tips",
   "password.simple": "Password too simple!"
 }
