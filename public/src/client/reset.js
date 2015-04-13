@@ -7,6 +7,8 @@ define('forum/reset', function() {
 	ResetPassword.init = function() {
 		var inputEl = $('#email'),
 			errorEl = $('#error'),
+			alertEl = $('.alert-info'),
+			formEl = $('form'),
 			successEl = $('#success');
 
 		$('#reset').on('click', function() {
@@ -19,6 +21,8 @@ define('forum/reset', function() {
 					errorEl.addClass('hide').hide();
 					successEl.removeClass('hide').show();
 					inputEl.val('');
+					alertEl.addClass('hide').hide();
+					formEl.addClass('hide').hide();
 				});
 			} else {
 				successEl.addClass('hide').hide();
