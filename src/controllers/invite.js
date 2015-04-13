@@ -18,7 +18,8 @@ var inviteController = {},
 
 inviteController.list = function (req, res, next) {
 	var uid = req.user ? req.user.uid : 0,
-		page = req.query.page || 1;
+		page = req.query.page || 1,
+		settings = {};
 
 	async.waterfall([
 		function (next) {
@@ -32,14 +33,14 @@ inviteController.list = function (req, res, next) {
 			}, next);
 		},
 		function (results, next) {
+			settings = results.userSettings;
+
 			var inviteIndex = utils.isNumber(req.params.invite_index) ? parseInt(req.params.invite_index, 10) - 1 : 0;
 			var inviteCount = parseInt(results.inviteCount, 10);
 
 			if (inviteIndex < 0 || inviteIndex > Math.max(inviteCount - 1, 0)) {
 				return helpers.redirect(res, '/invite' + (inviteIndex > inviteCount ? '/' + inviteCount : ''));
 			}
-
-			var settings = results.userSettings;
 
 			if (!settings.usePagination) {
 				inviteIndex = Math.max(inviteIndex - (settings.topicsPerPage - 1), 0);
