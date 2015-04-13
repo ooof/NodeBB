@@ -69,10 +69,29 @@ inviteController.list = function (req, res, next) {
 			invite.getInvite(data, next);
 		},
 		function (data, next) {
+			var inviteData = [];
+
 			data.invite.map(function (value, index) {
 				data.invite[index].joined = parseInt(value.joined, 10);
 				data.invite[index].invited = parseInt(value.invited, 10);
 			});
+
+			if(settings.inviteSort === 'invited') {
+				inviteData = data.invite.filter(function (item) {
+					return parseInt(item.joined, 10) === 0 && parseInt(item.invited, 10) === 1;
+				});
+			}
+			if(settings.inviteSort === 'joined') {
+				inviteData = data.invite.filter(function (item) {
+					return parseInt(item.joined, 10) === 1;
+				});
+			}
+			if(settings.inviteSort === 'voting') {
+				inviteData = data.invite.filter(function (item) {
+					return parseInt(item.invited, 10) === 0;
+				});
+			}
+			data.invite = inviteData.length ? inviteData : data.invite;
 			data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[global:header.invite]]', url: '/invite'}]);
 
 			next(null, data);
