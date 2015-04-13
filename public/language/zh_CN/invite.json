@@ -5,10 +5,19 @@
   "list.voting": "投票中",
   "list.invited": "已邀请",
   "list.new": "提名新人",
-  "list.no_invite": "<strong>目前还邀请列表为空.</strong><br />您可以邀请他人加入!",
+  "list.no_invite": "<strong>空</strong>",
+  "list.status": "所有状态",
+  "list.status_voting": "正在投票",
+  "list.status_invited": "已发邀请",
+  "list.status_not_joined": "邀请失败",
+  "list.status_joined": "已进社区",
 
   "detail.upvote": "支持",
   "detail.deleted_message": "此贴已被删除！",
+  "detail.invite_course": "邀请历程",
+  "detail.username": "提名人：",
+  "detail.email": "提名人邮箱：",
+  "detail.reason": "题名理由：",
 
   "voted_ago": "投票于 %1",
 

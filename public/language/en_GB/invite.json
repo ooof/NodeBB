@@ -5,10 +5,19 @@
   "list.voting": "Voting",
   "list.invited": "Has voted",
   "list.new": "Inviting",
-  "list.no_invite": "<strong>There are no votes in this vote list.</strong><br />You can invite others to join!",
+  "list.no_invite": "<strong>Empty</strong>",
+  "list.status": "All status",
+  "list.status_voting": "Voting",
+  "list.status_invited": "Invited",
+  "list.status_not_joined": "Invited failed",
+  "list.status_joined": "Joined",
 
   "detail.upvote": "Vote",
   "detail.deleted_message": "This invite has been deleted.",
+  "detail.invite_course": "Invite course",
+  "detail.username": "Invite username:",
+  "detail.email": "Invite email:",
+  "detail.reason": "Invite reason",
 
   "voted_ago": "voted %1",
 
