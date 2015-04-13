@@ -174,6 +174,16 @@ inviteController.details = function (req, res, next) {
 				inviteData.display_moderator_tools = userPrivileges.editable;
 				inviteData.notJoined = invitedTime === 0 ? false : Date.now() - inviteData.invitedTime > 1000 * 60 * 60 * 24 * 5;
 				inviteData.invitedByMe = results.invitedByMe;
+				if (!inviteData.notJoined && !inviteData.joined && !inviteData.invited) {
+					inviteData.endSymbol1 = '。';
+				} else {
+					inviteData.endSymbol1 = '；';
+				}
+				if (!inviteData.notJoined && !inviteData.joined) {
+					inviteData.endSymbol2 = '。';
+				} else {
+					inviteData.endSymbol2 = '；';
+				}
 				if (inviteData.invited) {
 					var date = new Date(parseInt(inviteData.invitedTime, 10)),
 						minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
