@@ -147,46 +147,69 @@ accountsController.getAccount = function(req, res, next) {
 			user.incrementUserFieldBy(userData.uid, 'profileviews', 1);
 		}
 
+		/**
+		 * 假设当前登录的用户为A，被浏览的用户为B，可能存在的共同提名人C
+		 * userData 为用户B的数据
+		 * userDataC 为用户C的数据
+		 */
+		var userDataC = {};
 		async.parallel({
-			voters: function (next) {
-				db.getSetMembers('invite:posts:' + userData.iid + ':upvote:by', next);
-			},
 			inviteData: function (next) {
-				db.getObjectFields('invite:' + userData.iid, ['uid', 'inviteCount'], function (err, data) {
-					data.isInviter = req.uid === parseInt(data.uid, 10);
-					next(null, data);
-				});
+				// isInviteB = A是否提名B
+				async.waterfall([
+					function (next) {
+						db.getObjectField('user:' + req.uid, 'iid', next);
+					},
+					function (iidA, next) {
+						if (iidA) {
+							db.getObjectField('invite:' + iidA, 'uid', next);
+						} else {
+							next()
+						}
+					},
+					function (iidA, next) {
+						userDataC.iid = iidA;
+						if (iidA) {
+							db.getObjectField('user:' + iidA, 'username', next);
+						} else {
+							next()
+						}
+					},
+					function (usernameC, next) {
+						userDataC.username = usernameC;
+						if (userData.iid) {
+							db.getObjectFields('invite:' + userData.iid, ['uid', 'inviteCount'], function (err, data) {
+								data.isInviteB = req.uid === parseInt(data.uid, 10);
+								// isSameInviter A和B是否有共同的提名人
+								data.isSameInviter = parseInt(userDataC.iid, 10) === parseInt(data.uid, 10);
+								next(null, data);
+							});
+
+						} else {
+							next(null, {
+								isInviteB: false,
+								isSameInviter: false
+							});
+						}
+					}
+				], next);
 			},
-			isInviterMe: function (next) {
+			// isInviteA B是否提名A
+			isInviteA: function (next) {
 				db.isSetMember('user:' + userData.uid + ':invited', req.uid, next);
 			},
-			isVoteHe: function (next) {
+			// isVoteB A是否给B投过票
+			isVoteB: function (next) {
 				db.isSetMember('invite:posts:' + userData.iid + ':upvote:by', req.uid, next);
 			},
-			// 是否提名过我，是否给我投过票
-			isVoteMeOrSame: function (next) {
+			// isVoteA B是否给A投过票
+			isVoteA: function (next) {
 				async.waterfall([
 					function (next) {
 						db.getObjectField('user:' + req.uid, 'iid', next)
 					},
 					function (iid, next) {
-						db.getSetMembers('invite:posts:' + iid + ':upvote:by', function (err, voters) {
-							if (err) {
-								return next(err);
-							}
-							next(null, {iid: iid, voters: voters})
-						});
-					},
-					function (data, next) {
-						var isVoteSame = data.voters.filter(function(uid) {
-							return parseInt(uid, 10) === req.uid === parseInt(userData.uid, 10);
-						});
-						db.isSetMember('invite:posts:' + data.iid + ':upvote:by', userData.uid, function (err, isVoteMe) {
-							if (err) {
-								return next(err);
-							}
-							next(null, {isVoteMe: isVoteMe, isVoteSame: isVoteSame})
-						});
+						db.isSetMember('invite:posts:' + iid + ':upvote:by', userData.uid, next);
 					}
 				], next);
 			},
@@ -203,8 +226,7 @@ accountsController.getAccount = function(req, res, next) {
 			if(err) {
 				return next(err);
 			}
-			var voters = results.voters,
-				inviteData = results.inviteData;
+			var inviteData = results.inviteData;
 
 			userData.posts = results.posts.posts.filter(function (p) {
 				return p && parseInt(p.deleted, 10) !== 1;
@@ -215,28 +237,26 @@ accountsController.getAccount = function(req, res, next) {
 			userData.inviteCount = results.inviteData.inviteCount;
 
 			// 投票关系
-            if (results.isVoteHe) {
-                userData.voteText = '我给 ' + userData.username + ' 投过票';
-            } else if (results.isVoteMeOrSame.isVoteMe) {
-				userData.voteText = userData.username + ' 给我投过票';
+			// isVoteB A投票B
+            if (results.isVoteB) {
+                userData.voteText = '我曾投票支持 ' + userData.username + ' 进入社区';
+			// isVoteA B投票A
+            } else if (results.isVoteA) {
+				userData.voteText = userData.username + ' 曾投票支持我进入社区';
             }
 
 			// 提名关系
-			var inviterSame = voters.filter(function (uid) {
-				return parseInt(inviteData.uid, 10) === req.uid === parseInt(uid, 10);
-			});
-			if (inviteData.isInviter) {
+			if (inviteData.isSameInviter) {
+				// A和B共同的提名人
+				userData.inviterText = '我与 ' + userData.username + ' 都是 ' + userDataC.username + ' 提名的';
+			} else if (inviteData.isInviteB) {
+				// A是B的提名人
 				userData.inviterText = '我是 ' + userData.username + ' 的提名人';
-				// 特殊情况
-				if (inviterSame) {
-					userData.voteText = '并且给他投过票';
-				}
-			} else if (results.isInviterMe) {
+				userData.voteText = '';
+			} else if (results.isInviteA) {
+				// B是A的提名人
 				userData.inviterText = userData.username + '是我的提名人';
-				// 特殊情况
-				if (results.isVoteMeOrSame.isVoteSame) {
-					userData.voteText = '并且给我投过票';
-				}
+				userData.voteText = '';
 			}
 
 			if (!userData.profileviews) {
