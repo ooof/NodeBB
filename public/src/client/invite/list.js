@@ -1,6 +1,6 @@
 "use strict";
 
-define('forum/invite/list', ['forum/invite/events', 'composer', 'components', 'navigator'], function (events, composer, components, navigator) {
+define('forum/invite/list', ['forum/invite/events', 'composer', 'components', 'navigator', 'sort'], function (events, composer, components, navigator, sort) {
 	var Invite = {};
 
 	$(window).on('action:ajaxify.start', function (ev, data) {
@@ -22,6 +22,8 @@ define('forum/invite/list', ['forum/invite/events', 'composer', 'components', 'n
 		$('#new_invite').on('click', function () {
 			composer.newInvite();
 		});
+
+		sort.handleSort('inviteSort', 'invite.setInviteSort', 'invite');
 	};
 
 	Invite.onNewInvite = function (vote) {

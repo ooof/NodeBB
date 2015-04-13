@@ -69,6 +69,7 @@ module.exports = function(User) {
 			settings.userLang = settings.userLang || meta.config.defaultLang || 'en_GB';
 			settings.topicPostSort = settings.topicPostSort || meta.config.topicPostSort || 'oldest_to_newest';
 			settings.categoryTopicSort = settings.categoryTopicSort || meta.config.categoryTopicSort || 'newest_to_oldest';
+			settings.inviteSort = settings.inviteSort || meta.config.inviteSort || 'newest_to_oldest';
 			settings.followTopicsOnCreate = (settings.followTopicsOnCreate === null || settings.followTopicsOnCreate === undefined) ? true : parseInt(settings.followTopicsOnCreate, 10) === 1;
 			settings.followTopicsOnReply = parseInt(settings.followTopicsOnReply, 10) === 1;
 			settings.sendChatNotifications = parseInt(settings.sendChatNotifications, 10) === 1;

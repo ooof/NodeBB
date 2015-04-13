@@ -158,4 +158,11 @@ SocketInvite.upvote = function (socket, data, callback) {
 	});
 };
 
+// 排序
+SocketInvite.setInviteSort = function(socket, sort, callback) {
+	if (socket.uid) {
+		user.setSetting(socket.uid, 'inviteSort', sort, callback);
+	}
+};
+
 module.exports = SocketInvite;
