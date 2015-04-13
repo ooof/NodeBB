@@ -90,6 +90,7 @@ apiController.getConfig = function(req, res, next) {
 		config.openOutgoingLinksInNewTab = settings.openOutgoingLinksInNewTab;
 		config.topicPostSort = settings.topicPostSort || config.topicPostSort;
 		config.categoryTopicSort = settings.categoryTopicSort || config.categoryTopicSort;
+		config.inviteSort = settings.inviteSort || config.inviteSort;
 		config.topicSearchEnabled = settings.topicSearchEnabled || false;
 
 		filterConfig();
