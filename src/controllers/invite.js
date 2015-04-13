@@ -82,26 +82,29 @@ inviteController.list = function (req, res, next) {
 				inviteData = data.invite.filter(function (item) {
 					return parseInt(item.joined, 10) === 0 && parseInt(item.invited, 10) === 1;
 				});
+				data.invite = inviteData;
 			}
 			// 已进社区
 			if(settings.inviteSort === 'joined') {
 				inviteData = data.invite.filter(function (item) {
 					return parseInt(item.joined, 10) === 1;
 				});
+				data.invite = inviteData;
 			}
 			// 正在投票
 			if(settings.inviteSort === 'voting') {
 				inviteData = data.invite.filter(function (item) {
 					return parseInt(item.invited, 10) === 0;
 				});
+				data.invite = inviteData;
 			}
 			// 正在投票
 			if(settings.inviteSort === 'not_joined') {
 				inviteData = data.invite.filter(function (item) {
 					return parseInt(item.invitedFailed, 10) === 1;
 				});
+				data.invite = inviteData;
 			}
-			data.invite = inviteData.length || settings.inviteSort === 'not_joined' ? inviteData : data.invite;
 			data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[global:header.invite]]', url: '/invite'}]);
 
 			next(null, data);
