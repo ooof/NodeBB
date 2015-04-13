@@ -164,7 +164,7 @@ accountsController.getAccount = function(req, res, next) {
 						if (iidA) {
 							db.getObjectField('invite:' + iidA, 'uid', next);
 						} else {
-							next()
+							next(null, null)
 						}
 					},
 					function (iidA, next) {
@@ -172,7 +172,7 @@ accountsController.getAccount = function(req, res, next) {
 						if (iidA) {
 							db.getObjectField('user:' + iidA, 'username', next);
 						} else {
-							next()
+							next(null, null)
 						}
 					},
 					function (usernameC, next) {
@@ -181,7 +181,10 @@ accountsController.getAccount = function(req, res, next) {
 							db.getObjectFields('invite:' + userData.iid, ['uid', 'inviteCount'], function (err, data) {
 								data.isInviteB = req.uid === parseInt(data.uid, 10);
 								// isSameInviter A和B是否有共同的提名人
-								data.isSameInviter = parseInt(userDataC.iid, 10) === parseInt(data.uid, 10);
+								if (userDataC.iid) {
+									data.isSameInviter = parseInt(userDataC.iid, 10) === parseInt(data.uid, 10);
+								}
+								console.log('tt');
 								next(null, data);
 							});
 
