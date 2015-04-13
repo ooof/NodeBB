@@ -23,8 +23,6 @@ categoriesController.recent = function(req, res, next) {
 			return next(err);
 		}
 
-		data['feeds:disableRSS'] = parseInt(meta.config['feeds:disableRSS'], 10) === 1;
-		data.rssFeedUrl = nconf.get('relative_path') + '/recent.rss';
 		data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[recent:title]]'}]);
 		res.render('recent', data);
 	});
@@ -54,8 +52,6 @@ categoriesController.popular = function(req, res, next) {
 
 		var data = {
 			topics: topics,
-			'feeds:disableRSS': parseInt(meta.config['feeds:disableRSS'], 10) === 1,
-			rssFeedUrl: nconf.get('relative_path') + '/popular/' + (req.params.term || 'daily') + '.rss',
 			breadcrumbs: helpers.buildBreadcrumbs([{text: '[[global:header.popular]]'}])
 		};
 
@@ -309,11 +305,6 @@ categoriesController.get = function(req, res, next) {
 
 			res.locals.linkTags = [
 				{
-					rel: 'alternate',
-					type: 'application/rss+xml',
-					href: nconf.get('url') + '/category/' + cid + '.rss'
-				},
-				{
 					rel: 'up',
 					href: nconf.get('url')
 				}
@@ -327,8 +318,6 @@ categoriesController.get = function(req, res, next) {
 		}
 
 		data.currentPage = page;
-		data['feeds:disableRSS'] = parseInt(meta.config['feeds:disableRSS'], 10) === 1;
-		data.rssFeedUrl = nconf.get('relative_path') + '/category/' + data.cid + '.rss';
 		data.pagination = pagination.create(data.currentPage, data.pageCount);
 
 		data.pagination.rel.forEach(function(rel) {

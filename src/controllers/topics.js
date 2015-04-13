@@ -230,11 +230,6 @@ topicsController.get = function(req, res, next) {
 
 			res.locals.linkTags = [
 				{
-					rel: 'alternate',
-					type: 'application/rss+xml',
-					href: nconf.get('url') + '/topic/' + tid + '.rss'
-				},
-				{
 					rel: 'canonical',
 					href: nconf.get('url') + '/topic/' + topicData.slug
 				}
@@ -257,8 +252,6 @@ topicsController.get = function(req, res, next) {
 		data.privileges = userPrivileges;
 		data['reputation:disabled'] = parseInt(meta.config['reputation:disabled'], 10) === 1;
 		data['downvote:disabled'] = parseInt(meta.config['downvote:disabled'], 10) === 1;
-		data['feeds:disableRSS'] = parseInt(meta.config['feeds:disableRSS'], 10) === 1;
-		data.rssFeedUrl = nconf.get('relative_path') + '/topic/' + data.tid + '.rss';
 		data.pagination = pagination.create(data.currentPage, data.pageCount);
 		data.pagination.rel.forEach(function(rel) {
 			res.locals.linkTags.push(rel);
