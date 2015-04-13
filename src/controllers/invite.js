@@ -101,7 +101,7 @@ inviteController.list = function (req, res, next) {
 					return parseInt(item.invitedFailed, 10) === 1;
 				});
 			}
-			data.invite = inviteData.length ? inviteData : data.invite;
+			data.invite = inviteData.length || settings.inviteSort === 'not_joined' ? inviteData : data.invite;
 			data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[global:header.invite]]', url: '/invite'}]);
 
 			next(null, data);
