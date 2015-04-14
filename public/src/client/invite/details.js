@@ -50,6 +50,9 @@ define('forum/invite/details', ['composer', 'components', 'navigator', 'translat
 	}
 
 	function upvoteInvite(iid) {
+		// 删除投票按钮
+		components.get('invite/upvote').parent().remove();
+
 		socket.emit('invite.upvote', {
 			iid: iid,
 			room_id: app.currentRoom

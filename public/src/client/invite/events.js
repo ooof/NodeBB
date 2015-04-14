@@ -34,8 +34,7 @@ define('forum/invite/events', ['components', 'translator'], function (components
 			lastEl = courseEl.children().last(),
 			voteCountEl = components.get('invite/vote-count');
 
-		// 投票后，隐藏投票按钮
-		votesEl.parent().remove();
+		// 投票后，自增票数
 		voteCountEl.text(data.inviteCount).attr('data-votes', data.inviteCount);
 
 		// 当票数大于1，删除编辑和删除按钮
@@ -51,6 +50,8 @@ define('forum/invite/events', ['components', 'translator'], function (components
 				hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours(),
 				invitedTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 
+			// 删除投票按钮
+			votesEl.parent().remove();
 			lastEl.text(invitedTime + ' 对 ' + data.username + ' 的提名已获得 ' + data.inviteCount + ' 票支持，达到邀请票数，邀请邮件已经发出；');
 		}
 	}
