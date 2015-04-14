@@ -106,6 +106,9 @@ inviteController.list = function (req, res, next) {
 				data.invite = inviteData;
 			}
 			data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[global:header.invite]]', url: '/invite'}]);
+			inviteData.map(function (item, index) {
+				return inviteData[index].expired = !!parseInt(item.expired, 10);
+			});
 
 			next(null, data);
 		}
