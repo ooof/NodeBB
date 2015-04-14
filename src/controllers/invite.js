@@ -177,6 +177,7 @@ inviteController.details = function (req, res, next) {
 				inviteData.display_moderator_tools = userPrivileges.editable;
 				inviteData.notJoined = invitedTime === 0 ? false : Date.now() - inviteData.invitedTime > 1000 * 60 * 60 * 24 * 5;
 				inviteData.invitedByMe = results.invitedByMe;
+				inviteData.canControl = parseInt(inviteData.inviteCount, 10) <= 1;
 				if (!inviteData.notJoined && !inviteData.joined && !inviteData.invited) {
 					inviteData.endSymbol1 = '。';
 				} else {

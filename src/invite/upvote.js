@@ -35,15 +35,16 @@ module.exports = function (Invite) {
 					Invite.inviteUser(uid, iid, count, next);
 				},
 				function (next) {
-					db.getObjectField('invite:' + iid, 'invited', next);
+					db.getObjectFields('invite:' + iid, ['invited', 'username'], next);
 				}
-			], function (err, isInvited) {
+			], function (err, inviteData) {
 				if (err) {
 					return callback(err);
 				}
 				var data = {
-					inviteCount: voteCount,
-					isInvited: !!parseInt(isInvited, 10)
+					username: inviteData.username,
+					inviteCount: parseInt(voteCount, 10),
+					isInvited: !!parseInt(inviteData.invited, 10)
 				};
 				websockets.in('invite_' + iid).emit('event:invite_upvote', data);
 				callback();

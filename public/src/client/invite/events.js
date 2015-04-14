@@ -28,20 +28,30 @@ define('forum/invite/events', ['components', 'translator'], function (components
 
 	function onUpvoteInvite(data) {
 		var votesEl = components.get('invite/upvote'),
-			voteCountEl = components.get('invite/vote-count'),
-			countEl = $('.count');
+			courseEl = components.get('invite/course'),
+			editEl = components.get('invite/edit'),
+			deleteEl = components.get('invite/delete'),
+			lastEl = courseEl.children().last(),
+			voteCountEl = components.get('invite/vote-count');
 
 		// 投票后，隐藏投票按钮
-		votesEl.parent().hide();
+		votesEl.parent().remove();
 		voteCountEl.text(data.inviteCount).attr('data-votes', data.inviteCount);
 
+		// 当票数大于1，删除编辑和删除按钮
+		if (data.inviteCount > 1) {
+			editEl.remove();
+			deleteEl.remove();
+		}
+
+		// 当发出邀请，更新邀请内容
 		if (data.isInvited) {
 			var date = new Date(),
 				minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
 				hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours(),
 				invitedTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 
-			$('<div class="small-text invited">' + invitedTime + '，邀请邮件已经发出</div>').insertAfter(countEl).css('display', 'none').fadeIn(500);
+			lastEl.text(invitedTime + ' 对 ' + data.username + ' 的提名已获得 ' + data.inviteCount + ' 票支持，达到邀请票数，邀请邮件已经发出；');
 		}
 	}
 
