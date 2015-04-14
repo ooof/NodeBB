@@ -184,7 +184,6 @@ accountsController.getAccount = function(req, res, next) {
 								if (userDataC.iid) {
 									data.isSameInviter = parseInt(userDataC.iid, 10) === parseInt(data.uid, 10);
 								}
-								console.log('tt');
 								next(null, data);
 							});
 
