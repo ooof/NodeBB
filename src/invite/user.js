@@ -94,7 +94,7 @@ module.exports = function (Invite) {
 					if (err) {
 						return next(err);
 					}
-					jobs.setJob(iid, Date.now());
+					jobs.setWarn(iid, Date.now());
 					db.setObjectField('invite:' + iid, 'invited', 1, next)
 				});
 			}

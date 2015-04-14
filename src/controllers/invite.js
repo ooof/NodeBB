@@ -101,7 +101,7 @@ inviteController.list = function (req, res, next) {
 			// 正在投票
 			if(settings.inviteSort === 'not_joined') {
 				inviteData = data.invite.filter(function (item) {
-					return parseInt(item.invitedFailed, 10) === 1;
+					return parseInt(item.expired, 10) === 1;
 				});
 				data.invite = inviteData;
 			}

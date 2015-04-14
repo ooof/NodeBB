@@ -45,7 +45,6 @@ module.exports = function (Invite) {
 				'edited': 0,
 				'joined': 0,
 				'invited': 0,
-				'invitedFailed': 0,
 				'slug': slug,
 				'timestamp': timestamp,
 				'lastvotetime': 0,
@@ -55,7 +54,8 @@ module.exports = function (Invite) {
 				'inviteCount': 0,
 				'locked': 0,
 				'deleted': 0,
-				'notification': 0,
+				'warned': 0,
+				'expired': 0,
 				'pinned': 0
 			};
 
