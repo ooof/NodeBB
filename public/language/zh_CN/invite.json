@@ -11,7 +11,7 @@
   "list.status_invited": "已发邀请",
   "list.status_not_joined": "邀请失败",
   "list.status_joined": "已进社区",
-  "list.posted_ago": "提名于 %1",
+  "list.posted_ago": "提名于%1",
 
   "detail.upvote": "支持",
   "detail.deleted_message": "此贴已被删除！",

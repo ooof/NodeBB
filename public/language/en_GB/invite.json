@@ -11,7 +11,7 @@
   "list.status_invited": "Invited",
   "list.status_not_joined": "Invited failed",
   "list.status_joined": "Joined",
-  "list.posted_ago": "invited %1",
+  "list.posted_ago": "invited%1",
 
   "detail.upvote": "Vote",
   "detail.deleted_message": "This invite has been deleted.",
