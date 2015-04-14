@@ -80,7 +80,7 @@ inviteController.list = function (req, res, next) {
 			// 已发邀请
 			if(settings.inviteSort === 'invited') {
 				inviteData = data.invite.filter(function (item) {
-					return parseInt(item.joined, 10) === 0 && parseInt(item.invited, 10) === 1;
+					return parseInt(item.joined, 10) === 0 && parseInt(item.invited, 10) === 1 && parseInt(item.expired, 10) === 0;
 				});
 				data.invite = inviteData;
 			}
@@ -106,8 +106,8 @@ inviteController.list = function (req, res, next) {
 				data.invite = inviteData;
 			}
 			data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[global:header.invite]]', url: '/invite'}]);
-			inviteData.map(function (item, index) {
-				return inviteData[index].expired = !!parseInt(item.expired, 10);
+			data.invite.map(function (item, index) {
+				return data.invite[index].expired = !!parseInt(item.expired, 10);
 			});
 
 			next(null, data);
