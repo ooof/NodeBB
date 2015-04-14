@@ -165,4 +165,40 @@ SocketInvite.setInviteSort = function(socket, sort, callback) {
 	}
 };
 
+SocketInvite.loadMore = function(socket, data, callback) {
+	if (!data) {
+		return callback(new Error('[[error:invalid-data]]'));
+	}
+
+	async.parallel({
+		settings: function(next) {
+			user.getSettings(socket.uid, next);
+		}
+	}, function(err, results) {
+		if (err) {
+			return callback(err);
+		}
+
+		var setKey = 'invite:posts:iid',
+			reverse = true;
+
+		var start = parseInt(data.after, 10),
+			stop = start + results.settings.topicsPerPage - 1;
+
+		invite.getInvite({
+			setKey: setKey,
+			reverse: reverse,
+			start: start,
+			stop: stop,
+			uid: socket.uid
+		}, function (err, data) {
+			if (err) {
+				return callback(err);
+			}
+
+			callback(null, data);
+		});
+	});
+};
+
 module.exports = SocketInvite;
