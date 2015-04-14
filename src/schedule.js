@@ -77,7 +77,8 @@ Jobs.getInviteIids = function (callback) {
 
 		for (var i = 0, iidsLength = expireIids.length; i < iidsLength; i++) {
 			db.getObject('invite:' + expireIids[i], function (err, inviteData) {
-				if (!parseInt(inviteData.joined, 10)) {
+				// 当已经邀请，但是没有加入，同时超过过期时间的时候
+				if (!!parseInt(inviteData.invited, 10) && !parseInt(inviteData.joined, 10)) {
 					invite.setInviteFields(inviteData.iid, {expired: 1, warned: 1});
 				}
 			});
