@@ -193,6 +193,10 @@ inviteController.details = function (req, res, next) {
 						hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
 					inviteData.invitedTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 				}
+				date = new Date(parseInt(inviteData.timestamp, 10));
+				minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+				hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+				inviteData.createdTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 
 				next(null, inviteData);
 			});
