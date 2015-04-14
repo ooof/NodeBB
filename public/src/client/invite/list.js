@@ -1,4 +1,5 @@
 "use strict";
+/* globals define, config, socket, app, ajaxify, templates */
 
 define('forum/invite/list', ['forum/invite/events', 'composer', 'components', 'navigator', 'sort'], function (events, composer, components, navigator, sort) {
 	var Invite = {};
@@ -24,6 +25,10 @@ define('forum/invite/list', ['forum/invite/events', 'composer', 'components', 'n
 		});
 
 		sort.handleSort('inviteSort', 'invite.setInviteSort', 'invite');
+
+		var threadSort = components.get('thread/sort'),
+			currentSetting = threadSort.find('a[data-sort="' + config.inviteSort + '"]');
+		threadSort.find('.title').text(currentSetting.text().trim());
 	};
 
 	Invite.onNewInvite = function (vote) {
