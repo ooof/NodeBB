@@ -252,10 +252,12 @@
 				});
 			},
 			function (iid, next) {
-				db.getObjectField("invite:" + iid, 'uid', next);
+				db.getObjectFields("invite:" + iid, ['uid', 'slug'], next);
 			},
-			function (uid, next) {
-				userData.uid = uid;
+			function (data, next) {
+				userData.uid = data.uid;
+				userData.slug = data.slug;
+
 				db.getObjectField("user:" + uid, 'username', function (err, invitedBy) {
 					if (err) {
 						return next(err);
@@ -315,19 +317,7 @@
 						db.getObjectField("email:iid", userData.email, next);
 					},
 					function (iid, next) {
-						async.series([
-							function (next) {
-								db.setObjectField("invite:" + iid, 'joined', 1, next);
-							},
-							function (next) {
-								db.setObjectField('invite:' + iid, 'invitedTime', Date.now(), next);
-							}
-						], function (err) {
-							if (err) {
-								return next(err);
-							}
-							next();
-						});
+						db.setObject("invite:" + iid, {joined: 1, invitedTime: Date.now()}, next);
 					}
 				], function (err) {
 					if (err) {
@@ -345,7 +335,7 @@
 
 				user.notifications.sendNotification({
 					bodyShort: '[[invite:notification.joined, ' + userData.invitedBy + ', ' + userData.inviteUsername + ']]',
-					path: nconf.get('relative_path') + '/user/' + utils.slugify(userData.username),
+					path: nconf.get('relative_path') + '/invite/' + userData.slug,
 					uid: uid,
 					score: 'votedUids',
 					iid: userData.iid,
