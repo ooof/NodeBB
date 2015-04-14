@@ -231,7 +231,17 @@ inviteController.details = function (req, res, next) {
 
 		invite.increaseViewCount(iid);
 
-		res.render('invite/details', data);
+		plugins.fireHook('filter:parse.post', {
+			postData: {
+				content: data.content
+			}
+		}, function (err, contentData) {
+			if (err) {
+				return next(err);
+			}
+			data.content = contentData.postData.content;
+			res.render('invite/details', data);
+		});
 	});
 };
 
