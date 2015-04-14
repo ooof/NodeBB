@@ -28,6 +28,14 @@ module.exports = function (Invite) {
 		var inviteData = {};
 		async.waterfall([
 			function (next) {
+				Invite.getInviteField(iid, 'inviteCount', next);
+			},
+			function (inviteCount, next) {
+				if (parseInt(inviteCount, 10)>1) {
+					return next('该提名已有多少投票，无法删除');
+				}
+			},
+			function (next) {
 				db.sortedSetRemove('invite:views', iid, next);
 			},
 			function (next) {
