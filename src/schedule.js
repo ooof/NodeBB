@@ -62,18 +62,27 @@ Jobs.getInviteIids = function (callback) {
 			return callback(err);
 		}
 
-		var warnIids = [];
+		var warnIids = [],
+			expireIids = [];
 
 		inviteTimes.map(function (item) {
 			if (Date.now() - item.value < Jobs.warn.time) {
 				Jobs.setWarn(item.score, parseInt(item.value, 10));
-			} else if (Date.now() - item.value >= Jobs.warn.time && Date.now() - invite.value < Jobs.expire.time) {
+			} else if (Date.now() - item.value >= Jobs.warn.time && Date.now() - item.value < Jobs.expire.time) {
 				warnIids.push(parseInt(item.score, 10));
 			} else if (Date.now() - item.value >= Jobs.expire.time) {
-				invite.setInviteField(item.score, 'expired', 1);
+				expireIids.push(parseInt(item.score, 10));
 			}
 		});
 
+		for (var i = 0, iidsLength = expireIids.length; i < iidsLength; i++) {
+			db.getObject('invite:' + expireIids[i], function (err, inviteData) {
+				if (!parseInt(inviteData.joined, 10)) {
+					invite.setInviteFields(inviteData.iid, {expired: 1, warned: 1});
+				}
+			});
+			// TODO send notification
+		}
 		callback(null, warnIids);
 	})
 };
