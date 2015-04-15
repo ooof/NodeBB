@@ -63,7 +63,7 @@ function getUserDataByUserSlug(userslug, callerUID, callback) {
 			var isAdmin = results.isAdmin;
 			var self = parseInt(callerUID, 10) === parseInt(userData.uid, 10);
 
-			var date = (Date.now() - parseInt(userData.joindate, 10)) / 1000;
+			var date = (Date.now() - parseInt(userData.joindate, 10)) / 1000 + 60 * 60 * 24;
 			var year = parseInt(date / 365 / 60 / 60 / 24, 10);
 			var day = year ? parseInt(date / 365 / 60 / 60 % 24, 10) : parseInt(date / 60 / 60 / 24, 10);
 			userData.joindateText = year ? year + '岁' + day + '天' : '第' + day + '天';
