@@ -30,7 +30,7 @@ var Jobs = {
 	// 到期时间 默认 seven days
 	expire: {
 		time: 1000 * 60 * 60 * 24 * 7,
-		text: '七天'
+		text: '一周'
 	}
 };
 

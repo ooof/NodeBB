@@ -14,6 +14,7 @@ var inviteController = {},
 	pagination = require('../pagination'),
 	utils = require('../../public/src/utils'),
 	db = require('../database'),
+	schedule = require('../schedule'),
 	invite = require('../invite');
 
 inviteController.list = function (req, res, next) {
@@ -203,6 +204,7 @@ inviteController.details = function (req, res, next) {
 					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
 					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
 					inviteData.notJoinedTime = date.getFullYear() + '/' + date.getMonth() + '/' + (date.getDate() + 7) + ' - ' + hours + ':' + minutes;
+					inviteData.expiredTime = schedule.expire.text;
 				}
 				date = new Date(parseInt(inviteData.timestamp, 10));
 				minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
