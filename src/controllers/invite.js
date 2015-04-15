@@ -179,7 +179,7 @@ inviteController.details = function (req, res, next) {
 				inviteData.theirid = inviteData.uid;
 				inviteData.user.banned = parseInt(userData.banned, 10) === 1;
 				inviteData.display_moderator_tools = userPrivileges.editable;
-				inviteData.notJoined = invitedTime === 0 ? false : Date.now() - inviteData.invitedTime > 1000 * 60 * 60 * 24 * 5;
+				inviteData.notJoined = !!parseInt(inviteData.expired, 10);
 				inviteData.invitedByMe = results.invitedByMe;
 				inviteData.canControl = parseInt(inviteData.inviteCount, 10) <= 1;
 				if (!inviteData.notJoined && !inviteData.joined && !inviteData.invited) {
@@ -197,6 +197,12 @@ inviteController.details = function (req, res, next) {
 						minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
 						hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
 					inviteData.invitedTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
+				}
+				if (inviteData.notJoined) {
+					date = new Date(parseInt(inviteData.notJoinedTime, 10));
+					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+					inviteData.notJoinedTime = date.getFullYear() + '/' + date.getMonth() + '/' + (date.getDate() + 7) + ' - ' + hours + ':' + minutes;
 				}
 				date = new Date(parseInt(inviteData.timestamp, 10));
 				minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();

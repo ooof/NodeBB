@@ -140,6 +140,9 @@ Jobs.setExpire = function (iid, date, sendData, next) {
 					}, next);
 				},
 				function (next) {
+					invite.setInviteField(iid, 'notJoinedTime', Date.now(), next);
+				},
+				function (next) {
 					var voters = sendData.upvote.voters;
 					if (!Array.isArray(voters) || !voters.length) {
 						return next();
