@@ -258,15 +258,11 @@
 				userData.uid = data.uid;
 				userData.slug = data.slug;
 
-				db.getObjectField("user:" + uid, 'username', function (err, invitedBy) {
-					if (err) {
-						return next(err);
-					}
-					userData.invitedBy = invitedBy;
-					next();
-				});
+				db.getObjectField("user:" + data.uid, 'username', next);
 			},
-			function(next) {
+			function(invitedBy, next) {
+				userData.invitedBy = invitedBy;
+
 				if (!userData.email) {
 					return next(new Error('[[error:invalid-email]]'));
 				}
