@@ -40,8 +40,8 @@ if (process.env.NODE_ENV === 'development') {
 		text: '2分钟'
 	};
 	Jobs.expire = {
-		time: 1000 * 60 * 8,
-		text: '8分钟'
+		time: 1000 * 60 * 6,
+		text: '6分钟'
 	}
 }
 
@@ -76,13 +76,7 @@ Jobs.getInviteIids = function (callback) {
 		});
 
 		for (var i = 0, iidsLength = expireIids.length; i < iidsLength; i++) {
-			db.getObject('invite:' + expireIids[i], function (err, inviteData) {
-				// 当已经邀请，但是没有加入，同时超过过期时间的时候
-				if (!!parseInt(inviteData.invited, 10) && !parseInt(inviteData.joined, 10)) {
-					invite.setInviteFields(inviteData.iid, {expired: 1, warned: 1});
-				}
-			});
-			// TODO send notification
+			Jobs.setExpireField(expireIids[i]);
 		}
 		callback(null, warnIids);
 	})
@@ -122,6 +116,18 @@ Jobs.setWarn = function (iid, time) {
 	}.bind(null, iid));
 };
 
+Jobs.setExpireField = function (iid, callback) {
+	callback = callback || function() {};
+	db.getObject('invite:' + iid, function (err, inviteData) {
+		// 当已经邀请，但是没有加入，同时超过过期时间的时候
+		if (!!parseInt(inviteData.invited, 10) && !parseInt(inviteData.joined, 10)) {
+			invite.setInviteFields(inviteData.iid, {expired: 1, warned: 1});
+		}
+		callback();
+	});
+	// TODO send notification
+};
+
 Jobs.setExpire = function (iid, date, sendData, next) {
 	Jobs.jobs[iid] = schedule.scheduleJob(date, function (iid) {
 		db.getObject('invite:' + iid, function (err, inviteData) {
@@ -141,6 +147,9 @@ Jobs.setExpire = function (iid, date, sendData, next) {
 				},
 				function (next) {
 					invite.setInviteField(iid, 'notJoinedTime', Date.now(), next);
+				},
+				function (next) {
+					Jobs.setExpireField(iid, next);
 				},
 				function (next) {
 					var voters = sendData.upvote.voters;
