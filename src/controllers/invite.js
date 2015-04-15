@@ -148,8 +148,7 @@ inviteController.details = function (req, res, next) {
 		},
 		function (results, next) {
 			userPrivileges = results.privileges;
-			var inviteData = results.inviteData,
-				invitedTime = parseInt(inviteData.invitedTime, 10);
+			var inviteData = results.inviteData;
 
 			if (iid + '/' + req.params.slug !== inviteData.slug) {
 				return helpers.notFound(req, res);
