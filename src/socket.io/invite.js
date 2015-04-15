@@ -65,14 +65,25 @@ SocketInvite.edit = function (socket, data, callback) {
 			return callback(err);
 		}
 
-		websockets.in('invite_' + data.iid).emit('event:invite_edited', {
-			iid: data.iid,
-			username: data.username,
-			email: data.email,
-			content: data.content
-		});
+		plugins.fireHook('filter:parse.post', {
+			postData: {
+				content: data.content
+			}
+		}, function (err, contentData) {
+			if (err) {
+				return next(err);
+			}
 
-		callback();
+			data.content = contentData.postData.content;
+			websockets.in('invite_' + data.iid).emit('event:invite_edited', {
+				iid: data.iid,
+				username: data.username,
+				email: data.email,
+				content: data.content
+			});
+
+			callback();
+		});
 	});
 };
 
