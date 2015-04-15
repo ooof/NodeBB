@@ -30,22 +30,22 @@ define('forum/invite/details', ['composer', 'components', 'navigator', 'translat
 	};
 
 	function addHandlers(data) {
-		var postContainer = components.get('invite');
+		var inviteContainer = components.get('invite').children('.post-row');
 
-		postContainer.on('click', '[component="invite/upvote"]', function () {
+		inviteContainer.on('click', '[component="invite/upvote"]', function () {
 			return upvoteInvite(data.iid);
 		});
 
-		postContainer.on('click', '[component="invite/edit"]', function () {
+		inviteContainer.on('click', '[component="invite/edit"]', function () {
 			composer.editInvite(data.iid);
 		});
 
-		postContainer.on('click', '[component="invite/delete"]', function () {
+		inviteContainer.on('click', '[component="invite/delete"]', function () {
 			deleteInvite(data.iid);
 		});
 
-		postContainer.on('click', '[component="invite/chat"]', function () {
-			app.openChat($('.username a').html(), data.theirid);
+		inviteContainer.on('click', '[component="invite/chat"]', function () {
+			app.openChat(inviteContainer.attr('data-username'), inviteContainer.attr('data-uid'));
 		});
 	}
 
