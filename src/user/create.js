@@ -8,6 +8,7 @@ var async = require('async'),
 	groups = require('../groups'),
 	meta = require('../meta'),
 	notifications = require('../notifications'),
+	avatar = require('../avatar'),
 	translator = require('../../public/src/modules/translator');
 
 module.exports = function(User) {
@@ -87,9 +88,11 @@ module.exports = function(User) {
 					},
 					function(uid, next) {
 						userData.uid = uid;
-						userData.picture = '/images/avatar/' + uid + '.png';
-						userData.uploadedpicture = userData.picture;
-						db.setObject('user:' + uid, userData, next);
+						avatar.getRandAvatar(function (avatar) {
+							userData.picture = '/images/avatar/' + avatar;
+							userData.uploadedpicture = userData.picture;
+							db.setObject('user:' + uid, userData, next);
+						});
 					}
 				], function(err) {
 					if (err) {

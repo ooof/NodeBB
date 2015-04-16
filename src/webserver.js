@@ -19,6 +19,7 @@ var path = require('path'),
 	emitter = require('./emitter'),
 
 	schedule = require('./schedule'),
+	avatar = require('./avatar'),
 	helpers = require('./../public/src/modules/helpers'),
 	net;
 
@@ -61,6 +62,7 @@ if(nconf.get('ssl')) {
 		middleware = middleware(app);
 		routes(app, middleware);
 		schedule.init();
+		avatar.install('update');
 
 		// Load server-side template helpers
 		helpers.register();

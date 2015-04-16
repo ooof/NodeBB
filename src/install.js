@@ -6,6 +6,7 @@ var async = require('async'),
 	prompt = require('prompt'),
 	winston = require('winston'),
 	nconf = require('nconf'),
+	avatar = require('./avatar'),
 	utils = require('../public/src/utils.js'),
 
 	DATABASES = {
@@ -265,6 +266,10 @@ function enableDefaultTheme(next) {
 	});
 }
 
+function setAvatar (next) {
+	avatar.install('install', next);
+}
+
 function createAdministrator(next) {
 	var Groups = require('./groups');
 	Groups.get('administrators', {}, function (err, groupObj) {
@@ -478,6 +483,7 @@ install.setup = function (callback) {
 		setupDefaultConfigs,
 		enableDefaultTheme,
 		createCategories,
+		setAvatar,
 		createAdministrator,
 		createMenuItems,
 		createWelcomePost,

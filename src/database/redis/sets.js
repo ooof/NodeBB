@@ -57,6 +57,10 @@ module.exports = function(redisClient, module) {
 		helpers.multiKeys(redisClient, 'smembers', keys, callback);
 	};
 
+	module.getSetRandMember = function(key, callback) {
+		redisClient.srandmember(key, callback);
+	};
+
 	module.setCount = function(key, callback) {
 		redisClient.scard(key, callback);
 	};
