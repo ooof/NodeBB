@@ -53,7 +53,11 @@ function removeAvatar(avatar) {
 }
 
 function getAvatar(avatarPath, callback) {
-	fs.readdir(avatarPath, callback);
+	fs.exists(avatarPath, function (exists) {
+		if (exists) {
+			fs.readdir(avatarPath, callback);
+		}
+	});
 }
 
 function setAvatarToDatabase(type, avatars, callback) {
