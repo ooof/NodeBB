@@ -6,7 +6,6 @@ var async = require('async'),
 	prompt = require('prompt'),
 	winston = require('winston'),
 	nconf = require('nconf'),
-	avatar = require('./avatar'),
 	utils = require('../public/src/utils.js'),
 
 	DATABASES = {
@@ -267,7 +266,7 @@ function enableDefaultTheme(next) {
 }
 
 function setAvatar (next) {
-	avatar.install('install', next);
+	require('./avatar').install('install', next);
 }
 
 function createAdministrator(next) {
