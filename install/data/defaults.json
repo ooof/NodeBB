@@ -98,5 +98,9 @@
     {
         "field": "defaultLang",
         "value": "zh_CN"
+    },
+    {
+        "field": "profile:allowProfileImageUploads",
+        "value": 0
     }
 ]

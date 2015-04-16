@@ -346,7 +346,7 @@ define('composer', [
 		};
 
 		if (postData.title) {
-			data.title = postData.title.replace(/%/g, '&#37;').replace(/,/g, '&#44;');
+			data.title = $('<div/>').text(postData.title).html().replace(/%/g, '&#37;').replace(/,/g, '&#44;');
 		}
 
 		var composerTemplate = isInvite || isInviteEdit ? 'invite/composer' : 'composer';
