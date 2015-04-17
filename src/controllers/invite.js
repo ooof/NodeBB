@@ -238,7 +238,8 @@ inviteController.details = function (req, res, next) {
 		data['reputation:disabled'] = parseInt(meta.config['reputation:disabled'], 10);
 		data['downvote:disabled'] = parseInt(meta.config['downvote:disabled'], 10);
 		data['feeds:disabledRSS'] = parseInt(meta.config['feeds:disabledRSS'], 10) || 0;
-		data['rssFeedUrl'] = nconf.get('relative_path') + '/invite/' + '' + data.iid + '.rss';
+		data['feeds:disableRSS'] = parseInt(meta.config['feeds:disableRSS'], 10) === 1;
+		data.rssFeedUrl = nconf.get('relative_path') + '/topic/' + data.tid + '.rss';
 
 		invite.increaseViewCount(iid);
 
