@@ -8,6 +8,13 @@
 						<li><a href="{relative_path}/admin/general/sounds">Sounds</a></li>
 					</ul>
 				</div>
+                <div class="sidebar-nav">
+                    <ul class="nav nav-list">
+                        <li class="nav-header"><i class="fa fa-fw fa-comments-o"></i> Ooof管理区</li>
+                        <li><a href="{relative_path}/admin/settings/invite">提名通过比例</a></li>
+                        <li><a href="{relative_path}/admin/settings/invite-time">提名提醒过期时间</a></li>
+                    </ul>
+                </div>
 				<div class="sidebar-nav">
 					<ul class="nav nav-list">
 						<li class="nav-header"><i class="fa fa-fw fa-comments-o"></i> Manage</li>

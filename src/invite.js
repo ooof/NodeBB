@@ -4,12 +4,9 @@ var async = require('async'),
 	validator = require('validator'),
 	_ = require('underscore'),
 	db = require('./database'),
-	posts = require('./posts'),
 	utils = require('../public/src/utils'),
 	plugins = require('./plugins'),
-	user = require('./user'),
-	categories = require('./categories'),
-	privileges = require('./privileges');
+	user = require('./user');
 
 (function (Invite) {
 	require('./invite/create')(Invite);

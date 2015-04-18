@@ -15,38 +15,40 @@
  */
 
 var schedule = require('node-schedule'),
+	meta = require('./meta'),
 	nconf = require('nconf'),
 	async = require('async'),
 	user = require('./user'),
 	invite = require('./invite'),
 	db = require('./database');
 
-var Jobs = {
-	// 提醒时间 默认 five days
-	warn: {
-		time: 1000 * 60 * 60 * 24 * 5,
-		text: '五天'
-	},
-	// 到期时间 默认 seven days
-	expire: {
-		time: 1000 * 60 * 60 * 24 * 7,
-		text: '一周'
-	}
-};
-
-if (process.env.NODE_ENV === 'development') {
-	Jobs.warn = {
-		time: 1000 * 60 * 2,
-		text: '2分钟'
-	};
-	Jobs.expire = {
-		time: 1000 * 60 * 6,
-		text: '6分钟'
-	}
-}
+var Jobs = {};
 
 Jobs.init = function () {
 	Jobs.jobs = {};
+
+	// 提醒时间 默认 five days
+	Jobs.warn = {
+		time: 1000 * 60 * 60 * 24 * parseInt(meta.config['invite:warnTime'], 10),
+		text: meta.config['invite:warnText']
+	};
+
+	// 到期时间 默认 seven days
+	Jobs.expire = {
+		time: 1000 * 60 * 60 * 24 * parseInt(meta.config['invite:expireTime'], 10),
+		text: meta.config['invite:expireText']
+	};
+
+	if (process.env.NODE_ENV === 'development') {
+		Jobs.warn = {
+			time: 1000 * 60 * 2,
+			text: '2分钟'
+		};
+		Jobs.expire = {
+			time: 1000 * 60 * 6,
+			text: '6分钟'
+		}
+	}
 
 	Jobs.getInviteIids(function (err, iids) {
 		if (err) {

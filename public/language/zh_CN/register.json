@@ -1,7 +1,7 @@
 {
     "register": "注册",
     "help.email": "默认情况下，您的电子邮箱不会公开。",
-    "help.username_restrictions": "全局唯一的用户名，长度 %1 到 %2 个字。其他人可以使用 @<span id='yourUsername'>用户名</span> 提及您。",
+    "help.minimum_password_length": "密码长度不少于%1位，并包含右侧字串中的三种：大写字母、小写字母、数字、特殊符号( ` ~ ! @ # $ % ^ & * ( ) _ + - = { } | [ ] \\ : \" ; ' < > ? , . /)。",
     "help.minimum_password_length": "密码长度不少于%1位，并包含右侧字串中的三种：大写字母、小写字母、数字、特殊符号。",
     "email_address": "电子邮箱地址",
     "email_address_placeholder": "输入电子邮箱地址",

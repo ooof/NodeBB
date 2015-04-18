@@ -8,10 +8,6 @@ var async = require('async'),
 	plugins = require('../plugins'),
 	user = require('../user'),
 	meta = require('../meta'),
-	posts = require('../posts'),
-	threadTools = require('../threadTools'),
-	postTools = require('../postTools'),
-	privileges = require('../privileges'),
 	categories = require('../categories');
 
 module.exports = function (Invite) {

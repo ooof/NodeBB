@@ -5,8 +5,6 @@ var async = require('async'),
 	invite = require('../invite'),
 	user = require('../user'),
 	helpers = require('./helpers'),
-	groups = require('../groups'),
-	categories = require('../categories'),
 	plugins = require('../plugins');
 
 module.exports = function (privileges) {

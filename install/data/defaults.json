@@ -102,5 +102,21 @@
     {
         "field": "profile:allowProfileImageUploads",
         "value": 0
+    },
+    {
+        "field": "invite:warnTime",
+        "value": 5
+    },
+    {
+        "field": "invite:warnText",
+        "value": "五天"
+    },
+    {
+        "field": "invite:expireTime",
+        "value": 7
+    },
+    {
+        "field": "invite:expireText",
+        "value": "七天"
     }
 ]
