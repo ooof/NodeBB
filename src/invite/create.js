@@ -8,11 +8,7 @@ var async = require('async'),
 	plugins = require('../plugins'),
 	user = require('../user'),
 	meta = require('../meta'),
-	posts = require('../posts'),
-	threadTools = require('../threadTools'),
-	postTools = require('../postTools'),
-	privileges = require('../privileges'),
-	categories = require('../categories');
+	privileges = require('../privileges');
 
 module.exports = function (Invite) {
 	Invite.create = function (data, callback) {
