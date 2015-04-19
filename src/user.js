@@ -163,6 +163,13 @@ var	async = require('async'),
 				db.sortedSetAdd('users:online', now, uid, next);
 			},
 			function(next) {
+				db.sortedSetAdd('users:recent', now, uid, next);
+			},
+			function(next) {
+				var ghostTime = now - parseInt(meta.config["ghost:time"], 10) * 60 * 60 * 1000;
+				db.sortedSetsRemoveRangeByScore(['users:recent'], '-inf', ghostTime, next);
+			},
+			function(next) {
 				topics.pushUnreadCount(uid);
 				plugins.fireHook('action:user.online', {uid: uid, timestamp: now});
 				next();
