@@ -164,8 +164,9 @@ inviteController.details = function (req, res, next) {
 					return helpers.notFound(req, res);
 				}
 
-				if (!userData) {
-					return helpers.notFound(req, res);
+				inviteData.user = userData;
+				if (userData) {
+					inviteData.user.banned = parseInt(userData.banned, 10) === 1;
 				}
 
 				inviteData.isSelf = userPrivileges.isSelf;
@@ -174,15 +175,13 @@ inviteController.details = function (req, res, next) {
 				inviteData.deleted = parseInt(inviteData.deleted, 10) === 1;
 				inviteData.pinned = parseInt(inviteData.pinned, 10) === 1;
 				inviteData.locked = parseInt(inviteData.locked, 10) === 1;
-				inviteData.user = userData;
 				inviteData.yourid = req.uid;
 				inviteData.theirid = inviteData.uid;
-				inviteData.user.banned = parseInt(userData.banned, 10) === 1;
 				inviteData.display_moderator_tools = userPrivileges.editable;
 				inviteData.notJoined = !!parseInt(inviteData.expired, 10);
 				inviteData.invitedByMe = results.invitedByMe;
 				inviteData.canControl = parseInt(inviteData.inviteCount, 10) <= 1;
-				inviteData.hideFooter = parseInt(inviteData.uid, 10) === parseInt(req.uid, 10) && inviteData.invited;
+				inviteData.hideFooter = (parseInt(inviteData.uid, 10) === parseInt(req.uid, 10) && inviteData.invited) || !userData;
 				if (!inviteData.notJoined && !inviteData.joined && !inviteData.invited) {
 					inviteData.endSymbol1 = '。';
 				} else {
