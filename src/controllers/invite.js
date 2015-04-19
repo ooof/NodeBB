@@ -182,6 +182,7 @@ inviteController.details = function (req, res, next) {
 				inviteData.notJoined = !!parseInt(inviteData.expired, 10);
 				inviteData.invitedByMe = results.invitedByMe;
 				inviteData.canControl = parseInt(inviteData.inviteCount, 10) <= 1;
+				inviteData.hideFooter = parseInt(inviteData.uid, 10) === parseInt(req.uid, 10) && inviteData.invited;
 				if (!inviteData.notJoined && !inviteData.joined && !inviteData.invited) {
 					inviteData.endSymbol1 = '。';
 				} else {
