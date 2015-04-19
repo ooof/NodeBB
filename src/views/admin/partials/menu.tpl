@@ -11,8 +11,9 @@
                 <div class="sidebar-nav">
                     <ul class="nav nav-list">
                         <li class="nav-header"><i class="fa fa-fw fa-comments-o"></i> Ooof管理区</li>
-                        <li><a href="{relative_path}/admin/settings/invite">提名通过比例</a></li>
-                        <li><a href="{relative_path}/admin/settings/invite-time">提名提醒过期时间</a></li>
+                        <li><a href="{relative_path}/admin/settings/email-body">邮件</a></li>
+                        <li><a href="{relative_path}/admin/settings/invite">提名</a></li>
+                        <li><a href="{relative_path}/admin/settings/ghost">前世幽灵</a></li>
                     </ul>
                 </div>
 				<div class="sidebar-nav">
@@ -28,7 +29,6 @@
 				<div class="sidebar-nav">
 					<ul class="nav nav-list">
 						<li class="nav-header"><i class="fa fa-fw fa-cogs"></i> Settings</li>
-						<li><a href="{relative_path}/admin/settings/invite">提名通过比例</a></li>
 						<li><a href="{relative_path}/admin/settings/general">General</a></li>
 						<li><a href="{relative_path}/admin/settings/reputation">Reputation</a></li>
 						<li><a href="{relative_path}/admin/settings/email">Email</a></li>

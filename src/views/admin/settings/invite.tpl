@@ -4,10 +4,39 @@
     <div class="panel-heading">题名设置</div>
     <div class="panel-body">
         <form>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" checked data-field="invite:inviteSmart"> <strong>开启智能提名</strong>
+                </label>
+            </div><br />
+
             <div class="form-group">
                 <label for="vote-percent"><strong>提名比例</strong></label>
-                <p class="help-block">小技巧：当管理员想直接邀请一个人的时候，可以设置数量为0%</p>
-                <input type="range" id="vote-percent" min="0" max="100" value="50" data-field="votePercent"/><br />
+                <input type="range" id="vote-percent" min="0" max="100" value="50" data-field="votePercent"/>
+                <p class="help-block">小技巧：当管理员想直接邀请一个人的时候，可以设置数量为0%</p><br />
+            </div>
+
+            <div class="form-group">
+                <p class="help-block">提醒时间</p>
+                <label for="invite-warn-time"><strong>天数-数字</strong></label>
+                <input type="number" class="form-control" id="invite-warn-time" value="5" data-field="invite:warnTime"/><br />
+                <label for="invite-warn-text"><strong>天数对应文字</strong></label>
+                <input type="text" class="form-control" id="invite-warn-text" value="五天" data-field="invite:warnText"/><br />
+            </div>
+
+            <div class="form-group">
+                <p class="help-block">过期时间</p>
+                <label for="invite-expire-time"><strong>天数-数字</strong></label>
+                <input type="number" class="form-control" id="invite-expire-time" value="7" data-field="invite:expireTime"/><br />
+                <label for="invite-expire-text"><strong>天数对应文字</strong></label>
+                <input type="text" class="form-control" id="invite-expire-text" value="七天" data-field="invite:expireText"/><br />
+            </div>
+
+            <div class="form-group">
+                <p class="help-block">导出数据</p>
+                <button class="btn btn-default" type="button" data-action="invite.exportInvite">提名关系</button>
+                <button class="btn btn-default" type="button" data-action="invite.exportVote">投票关系</button>
+                <button class="btn btn-default" type="button" data-action="invite.exportUserData">用户数据</button>
             </div>
         </form>
     </div>

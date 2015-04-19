@@ -118,5 +118,33 @@
     {
         "field": "invite:expireText",
         "value": "七天"
+    },
+    {
+        "field": "invite:inviteSmart",
+        "value": 1
+    },
+    {
+        "field": "votePercent",
+        "value": 50
+    },
+    {
+        "field": "allowGhost",
+        "value": 1
+    },
+    {
+        "field": "ghost:time",
+        "value": 24
+    },
+    {
+        "field": "email:body",
+        "value": "您的朋友邀请您进入一个有趣的社区！"
+    },
+    {
+        "field": "email:click",
+        "value": "点击进入！"
+    },
+    {
+        "field": "email:end",
+        "value": "谢谢！"
     }
 ]
