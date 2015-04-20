@@ -136,6 +136,10 @@
         "value": 24
     },
     {
+        "field": "disableSocialButtons",
+        "value": 1
+    },
+    {
         "field": "feeds:disableRSS",
         "value": 1
     },
