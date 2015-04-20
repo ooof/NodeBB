@@ -74,7 +74,7 @@ var	fs = require('fs'),
 		});
 	};
 
-	Emailer.sendInvite = function(template, uid, params, callback) {
+	Emailer.sendInvite = function(params, callback) {
 		if (!callback) { callback = function() {}; }
 		if (!app) {
 			winston.warn('[emailer] App not ready!');
@@ -82,46 +82,48 @@ var	fs = require('fs'),
 		}
 
 		async.parallel({
+			fromname: function(next) {
+				templates.parse(meta.config['email:fromname'], params, function (data) {
+					if (!data) {
+						return next(null, 'Inviting')
+					}
+					next(null, data);
+				});
+			},
 			html: function(next) {
-				app.render('emails/' + template, params, next);
+				templates.parse(meta.config['email:html'], params, function (data) {
+					next(null, data);
+				});
 			},
-			plaintext: function(next) {
-				app.render('emails/' + template + '_plaintext', params, next);
-			},
-			settings: async.apply(User.getSettings, uid)
+			subject: function(next) {
+				templates.parse(meta.config['email:subject'], params, function (data) {
+					if (!data) {
+						return next(null, params.username + ', 有朋友邀请您进入一个社区')
+					}
+					next(null, data);
+				});
+			}
 		}, function(err, results) {
 			if (err) {
 				winston.error('[emailer] Error sending digest : ' + err.stack);
 				return callback(err);
 			}
-			async.map([results.html, results.plaintext, params.subject], function(raw, next) {
-				translator.translate(raw, results.settings.userLang || meta.config.defaultLang || 'en_GB', function(translated) {
-					next(undefined, translated);
-				});
-			}, function(err, translated) {
-				if (err) {
-					winston.error(err.message);
-					return callback(err);
-				}
 
-				if (Plugins.hasListeners('action:email.send')) {
-					Plugins.fireHook('action:email.send', {
-						to: params.email,
-						from: meta.config['email:from'] || 'no-reply@localhost.lan',
-						subject: translated[2],
-						html: translated[0],
-						plaintext: translated[1],
-						template: template,
-						uid: uid,
-						fromUid: params.fromUid,
-						fromname: params.fromname
-					});
-					callback();
-				} else {
-					winston.warn('[emailer] No active email plugin found!');
-					callback();
-				}
-			});
+			if (Plugins.hasListeners('action:email.send')) {
+				Plugins.fireHook('action:email.send', {
+					to: params.email,
+					from: meta.config['email:from'] || 'no-reply@localhost.lan',
+					subject: results.subject,
+					html: results.html,
+					uid: params.uid,
+					fromUid: params.uid,
+					fromname: results.fromname
+				});
+				callback();
+			} else {
+				winston.warn('[emailer] No active email plugin found!');
+				callback();
+			}
 		});
 	};
 }(module.exports));

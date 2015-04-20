@@ -7,6 +7,7 @@ var db = require('../database'),
 	utils = require('../../public/src/utils'),
 	plugins = require('../plugins'),
 	user = require('../user'),
+	invite = require('../invite'),
 	jobs = require('../schedule'),
 	emailer = require('../emailer');
 
@@ -101,23 +102,35 @@ module.exports = function (Invite) {
 	};
 
 	Invite.sendUser = function (uid, iid, callback) {
-		var userData,
-			invite_code = utils.generateUUID(),
-			invite_link = nconf.get('url') + '/register?code=' + invite_code,
+		var userData = {},
+			register_code = utils.generateUUID(),
+			register_link = nconf.get('url') + '/register?code=' + register_code,
 			timestamp = Date.now();
 
 		async.waterfall([
 			function (next) {
-				db.getObjectFields('invite:' + iid, ['username', 'email'], next);
+				invite.getInviteFields(iid, ['username', 'uid', 'email'], next);
 			},
 			function (data, next) {
 				userData = data;
-				db.setObject('confirm:' + invite_code, {
+				db.setObject('confirm:' + register_code, {
 					email: data.email.toLowerCase(),
 					username: data.username
 				}, next);
 			},
 			function (next) {
+				user.getUserFields(userData.uid, ['iid', 'username'], next);
+			},
+			function (data, next) {
+				userData.from_username = data.username;
+				if (data.iid) {
+					invite.getInviteField(data.iid, 'username', next);
+				} else {
+					next(null, '管理员');
+				}
+			},
+			function (username, next) {
+				userData.from_invite_username = username;
 				db.setObjectField('invite:' + iid, 'invited', 1, next);
 			},
 			function (next) {
@@ -129,7 +142,7 @@ module.exports = function (Invite) {
 			},
 			function (next) {
 				// 邀请链接默认7天到期
-				db.expireAt('confirm:' + invite_code, Math.floor(timestamp / parseInt(meta.config['invite:expireTime'], 10)), next);
+				db.expireAt('confirm:' + register_code, Math.floor(timestamp / parseInt(meta.config['invite:expireTime'], 10)), next);
 			}
 		], function (err) {
 			if (err) {
@@ -144,15 +157,16 @@ module.exports = function (Invite) {
 
 			var params = {
 				email: userData.email,
-				invite_link: invite_link,
-				subject: userData.username + ', 有朋友邀请您进入一个社区',
-				fromname: 'Inviting',
-				template: 'invite',
+				register_link: register_link,
 				site_title: meta.config.title || 'NodeBB',
-				username: userData.username
+				username: userData.username,
+				from_username: userData.from_username,
+				uid: userData.uid,
+				from_invite_username: userData.from_invite_username
 			};
+			console.log(params);
 			if (plugins.hasListeners('action:email.send')) {
-				emailer.sendInvite('invite', uid, params, callback);
+				emailer.sendInvite(params, callback);
 			} else {
 				callback(new Error('[[error:no-emailers-configured]]'));
 			}
