@@ -127,5 +127,60 @@ var	fs = require('fs'),
 			}
 		});
 	};
+
+	Emailer.sendReset = function(params, callback) {
+		if (!callback) { callback = function() {}; }
+		if (!app) {
+			winston.warn('[emailer] App not ready!');
+			return callback();
+		}
+
+		async.parallel({
+			fromname: function(next) {
+				templates.parse(meta.config['email:reset:fromname'], params, function (data) {
+					if (!data) {
+						return next(null, 'reset')
+					}
+					next(null, data);
+				});
+			},
+			html: function(next) {
+				templates.parse(meta.config['email:reset:html'], params, function (data) {
+					next(null, data);
+				});
+			},
+			subject: function(next) {
+				templates.parse(meta.config['email:reset:subject'], params, function (data) {
+					if (!data) {
+						return next(null, '密码重置申请！')
+					}
+					next(null, data);
+				});
+			},
+			email: async.apply(User.getUserField, params.uid, 'email')
+		}, function(err, results) {
+			if (err) {
+				winston.error('[emailer] Error sending digest : ' + err.stack);
+				return callback(err);
+			}
+
+			if (Plugins.hasListeners('action:email.send')) {
+				Plugins.fireHook('action:email.send', {
+					to: results.email,
+					from: meta.config['email:from'] || 'no-reply@localhost.lan',
+					subject: results.subject,
+					html: results.html,
+					uid: params.uid,
+					template: 'invite',
+					fromUid: params.uid,
+					fromname: results.fromname
+				});
+				callback();
+			} else {
+				winston.warn('[emailer] No active email plugin found!');
+				callback();
+			}
+		});
+	};
 }(module.exports));
 

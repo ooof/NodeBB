@@ -63,7 +63,7 @@ var async = require('async'),
 			},
 			function(subject, code, next) {
 				var reset_link = nconf.get('url') + '/reset/' + code;
-				emailer.send('reset', uid, {
+				emailer.sendReset({
 					site_title: (meta.config.title || 'NodeBB'),
 					reset_link: reset_link,
 					subject: subject,

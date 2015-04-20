@@ -31,13 +31,6 @@
                 <label for="invite-expire-text"><strong>天数对应文字</strong></label>
                 <input type="text" class="form-control" id="invite-expire-text" value="七天" data-field="invite:expireText"/><br />
             </div>
-
-            <div class="form-group">
-                <p class="help-block">导出数据</p>
-                <a class="btn btn-default" target="_blank" href="/admin/invite/export/invite.csv">提名关系</a>
-                <a class="btn btn-default" target="_blank" href="/admin/invite/export/vote.csv">投票关系</a>
-                <a class="btn btn-default" target="_blank" href="/admin/invite/export/user.csv">用户数据</a>
-            </div>
         </form>
     </div>
 </div>
