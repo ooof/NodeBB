@@ -246,22 +246,21 @@
 				});
 			},
 			function (next) {
-				db.getObjectField("email:iid", userData.email, function (err, iid) {
-					userData.iid = iid;
-					next(null, iid)
-				});
+				db.getObjectField("email:iid", userData.email, next);
 			},
 			function (iid, next) {
-				db.getObjectFields("invite:" + iid, ['uid', 'slug'], next);
+				userData.iid = iid;
+				db.getObjectFields("invite:" + iid, ['uid', 'slug', 'username'], next);
 			},
 			function (data, next) {
-				userData.uid = data.uid;
-				userData.slug = data.slug;
+				userData.invitedByUid = data.uid;
+				userData.invitedBySlug = data.slug;
+				userData.invitedUsername = data.username;
 
 				db.getObjectField("user:" + data.uid, 'username', next);
 			},
-			function(invitedBy, next) {
-				userData.invitedBy = invitedBy;
+			function(invitedByUsername, next) {
+				userData.invitedByUsername = invitedByUsername;
 
 				if (!userData.email) {
 					return next(new Error('[[error:invalid-email]]'));
@@ -292,35 +291,14 @@
 				req.login({uid: uid}, next);
 			},
 			function(next) {
-				db.setObjectField('invite:' + userData.iid, 'joinedTime', Date.now(), next);
-			},
-			function(next) {
-				db.setObjectField("user:" + uid, 'iid', userData.iid, next)
-			},
-			function(next) {
-				db.setObjectField("user:" + uid, 'invitedBy', userData.uid, next)
+				db.setObject('invite:' + userData.iid, {realUsername: userData.username, joined: 1, joinedTime: Date.now()}, next);
 			},
 			// user:{uid}:invited 某个用户邀请并已加入的用户
 			function(next) {
 				db.setAdd("user:" + userData.uid + ":invited", uid, next)
 			},
-			function(next) {
-				async.waterfall([
-					function (next) {
-						db.delete("confirm:" + userData.code, next);
-					},
-					function (next) {
-						db.getObjectField("email:iid", userData.email, next);
-					},
-					function (iid, next) {
-						db.setObject("invite:" + iid, {joined: 1, invitedTime: Date.now()}, next);
-					}
-				], function (err) {
-					if (err) {
-						return next(err);
-					}
-					next();
-				});
+			function (next) {
+				db.delete("confirm:" + userData.code, next);
 			},
 			// 取消该提名的监控任务
 			function(next) {
@@ -331,7 +309,7 @@
 
 				user.notifications.sendNotification({
 					bodyShort: '[[invite:notification.joined, ' + userData.invitedBy + ', ' + userData.inviteUsername + ']]',
-					path: nconf.get('relative_path') + '/invite/' + userData.slug,
+					path: nconf.get('relative_path') + '/invite/' + userData.invitedBySlug,
 					uid: uid,
 					score: 'votedUids',
 					iid: userData.iid,

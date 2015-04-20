@@ -466,35 +466,19 @@ function generateData(type, callback) {
 	if (type === 'invite.csv') {
 		async.waterfall([
 			function (next) {
-				db.getSortedSetRangeWithScores('invite:posts:iid', 0, -1, next);
+				user.getUidsFromHash('username:uid', next);
 			},
-			function (iids, next) {
-				iids = iids.map(function (iid) {
-					return iid.value;
+			function (uids, next) {
+				user.getMultipleUserFields(uids, ['username', 'invitedByUsername'], next);
+			},
+			function (userData, next) {
+				userData.map(function (item) {
+					data.push([item.invitedByUsername, item.username]);
 				});
-
-				next(null, iids);
-			},
-			function (iids, next) {
-				invite.getInvitesFields(iids, ['uid', 'username'], next);
-			},
-			function (inviteData, next) {
-				async.eachSeries(inviteData, function (item, next) {
-					user.getUserField(item.uid, 'username', function (err, username) {
-						username = username !== '[[global:guest]]' ? username : '无';
-						data.push([username, item.username]);
-						next();
-					})
-				}, next);
+				data.unshift(["提名人", "被提名人"]);
+				next(null, data);
 			}
-		], function (err) {
-			if (err) {
-				return callback(err);
-			}
-
-			data.unshift(["提名人", "被提名人"]);
-			callback(null, data);
-		});
+		], callback);
 	} else if (type === 'vote.csv') {
 		var iids = [];
 		var upvoteIids = [];
@@ -517,7 +501,7 @@ function generateData(type, callback) {
 			},
 			function (inviteUpvoteIids, next) {
 				upvoteIids = inviteUpvoteIids;
-				invite.getInvitesFields(iids, ['uid', 'username'], next);
+				invite.getInvitesFields(iids, ['realUsername'], next);
 			},
 			function (inviteData, next) {
 				var index = 0;
@@ -525,7 +509,7 @@ function generateData(type, callback) {
 					async.eachSeries(upvoteIids[index], function (upvoteItem, next) {
 						user.getUserField(upvoteItem, 'username', function (err, username) {
 							username = username !== '[[global:guest]]' ? username : '无';
-							data.push([username, item.username]);
+							data.push([username, item.realUsername]);
 							next();
 						})
 					}, next);
@@ -558,16 +542,10 @@ function generateData(type, callback) {
 						return item[key] ? item[key] : 0;
 					});
 				});
-				next();
+				data.unshift(["用户 id", "注册时间", "发贴数量", "关注数量", "粉丝数量"]);
+				next(null, data);
 			}
-		], function (err) {
-			if (err) {
-				return callback(err);
-			}
-
-			data.unshift(["用户 id", "注册时间", "发贴数量", "关注数量", "粉丝数量"]);
-			callback(null, data);
-		});
+		], callback);
 	}
 }
 

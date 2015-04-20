@@ -20,6 +20,7 @@ module.exports = function (Invite) {
 
 			var now = Date.now(),
 				voteCount;
+
 			async.waterfall([
 				function (next) {
 					db.sortedSetAdd('invite:posts:uid:' + uid + ':iid', now, iid, next);

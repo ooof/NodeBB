@@ -65,22 +65,19 @@ module.exports = function (Invite) {
 	Invite.inviteUser = function (uid, iid, voteCount, callback) {
 		async.waterfall([
 			function (next) {
+				// 获取用户总数
 				db.getObjectField('global', 'userCount', next);
 			},
 			function (userCount, next) {
-				voteCount = parseInt(voteCount, 10);
-				userCount = parseInt(userCount, 10);
-
-				var votePercent = voteCount / userCount >= (meta.config.votePercent ? meta.config.votePercent/100 : 0.5);
-				next(null, votePercent);
-			},
-			function (votePercent, next) {
-				if (votePercent) {
+				// 判断是否通过投票比例
+				var canSendInvite = parseInt(voteCount, 10) / parseInt(userCount, 10) >= (meta.config.votePercent ? meta.config.votePercent / 100 : 0.5);
+				if (canSendInvite) {
 					return db.getObjectFields('invite:' + iid, ['slug', 'username'], next);
 				}
 				callback();
 			},
 			function (inviteData, next) {
+				// 通知投票用户已发出邀请
 				user.notifications.sendNotification({
 					bodyShort: '[[invite:notification.invited, ' + inviteData.username + ']]',
 					path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
@@ -91,11 +88,12 @@ module.exports = function (Invite) {
 				}, next);
 			},
 			function (next) {
+				// 给被提名人发送邮件邀请
 				Invite.sendUser(uid, iid, function (err) {
 					if (err) {
 						return next(err);
 					}
-					jobs.setWarn(iid, Date.now());
+					jobs.setWarn(iid, Date.now(), next);
 				});
 			}
 		], callback);
@@ -131,10 +129,7 @@ module.exports = function (Invite) {
 			},
 			function (username, next) {
 				userData.from_invite_username = username;
-				db.setObjectField('invite:' + iid, 'invited', 1, next);
-			},
-			function (next) {
-				db.setObjectField('invite:' + iid, 'invitedTime', timestamp, next);
+				db.setObject('invite:' + iid, {invited: 1, invitedTime: timestamp}, next);
 			},
 			function(next) {
 				// invite:time 记录邀请时间和iid 该表用于执行定时任务

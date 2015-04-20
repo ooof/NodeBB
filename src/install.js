@@ -321,7 +321,15 @@ function createAdmin(callback) {
 				return retryPassword(results);
 			}
 
-			User.create({username: results.username, password: results.password, email: results.email}, function (err, uid) {
+			User.create({
+				username: results.username,
+				password: results.password,
+				email: results.email,
+				iid: 0,
+				'invitedByUid': 0,
+				'invitedByUsername': 'admin',
+				'invitedUsername': 'admin'
+			}, function (err, uid) {
 				if (err) {
 					winston.warn(err.message + ' Please try again.');
 					return callback(new Error('invalid-values'));

@@ -116,6 +116,7 @@ var	fs = require('fs'),
 					subject: results.subject,
 					html: results.html,
 					uid: params.uid,
+					template: 'invite',
 					fromUid: params.uid,
 					fromname: results.fromname
 				});

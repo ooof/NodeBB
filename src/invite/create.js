@@ -14,6 +14,7 @@ module.exports = function (Invite) {
 	Invite.create = function (data, callback) {
 		var uid = data.uid,
 			username = data.username,
+			invitedByUsername = data.invitedByUsername,
 			email = data.email,
 			content = data.content;
 
@@ -35,6 +36,8 @@ module.exports = function (Invite) {
 				'iid': iid,
 				'uid': uid,
 				'username': username,
+				'invitedByUsername': invitedByUsername,
+				'realUsername': '',
 				'content': content,
 				'email': email,
 				'editor': '',
@@ -102,7 +105,7 @@ module.exports = function (Invite) {
 			username = data.username,
 			email = data.email,
 			content = data.content,
-			inviteData;
+			inviteData = {};
 
 		async.waterfall([
 			function (next) {
@@ -156,14 +159,14 @@ module.exports = function (Invite) {
 				user.isReadyToPost(uid, next);
 			},
 			function (next) {
-				Invite.create({uid: uid, username: data.username, content: content, email: data.email}, next);
+				db.getObjectField('user:' + uid, 'username', next);
+			},
+			function (invitedByUsername, next) {
+				inviteData.invitedByUsername = invitedByUsername;
+				Invite.create({uid: uid, username: data.username, content: content, email: data.email, invitedByUsername: invitedByUsername}, next);
 			},
 			function (data, next) {
 				inviteData = data;
-				db.getObjectField('user:' + uid, 'username', next);
-			},
-			function (invitedBy, next) {
-				inviteData.invitedBy = invitedBy;
 				Invite.getInviteField(inviteData.iid, 'inviteCount', next);
 			},
 			function (inviteCount, next) {
@@ -175,7 +178,7 @@ module.exports = function (Invite) {
 				if (!invitePercent && parseInt(uid, 10)) {
 					// 发送提名通知给用户
 					user.notifications.sendNotification({
-						bodyShort: '[[invite:notification.inviting, ' + inviteData.invitedBy + ', ' + username + ']]',
+						bodyShort: '[[invite:notification.inviting, ' + inviteData.invitedByUsername + ', ' + username + ']]',
 						path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
 						nid: 'inviting:' + inviteData.iid,
 						uid: uid,

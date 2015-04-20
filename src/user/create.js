@@ -47,7 +47,10 @@ module.exports = function(User) {
 				'topiccount': 0,
 				'lastposttime': 0,
 				'banned': 0,
-				'invitedBy': 0,
+				'iid': data.iid,
+				'invitedByUid': data.invitedByUid,
+				'invitedByUsername': data.invitedByUsername,
+				'invitedUsername': data.invitedUsername,
 				'status': 'online'
 			};
 

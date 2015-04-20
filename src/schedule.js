@@ -108,7 +108,8 @@ Jobs.setSchedules = function (iids) {
 	}
 };
 
-Jobs.setWarn = function (iid, time) {
+Jobs.setWarn = function (iid, time, callback) {
+	callback = callback || function() {};
 	var date = new Date(time + Jobs.warn.time);
 
 	Jobs.jobs[iid] = schedule.scheduleJob(date, function (iid) {
@@ -119,6 +120,7 @@ Jobs.setWarn = function (iid, time) {
 			Jobs.sendInviteNotification(inviteData);
 		});
 	}.bind(null, iid));
+	callback();
 };
 
 Jobs.setExpireField = function (iid, callback) {
