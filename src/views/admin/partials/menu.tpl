@@ -11,9 +11,10 @@
                 <div class="sidebar-nav">
                     <ul class="nav nav-list">
                         <li class="nav-header"><i class="fa fa-fw fa-comments-o"></i> Ooof管理区</li>
-                        <li><a href="{relative_path}/admin/settings/email-body">邮件</a></li>
                         <li><a href="{relative_path}/admin/settings/invite">提名</a></li>
+                        <li><a href="{relative_path}/admin/settings/email-body">邮件文本</a></li>
                         <li><a href="{relative_path}/admin/settings/ghost">前世幽灵</a></li>
+                        <li><a href="{relative_path}/admin/settings/export">导出数据</a></li>
                     </ul>
                 </div>
 				<div class="sidebar-nav">
