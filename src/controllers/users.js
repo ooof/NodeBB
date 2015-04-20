@@ -37,9 +37,35 @@ usersController.getOnlineUsers = function(req, res, next) {
 		var userData = {
 			'route_users:online': true,
 			search_display: 'hidden',
+			ghost_display: 'hidden',
 			loadmore_display: results.count > 50 ? 'block' : 'hide',
 			users: results.users,
 			anonymousUserCount: websockets.getOnlineAnonCount()
+		};
+
+		res.render('users', userData);
+	});
+};
+
+usersController.getGhostUsers = function(req, res, next) {
+	async.parallel({
+		users: function(next) {
+			user.getUsersFromSet('users:recent', req.uid, 0, 49, next);
+		},
+		count: function(next) {
+			var now = Date.now();
+			db.sortedSetCount('users:recent', now - 300000, now, next);
+		}
+	}, function(err, results) {
+		if (err) {
+			return next(err);
+		}
+
+		var userData = {
+			search_display: 'hidden',
+			user_display: 'hidden',
+			loadmore_display: results.count > 50 ? 'block' : 'hide',
+			users: results.users
 		};
 
 		res.render('users', userData);
@@ -66,6 +92,7 @@ usersController.getUsers = function(set, count, req, res, next) {
 		var pageCount = Math.ceil(data.count / (parseInt(meta.config.userSearchResultsPerPage, 10) || 20));
 		var userData = {
 			search_display: 'hidden',
+			ghost_display: 'hidden',
 			loadmore_display: data.count > count ? 'block' : 'hide',
 			users: data.users,
 			pagination: pagination.create(1, pageCount)
@@ -108,6 +135,7 @@ usersController.getUsersForSearch = function(req, res, next) {
 
 		var userData = {
 			search_display: 'block',
+			ghost_display: 'hidden',
 			loadmore_display: 'hidden',
 			users: data.users
 		};
