@@ -136,6 +136,10 @@
         "value": 24
     },
     {
+        "field": "feeds:disableRSS",
+        "value": 1
+    },
+    {
         "field": "email:html",
         "value": "<p>您好, {username}:</p>\r\n\r\n<p>您的朋友邀请您进入一个有趣的社区！</p>\r\n\r\n<blockquote>\r\n\t<a href=\"{register_link}\">点击进入</a>\r\n</blockquote>\r\n\r\n<p>谢谢！</p>"
     },
