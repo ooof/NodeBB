@@ -95,7 +95,6 @@ module.exports = function (Invite) {
 						return next(err);
 					}
 					jobs.setWarn(iid, Date.now());
-					db.setObjectField('invite:' + iid, 'invited', 1, next)
 				});
 			}
 		], callback);
@@ -104,7 +103,8 @@ module.exports = function (Invite) {
 	Invite.sendUser = function (uid, iid, callback) {
 		var userData,
 			invite_code = utils.generateUUID(),
-			invite_link = nconf.get('url') + '/register?code=' + invite_code;
+			invite_link = nconf.get('url') + '/register?code=' + invite_code,
+			timestamp = Date.now();
 
 		async.waterfall([
 			function (next) {
@@ -121,11 +121,15 @@ module.exports = function (Invite) {
 				db.setObjectField('invite:' + iid, 'invited', 1, next);
 			},
 			function (next) {
-				db.setObjectField('invite:' + iid, 'invitedTime', Date.now(), next);
+				db.setObjectField('invite:' + iid, 'invitedTime', timestamp, next);
+			},
+			function(next) {
+				// invite:time 记录邀请时间和iid 该表用于执行定时任务
+				db.sortedSetAdd('invite:time', iid, timestamp, next);
 			},
 			function (next) {
 				// 邀请链接默认7天到期
-				db.expireAt('confirm:' + invite_code, Math.floor(Date.now() / parseInt(meta.config['invite:expireTime'], 10)), next);
+				db.expireAt('confirm:' + invite_code, Math.floor(timestamp / parseInt(meta.config['invite:expireTime'], 10)), next);
 			}
 		], function (err) {
 			if (err) {

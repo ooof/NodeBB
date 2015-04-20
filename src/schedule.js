@@ -68,11 +68,14 @@ Jobs.getInviteIids = function (callback) {
 			expireIids = [];
 
 		inviteTimes.map(function (item) {
-			if (Date.now() - item.value < Jobs.warn.time) {
+			var invitedTime = item.value,
+				timestamp = Date.now();
+
+			if (timestamp - invitedTime < Jobs.warn.time) {
 				Jobs.setWarn(item.score, parseInt(item.value, 10));
-			} else if (Date.now() - item.value >= Jobs.warn.time && Date.now() - item.value < Jobs.expire.time) {
+			} else if (timestamp - invitedTime >= Jobs.warn.time && timestamp - invitedTime < Jobs.expire.time) {
 				warnIids.push(parseInt(item.score, 10));
-			} else if (Date.now() - item.value >= Jobs.expire.time) {
+			} else if (timestamp - invitedTime >= Jobs.expire.time) {
 				expireIids.push(parseInt(item.score, 10));
 			}
 		});
@@ -125,7 +128,7 @@ Jobs.setExpireField = function (iid, callback) {
 		if (!!parseInt(inviteData.invited, 10) && !parseInt(inviteData.joined, 10)) {
 			invite.setInviteFields(inviteData.iid, {expired: 1, warned: 1});
 		}
-		callback();
+		db.sortedSetRemove('invite:time', inviteData.invitedTime, callback());
 	});
 	// TODO send notification
 };
