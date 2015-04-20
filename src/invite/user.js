@@ -164,7 +164,6 @@ module.exports = function (Invite) {
 				uid: userData.uid,
 				from_invite_username: userData.from_invite_username
 			};
-			console.log(params);
 			if (plugins.hasListeners('action:email.send')) {
 				emailer.sendInvite(params, callback);
 			} else {
