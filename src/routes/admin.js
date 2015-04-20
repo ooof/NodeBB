@@ -74,6 +74,8 @@ function addRoutes(router, middleware, controllers) {
 	router.get('/advanced/logs', controllers.admin.logs.get);
 
 	router.get('/development/logger', controllers.admin.logger.get);
+
+	router.get('/invite/export/:type?', controllers.admin.invite.export);
 }
 
 module.exports = function(app, middleware, controllers) {

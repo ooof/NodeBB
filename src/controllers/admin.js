@@ -17,6 +17,9 @@ var async = require('async'),
 	widgets = require('../widgets'),
 	groups = require('../groups'),
 	pkg = require('../../package.json'),
+	csv = require('express-csv'),
+	invite = require('../invite'),
+	helpers = require('./helpers'),
 	validator = require('validator');
 
 
@@ -26,6 +29,7 @@ var adminController = {
 	flags: {},
 	topics: {},
 	groups: {},
+	invite: {},
 	appearance: {},
 	extend: {
 		widgets: {}
@@ -431,6 +435,56 @@ adminController.themes.get = function(req, res, next) {
 			return next();
 		}
 	});
+};
+
+adminController.invite.export = function (req, res, next) {
+	var type = req.params.type,
+		inviterData = [],
+		voterData = [],
+		userData = [];
+
+	async.waterfall([
+		function (next) {
+			db.getSortedSetRangeWithScores('invite:posts:iid', 0, -1, next);
+		},
+		function (iids, next) {
+			iids = iids.map(function (iid) {
+				return iid.value;
+			});
+
+			next(null, iids);
+		},
+		function (iids, next) {
+			invite.getInvitesFields(iids, ['uid', 'username'], next);
+		},
+		function (inviteData, next) {
+			async.eachSeries(inviteData, function (data, next) {
+				user.getUserField(data.uid, 'username', function (err, username) {
+					username = username !== '[[global:guest]]' ? username : '无';
+					inviterData.push([username, data.username]);
+					next();
+				})
+			}, next);
+		}
+	], function (err) {
+		if (err) {
+			return next(err);
+		}
+
+		if (type === 'invite.csv') {
+			inviterData.unshift(["提名人", "被提名人"]);
+			res.csv(inviterData);
+		} else if (type === 'vote.csv') {
+			voterData.unshift(["投票人", "被投票人"]);
+			res.csv(voterData);
+		} else if (type === 'user.csv') {
+			userData.unshift(["用户 id", "注册时间", "发贴数量", "好友数量", "粉丝数量"]);
+			res.csv(userData);
+		} else {
+			return helpers.notFound(req, res);
+		}
+	});
+
 };
 
 module.exports = adminController;

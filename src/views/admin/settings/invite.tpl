@@ -34,9 +34,9 @@
 
             <div class="form-group">
                 <p class="help-block">导出数据</p>
-                <button class="btn btn-default" type="button" data-action="invite.exportInvite">提名关系</button>
-                <button class="btn btn-default" type="button" data-action="invite.exportVote">投票关系</button>
-                <button class="btn btn-default" type="button" data-action="invite.exportUserData">用户数据</button>
+                <a class="btn btn-default" target="_blank" href="/admin/invite/export/invite.csv">提名关系</a>
+                <a class="btn btn-default" target="_blank" href="/admin/invite/export/vote.csv">投票关系</a>
+                <a class="btn btn-default" target="_blank" href="/admin/invite/export/user.csv">用户数据</a>
             </div>
         </form>
     </div>
