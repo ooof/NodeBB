@@ -438,53 +438,137 @@ adminController.themes.get = function(req, res, next) {
 };
 
 adminController.invite.export = function (req, res, next) {
-	var type = req.params.type,
-		inviterData = [],
-		voterData = [],
-		userData = [];
+	var type = req.params.type;
 
-	async.waterfall([
-		function (next) {
-			db.getSortedSetRangeWithScores('invite:posts:iid', 0, -1, next);
-		},
-		function (iids, next) {
-			iids = iids.map(function (iid) {
-				return iid.value;
-			});
-
-			next(null, iids);
-		},
-		function (iids, next) {
-			invite.getInvitesFields(iids, ['uid', 'username'], next);
-		},
-		function (inviteData, next) {
-			async.eachSeries(inviteData, function (data, next) {
-				user.getUserField(data.uid, 'username', function (err, username) {
-					username = username !== '[[global:guest]]' ? username : '无';
-					inviterData.push([username, data.username]);
-					next();
-				})
-			}, next);
-		}
-	], function (err) {
+	generateData(type, function (err, data) {
 		if (err) {
 			return next(err);
 		}
 
-		if (type === 'invite.csv') {
-			inviterData.unshift(["提名人", "被提名人"]);
-			res.csv(inviterData);
-		} else if (type === 'vote.csv') {
-			voterData.unshift(["投票人", "被投票人"]);
-			res.csv(voterData);
-		} else if (type === 'user.csv') {
-			userData.unshift(["用户 id", "注册时间", "发贴数量", "好友数量", "粉丝数量"]);
-			res.csv(userData);
-		} else {
+		if (!type) {
 			return helpers.notFound(req, res);
 		}
-	});
+
+		res.csv(data);
+	})
 
 };
+
+function generateData(type, callback) {
+	var data = [];
+
+	/**
+	 * invite.csv 提名数据
+	 * vote.csv 投票数据
+	 * user.csv 用户数据
+	 */
+
+	if (type === 'invite.csv') {
+		async.waterfall([
+			function (next) {
+				db.getSortedSetRangeWithScores('invite:posts:iid', 0, -1, next);
+			},
+			function (iids, next) {
+				iids = iids.map(function (iid) {
+					return iid.value;
+				});
+
+				next(null, iids);
+			},
+			function (iids, next) {
+				invite.getInvitesFields(iids, ['uid', 'username'], next);
+			},
+			function (inviteData, next) {
+				async.eachSeries(inviteData, function (item, next) {
+					user.getUserField(item.uid, 'username', function (err, username) {
+						username = username !== '[[global:guest]]' ? username : '无';
+						data.push([username, item.username]);
+						next();
+					})
+				}, next);
+			}
+		], function (err) {
+			if (err) {
+				return callback(err);
+			}
+
+			data.unshift(["提名人", "被提名人"]);
+			callback(null, data);
+		});
+	} else if (type === 'vote.csv') {
+		var iids = [];
+		var upvoteIids = [];
+		async.waterfall([
+			function (next) {
+				db.getSortedSetRangeWithScores('invite:posts:iid', 0, -1, next);
+			},
+			function (inviteIids, next) {
+				iids = inviteIids.map(function (iid) {
+					return iid.value;
+				});
+
+				next(null, iids);
+			},
+			function (iids, next) {
+				var sortSets = iids.map(function (iid) {
+					return 'invite:posts:' + iid + ':upvote:by';
+				});
+				db.getSetsMembers(sortSets, next)
+			},
+			function (inviteUpvoteIids, next) {
+				upvoteIids = inviteUpvoteIids;
+				invite.getInvitesFields(iids, ['uid', 'username'], next);
+			},
+			function (inviteData, next) {
+				var index = 0;
+				async.eachSeries(inviteData, function (item, next) {
+					async.eachSeries(upvoteIids[index], function (upvoteItem, next) {
+						user.getUserField(upvoteItem, 'username', function (err, username) {
+							username = username !== '[[global:guest]]' ? username : '无';
+							data.push([username, item.username]);
+							next();
+						})
+					}, next);
+					index++;
+				}, next);
+			}
+		], function (err) {
+			if (err) {
+				return callback(err);
+			}
+
+			data.unshift(["投票人", "被投票人"]);
+			callback(null, data);
+		});
+	} else if (type === 'user.csv') {
+		async.waterfall([
+			function (next) {
+				user.getUidsFromHash('username:uid', next);
+			},
+			function (uids, next) {
+				user.getMultipleUserFields(uids, ['uid', 'joindate', 'topiccount', 'followingCount', 'followerCount'], next)
+			},
+			function (userData, next) {
+				userData.map(function (item, index) {
+					data[index] = Object.keys(item).map(function (key) {
+						if (key === 'joindate') {
+							var date = new Date(parseInt(item[key], 10));
+							return date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate();
+						}
+						return item[key] ? item[key] : 0;
+					});
+				});
+				next();
+			}
+		], function (err) {
+			if (err) {
+				return callback(err);
+			}
+
+			data.unshift(["用户 id", "注册时间", "发贴数量", "关注数量", "粉丝数量"]);
+			callback(null, data);
+		});
+	}
+}
 
 module.exports = adminController;
