@@ -153,9 +153,6 @@ Jobs.setExpire = function (iid, date, sendData, next) {
 					}, next);
 				},
 				function (next) {
-					invite.setInviteField(iid, 'notJoinedTime', Date.now(), next);
-				},
-				function (next) {
 					Jobs.setExpireField(iid, next);
 				},
 				function (next) {

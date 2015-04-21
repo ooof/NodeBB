@@ -159,15 +159,14 @@ inviteController.details = function (req, res, next) {
 			}
 
 
-			user.getUserData(inviteData.uid, function (err, userData) {
+			user.getUserFields(inviteData.uid, ['uid', 'username', 'userslug', 'picture', 'banned'], function (err, userData) {
 				if (err && err.message === '[[error:no-user]]' && !userData) {
 					return helpers.notFound(req, res);
 				}
 
 				inviteData.user = userData;
-				if (userData) {
-					inviteData.user.banned = parseInt(userData.banned, 10) === 1;
-				}
+				inviteData.user.banned = inviteData.user.banned ? parseInt(userData.banned, 10) === 1 : 0;
+				inviteData.user.deleted = inviteData.user.uid === 0 ? 1 : 0;
 
 				inviteData.isSelf = userPrivileges.isSelf;
 				inviteData.joined = parseInt(inviteData.joined, 10) === 1;
@@ -181,7 +180,7 @@ inviteController.details = function (req, res, next) {
 				inviteData.notJoined = !!parseInt(inviteData.expired, 10);
 				inviteData.invitedByMe = results.invitedByMe;
 				inviteData.canControl = parseInt(inviteData.inviteCount, 10) <= 1;
-				inviteData.hideFooter = (parseInt(inviteData.uid, 10) === parseInt(req.uid, 10) && inviteData.invited) || !userData;
+				inviteData.hideFooter = (parseInt(inviteData.uid, 10) === parseInt(req.uid, 10) && inviteData.invited) || !userData || inviteData.user.deleted;
 				if (!inviteData.notJoined && !inviteData.joined && !inviteData.invited) {
 					inviteData.endSymbol1 = '。';
 				} else {
@@ -199,10 +198,6 @@ inviteController.details = function (req, res, next) {
 					inviteData.invitedTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 				}
 				if (inviteData.notJoined) {
-					date = new Date(parseInt(inviteData.notJoinedTime, 10));
-					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-					inviteData.notJoinedTime = date.getFullYear() + '/' + date.getMonth() + '/' + (date.getDate() + 7) + ' - ' + hours + ':' + minutes;
 					inviteData.expiredTime = schedule.expire.text;
 				}
 				date = new Date(parseInt(inviteData.timestamp, 10));

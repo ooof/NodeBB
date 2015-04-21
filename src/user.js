@@ -115,9 +115,10 @@ var	async = require('async'),
 
 			if (!parseInt(user.uid, 10)) {
 				user.uid = 0;
-				user.username = '[[global:guest]]';
+				user.username = '无名';
 				user.userslug = '';
-				user.picture = User.createGravatarURLFromEmail('');
+				user.picture = '/images/avatar/ling.png';
+				user.uploadedpicture = '/images/avatar/ling.png';
 			}
 
 			if (user.picture) {
