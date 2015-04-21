@@ -62,34 +62,23 @@ module.exports = function (Invite) {
 		db.getObjectField('username:iid:invite', username, callback);
 	};
 
-	Invite.inviteUser = function (uid, iid, voteCount, callback) {
+	Invite.inviteUser = function (inviteData, callback) {
+		var uid = inviteData.uid,
+			iid = inviteData.iid;
+
 		async.waterfall([
 			function (next) {
-				// 获取用户总数
-				db.getObjectField('global', 'userCount', next);
-			},
-			function (userCount, next) {
-				// 判断是否通过投票比例
-				var canSendInvite = parseInt(voteCount, 10) / parseInt(userCount, 10) >= (meta.config.votePercent ? meta.config.votePercent / 100 : 0.5);
-				if (canSendInvite) {
+				if (inviteData.passInvite) {
 					return db.getObjectFields('invite:' + iid, ['slug', 'username'], next);
 				}
 				callback();
 			},
 			function (inviteData, next) {
-				// 通知投票用户已发出邀请
-				user.notifications.sendNotification({
-					bodyShort: '[[invite:notification.invited, ' + inviteData.username + ']]',
-					path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-					score: 'votedUids',
-					uid: uid,
-					iid: iid,
-					nid: 'upvote:uid:' + uid + ':iid:' + iid
-				}, next);
+				Invite.notificationUserInvited(inviteData, uid, iid, next);
 			},
 			function (next) {
 				// 给被提名人发送邮件邀请
-				Invite.sendUser(uid, iid, function (err) {
+				Invite.sendInviteEmail(uid, iid, function (err) {
 					if (err) {
 						return next(err);
 					}
@@ -99,7 +88,33 @@ module.exports = function (Invite) {
 		], callback);
 	};
 
-	Invite.sendUser = function (uid, iid, callback) {
+	// 通知全站用户参与提名
+	Invite.notificationUserUpvote = function (inviteData, callback) {
+		user.notifications.sendNotification({
+			bodyShort: '[[invite:notification.inviting, ' + inviteData.invitedByUsername + ', ' + inviteData.username + ']]',
+			path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
+			nid: 'inviting:' + inviteData.iid,
+			uid: inviteData.uid,
+			score: 'other'
+		}, function () {
+			callback(null, inviteData);
+		});
+	};
+
+	// 通知参与提名的用户该提名已通过并已发出邀请
+	Invite.notificationUserInvited = function (inviteData, uid, iid, callback) {
+		user.notifications.sendNotification({
+			bodyShort: '[[invite:notification.invited, ' + inviteData.username + ']]',
+			path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
+			score: 'votedUids',
+			uid: uid,
+			iid: iid,
+			nid: 'upvote:uid:' + uid + ':iid:' + iid
+		}, callback);
+	};
+
+	// 向用户发出注册邀请
+	Invite.sendInviteEmail = function (uid, iid, callback) {
 		var userData = {},
 			register_code = utils.generateUUID(),
 			register_link = nconf.get('url') + '/register?code=' + register_code,

@@ -88,14 +88,9 @@ module.exports = function (Invite) {
 						db.setObjectField('email:iid', email, iid, next);
 					},
 					function (next) {
-						Invite.upVote(uid, iid, next);
+						Invite.upVote(inviteData, next);
 					}
-				], function (err) {
-					if (err) {
-						return callback(err);
-					}
-					callback(null, inviteData);
-				});
+				], callback);
 			});
 		});
 	};
@@ -164,29 +159,6 @@ module.exports = function (Invite) {
 			function (invitedByUsername, next) {
 				inviteData.invitedByUsername = invitedByUsername;
 				Invite.create({uid: uid, username: data.username, content: content, email: data.email, invitedByUsername: invitedByUsername}, next);
-			},
-			function (data, next) {
-				inviteData = data;
-				Invite.getInviteField(inviteData.iid, 'inviteCount', next);
-			},
-			function (inviteCount, next) {
-				inviteData.inviteCount = inviteCount;
-				db.getObjectField('global', 'userCount', next);
-			},
-			function (userCount, next) {
-				var invitePercent = inviteData.inviteCount / userCount >= .5;
-				if (!invitePercent && parseInt(uid, 10)) {
-					// 发送提名通知给用户
-					user.notifications.sendNotification({
-						bodyShort: '[[invite:notification.inviting, ' + inviteData.invitedByUsername + ', ' + username + ']]',
-						path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-						nid: 'inviting:' + inviteData.iid,
-						uid: uid,
-						score: 'other'
-					});
-				}
-
-				next(null, inviteData);
 			}
 		], callback);
 	};
