@@ -24,12 +24,12 @@ module.exports = function (Invite) {
 				return callback(new Error('[[invite:error.already-voted]]'));
 			}
 
-			var now = Date.now(),
+			var timestamp = Date.now(),
 				inviteCount;
 
 			async.waterfall([
 				function (next) {
-					db.sortedSetAdd('invite:posts:uid:' + uid + ':iid', now, iid, next);
+					db.sortedSetAdd('invite:posts:uid:' + uid + ':iid', timestamp, iid, next);
 				},
 				function (next) {
 					db.setAdd('invite:posts:' + iid + ':upvote:by', uid, next);
