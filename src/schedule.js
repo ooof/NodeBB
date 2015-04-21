@@ -143,25 +143,26 @@ Jobs.setExpire = function (iid, date, sendData, next) {
 			}
 			async.waterfall([
 				function (next) {
+					Jobs.setExpireField(iid, next);
+				},
+				function (next) {
 					user.notifications.sendNotification({
 						bodyShort: sendData.invite.username + '，您提名的 ' + inviteData.username + ' 邀请邮件已经发出' + Jobs.expire.text + '，但到目前还没有注册进入社区，该提名已过期。',
 						path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-						score: 'somebody',
-						iid: iid,
+						nid: 'invite:iid:' + iid + ':uid:' + inviteData.uid + ':expired',
 						uid: inviteData.uid,
-						nid: 'invite:iid:' + iid + ':uid:' + inviteData.uid + ':expired'
+						iid: iid,
+						score: 'somebody',
+						step: 5
 					}, next);
-				},
-				function (next) {
-					Jobs.setExpireField(iid, next);
 				},
 				function (next) {
 					var voters = sendData.upvote.voters;
 					if (!Array.isArray(voters) || !voters.length) {
 						return next();
 					}
-					async.map(voters, function (id, callback) {
-						db.getObjectField('user:' + id, 'username', function (err, username) {
+					async.map(voters, function (uid, callback) {
+						db.getObjectField('user:' + uid, 'username', function (err, username) {
 							if (err) {
 								return callback(err);
 							}
@@ -171,13 +172,14 @@ Jobs.setExpire = function (iid, date, sendData, next) {
 							user.notifications.sendNotification({
 								bodyShort: username + '，您参与投票的 ' + inviteData.username + ' 的邀请邮件已经发出' + Jobs.expire.text + '，但到目前还没有注册进入社区，该提名已过期。',
 								path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-								score: 'somebody',
+								nid: 'invite:iid:' + iid + ':uid:'+ uid + ':expired',
+								uid: uid,
 								iid: iid,
-								uid: id,
-								nid: 'invite:iid:' + iid + ':uid:'+ id + ':expired'
+								score: 'somebody',
+								step: 5
 							}, next);
 						});
-					}, next());
+					}, next);
 				}
 			], next);
 		});
@@ -201,10 +203,11 @@ Jobs.sendInviteNotification = function (inviteData, callback) {
 			user.notifications.sendNotification({
 				bodyShort: username + '，您提名的 ' + inviteData.username + ' 邀请邮件已经发出' + Jobs.warn.text + '，但到目前还没有注册进入社区，觉得需要的话，可以以您觉得合适的方式通知他本人查收一下邮件。',
 				path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-				score: 'somebody',
-				iid: iid,
+				nid: 'invite:iid:' + iid + ':uid:' + inviteData.uid + ':warned',
 				uid: inviteData.uid,
-				nid: 'invite:iid:' + iid + ':uid:' + inviteData.uid + ':warned'
+				iid: iid,
+				score: 'somebody',
+				step: 4
 			}, next);
 		},
 		function (next) {
@@ -231,10 +234,11 @@ Jobs.sendInviteNotification = function (inviteData, callback) {
 					user.notifications.sendNotification({
 						bodyShort: username + '，您参与投票的 ' + inviteData.username + ' 的邀请邮件已经发出' + Jobs.warn.text + '，但到目前还没有注册进入社区，觉得需要的话，可以以您觉得合适的方式通知他本人查收一下邮件。',
 						path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-						score: 'somebody',
-						iid: iid,
+						nid: 'invite:iid:' + iid + ':uid:'+ id + ':warned',
 						uid: id,
-						nid: 'invite:iid:' + iid + ':uid:'+ id + ':warned'
+						iid: iid,
+						score: 'somebody',
+						step: 4
 					}, next);
 				});
 			}, next());
