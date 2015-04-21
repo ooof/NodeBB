@@ -530,7 +530,7 @@ function generateData(type, callback) {
 				user.getUidsFromHash('username:uid', next);
 			},
 			function (uids, next) {
-				user.getMultipleUserFields(uids, ['uid', 'joindate', 'topiccount', 'followingCount', 'followerCount'], next)
+				user.getMultipleUserFields(uids, ['username', 'joindate', 'topiccount', 'followingCount', 'followerCount'], next)
 			},
 			function (userData, next) {
 				userData.map(function (item, index) {
