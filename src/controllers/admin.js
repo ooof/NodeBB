@@ -507,9 +507,10 @@ function generateData(type, callback) {
 				var index = 0;
 				async.eachSeries(inviteData, function (item, next) {
 					async.eachSeries(upvoteIids[index], function (upvoteItem, next) {
-						user.getUserField(upvoteItem, 'username', function (err, username) {
-							username = username !== '[[global:guest]]' ? username : '无';
-							data.push([username, item.realUsername]);
+						user.getUserFields(upvoteItem, ['username', 'uid'], function (err, userData) {
+							if (!parseInt(userData.uid, 10)) {
+								data.push([userData.username, item.realUsername]);
+							}
 							next();
 						})
 					}, next);
