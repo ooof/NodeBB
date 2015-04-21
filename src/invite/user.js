@@ -90,11 +90,13 @@ module.exports = function (Invite) {
 
 	// 通知全站用户参与提名
 	Invite.notificationUserUpvote = function (inviteData, callback) {
+		// step: 1
 		user.notifications.sendNotification({
 			bodyShort: '[[invite:notification.inviting, ' + inviteData.invitedByUsername + ', ' + inviteData.username + ']]',
 			path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-			nid: 'inviting:' + inviteData.iid,
+			nid: 'upvote:' + inviteData.iid,
 			uid: inviteData.uid,
+			iid: inviteData.iid,
 			score: 'other'
 		}, function () {
 			callback(null, inviteData);
@@ -103,13 +105,14 @@ module.exports = function (Invite) {
 
 	// 通知参与提名的用户该提名已通过并已发出邀请
 	Invite.notificationUserInvited = function (inviteData, uid, iid, callback) {
+		// step: 2
 		user.notifications.sendNotification({
 			bodyShort: '[[invite:notification.invited, ' + inviteData.username + ']]',
 			path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-			score: 'votedUids',
+			nid: 'invited:uid:' + uid + ':iid:' + iid,
 			uid: uid,
 			iid: iid,
-			nid: 'upvote:uid:' + uid + ':iid:' + iid
+			score: 'allVotedUids'
 		}, callback);
 	};
 
@@ -151,8 +154,8 @@ module.exports = function (Invite) {
 				db.sortedSetAdd('invite:time', iid, timestamp, next);
 			},
 			function (next) {
-				// 邀请链接默认7天到期
-				db.expireAt('confirm:' + register_code, Math.floor(timestamp / parseInt(meta.config['invite:expireTime'], 10)), next);
+				// 邀请链接到期设置
+				db.pexpireAt('confirm:' + register_code, Math.floor(timestamp + jobs.expire.time), next);
 			}
 		], function (err) {
 			if (err) {
@@ -160,8 +163,8 @@ module.exports = function (Invite) {
 			}
 
 			// for test
-			if ((userData.email.indexOf('yufeg.com') !== -1 || userData.email.indexOf('test') !== -1) && process.env.NODE_ENV === 'development') {
-				console.log('development test');
+			if (userData.email.indexOf('@test.com') !== -1 && process.env.NODE_ENV === 'development') {
+				console.log('invite development test');
 				return callback();
 			}
 

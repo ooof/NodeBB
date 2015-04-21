@@ -320,5 +320,27 @@ var async = require('async'),
 		});
 	};
 
+	Notifications.deletePrevStepNotificationByIid = function (iid, callback) {
+		var key = 'notifications:iid:' + iid,
+			nid;
+
+		async.waterfall([
+			function (next) {
+				db.getObjectField(key, 'nid', next);
+			},
+			function (_nid, next) {
+				var type = Object.prototype.toString.call(_nid).slice(8, -1);
+				if (type === 'Null') {
+					return callback();
+				}
+				nid = _nid;
+				db.sortedSetRemove('notifications', _nid, next);
+			},
+			function (next) {
+				db.deleteAll([key, 'notifications:' + nid], next);
+			}
+		], callback);
+	};
+
 }(exports));
 

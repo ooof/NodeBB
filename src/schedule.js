@@ -146,14 +146,14 @@ Jobs.setExpire = function (iid, date, sendData, next) {
 					Jobs.setExpireField(iid, next);
 				},
 				function (next) {
+					// step: 5
 					user.notifications.sendNotification({
 						bodyShort: sendData.invite.username + '，您提名的 ' + inviteData.username + ' 邀请邮件已经发出' + Jobs.expire.text + '，但到目前还没有注册进入社区，该提名已过期。',
 						path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
 						nid: 'invite:iid:' + iid + ':uid:' + inviteData.uid + ':expired',
 						uid: inviteData.uid,
 						iid: iid,
-						score: 'somebody',
-						step: 5
+						score: 'somebody'
 					}, next);
 				},
 				function (next) {
@@ -169,14 +169,14 @@ Jobs.setExpire = function (iid, date, sendData, next) {
 							if (!username) {
 								return next();
 							}
+							// step: 5
 							user.notifications.sendNotification({
 								bodyShort: username + '，您参与投票的 ' + inviteData.username + ' 的邀请邮件已经发出' + Jobs.expire.text + '，但到目前还没有注册进入社区，该提名已过期。',
 								path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
 								nid: 'invite:iid:' + iid + ':uid:'+ uid + ':expired',
 								uid: uid,
 								iid: iid,
-								score: 'somebody',
-								step: 5
+								score: 'somebody'
 							}, next);
 						});
 					}, next);

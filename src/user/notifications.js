@@ -318,47 +318,61 @@ var async = require('async'),
 	UserNotifications.sendNotification = function(data, next) {
 		next = next || function() {};
 
+		// 给某一个人发送通知
         if (data.score === 'somebody') {
-			return notifications.create(data, function(err, notification) {
-				if (!err && notification) {
-					notifications.push(notification, data.uid);
-				}
-				next();
-			});
+			createNotification(data, data.uid, next);
         }
 
-		user.getUidsFromHash('username:uid', function (err, uids) {
-			if (err || !Array.isArray(uids) || !uids.length) {
-				return;
-			}
+		// 给所有投票人发送通知
+		if (data.score === 'votedUids' || data.score === 'allVotedUids') {
+			db.getSetMembers('invite:posts:' + data.iid + ':upvote:by', function (err, votedUids) {
+				if (err) {
+					return next(err);
+				}
+				var uids = votedUids.filter(function (uid) {
+					return data.score === 'allVotedUids' ? parseInt(uid, 10) : parseInt(uid, 10) !== parseInt(data.uid, 10);
+				});
 
-			var score = data.score ?  data.score : 'all';
-			if (data.score) delete data.score;
+				createNotification(data, uids, next);
+			});
+		}
 
-			if (score === 'other') {
+		// 给排除自己以外的所有用户发送通知
+		if (data.score === 'other') {
+			user.getUidsFromHash('username:uid', function (err, uids) {
+				if (err || !Array.isArray(uids) || !uids.length) {
+					return;
+				}
+
 				uids = uids.filter(function (uid) {
 					return uid !== data.uid;
 				});
-				delete data.uid;
-			} else if (score === 'votedUids') {
-				db.getSetMembers('invite:posts:' + data.iid + ':upvote:by', function (err, votedUids) {
-					if (err) {
-						return next(err);
-					}
-					uids = votedUids.filter(function (uid) {
-						return parseInt(uid, 10) !== parseInt(data.uid, 10);
-					});
-					delete data.uid;
-				});
-			}
 
-			notifications.create(data, function(err, notification) {
-				if (!err && notification) {
-					notifications.push(notification, uids);
-				}
-				next();
+				createNotification(data, uids, next);
 			});
-		});
+		}
+
+		function createNotification(data, uids, next) {
+			delete data.uid;
+			delete data.score;
+
+			async.waterfall([
+				function (next) {
+					notifications.deletePrevStepNotificationByIid(data.iid, next)
+				},
+				function (next) {
+					db.setObject('notifications:iid:' + data.iid, data, next);
+				},
+				function (next) {
+					notifications.create(data, function (err, notification) {
+						if (!err && notification) {
+							notifications.push(notification, uids);
+						}
+						next();
+					});
+				}
+			], next);
+		}
 	};
 
 	UserNotifications.sendWelcomeNotification = function(uid) {

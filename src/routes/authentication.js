@@ -307,13 +307,14 @@
 			function(next) {
 				user.logIP(uid, req.ip);
 
+				// step: 3
 				user.notifications.sendNotification({
 					bodyShort: '[[invite:notification.joined, ' + userData.invitedByUsername + ', ' + userData.inviteUsername + ']]',
 					path: nconf.get('relative_path') + '/invite/' + userData.invitedBySlug,
 					uid: uid,
-					score: 'votedUids',
 					iid: userData.iid,
-					nid: 'joined:' + uid
+					nid: 'joined:' + uid,
+					score: 'votedUids'
 				});
 
 				plugins.fireHook('filter:register.complete', {uid: uid, referrer: req.body.referrer}, next);
