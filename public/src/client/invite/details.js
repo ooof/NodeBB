@@ -25,9 +25,22 @@ define('forum/invite/details', ['composer', 'components', 'navigator', 'translat
 		app.enterRoom('invite_' + data.iid);
 
 		addHandlers(data);
+		addSymbol();
 
 		events.init();
 	};
+
+	function addSymbol() {
+		var inviteCourseEls = $('[component="invite/course"]').children();
+		inviteCourseEls.map(function (index) {
+			var self = $(this);
+
+			if (index !== inviteCourseEls.length - 1) {
+				return self.text(self.text() + '；')
+			}
+			return self.text(self.text() + '。')
+		})
+	}
 
 	function addHandlers(data) {
 		var inviteContainer = components.get('invite').children('.post-row');

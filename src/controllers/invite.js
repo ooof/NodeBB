@@ -181,16 +181,6 @@ inviteController.details = function (req, res, next) {
 				inviteData.invitedByMe = results.invitedByMe;
 				inviteData.canControl = parseInt(inviteData.inviteCount, 10) <= 1;
 				inviteData.hideFooter = (parseInt(inviteData.uid, 10) === parseInt(req.uid, 10) && inviteData.invited) || !userData || inviteData.user.deleted;
-				if (!inviteData.notJoined && !inviteData.joined && !inviteData.invited) {
-					inviteData.endSymbol1 = '。';
-				} else {
-					inviteData.endSymbol1 = '；';
-				}
-				if (!inviteData.notJoined && !inviteData.joined) {
-					inviteData.endSymbol2 = '。';
-				} else {
-					inviteData.endSymbol2 = '；';
-				}
 				if (inviteData.invited) {
 					var date = new Date(parseInt(inviteData.invitedTime, 10)),
 						minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
