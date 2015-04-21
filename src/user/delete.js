@@ -1,6 +1,7 @@
 'use strict';
 
 var async = require('async'),
+	nconf = require('nconf'),
 	db = require('../database'),
 	posts = require('../posts'),
 	topics = require('../topics'),
@@ -42,7 +43,7 @@ module.exports = function(User) {
 	}
 
 	User.deleteAccount = function(uid, callback) {
-		User.getUserFields(uid, ['username', 'userslug', 'fullname', 'email'], function(err, userData) {
+		User.getUserFields(uid, ['username', 'userslug', 'fullname', 'email', 'invitedByUid', 'invitedUsername'], function(err, userData) {
 			if (err)  {
 				return callback(err);
 			}
@@ -94,6 +95,10 @@ module.exports = function(User) {
 					groups.leaveAllGroups(uid, next);
 				},
 				function(next) {
+					// 向提名人发出通知，告知他提名的某位用户已被删除
+					sendNotificationToInviter(userData.invitedByUid, userData.invitedUsername, next);
+				},
+				function(next) {
 					plugins.fireHook('filter:user.delete', uid, next);
 				}
 			], function(err) {
@@ -112,6 +117,15 @@ module.exports = function(User) {
 			});
 		});
 	};
+
+	function sendNotificationToInviter(uid, username, callback) {
+		User.notifications.sendNotification({
+			bodyShort: '您提名的' + username + '已被删除',
+			nid: 'user:deleted:' + uid,
+			uid: uid,
+			score: 'somebody'
+		}, callback);
+	}
 
 	function deleteUserIps(uid, callback) {
 		db.getSortedSetRange('uid:' + uid + ':ip', 0, -1, function(err, ips) {
