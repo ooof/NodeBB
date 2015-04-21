@@ -308,7 +308,7 @@
 				user.logIP(uid, req.ip);
 
 				user.notifications.sendNotification({
-					bodyShort: '[[invite:notification.joined, ' + userData.invitedBy + ', ' + userData.inviteUsername + ']]',
+					bodyShort: '[[invite:notification.joined, ' + userData.invitedByUsername + ', ' + userData.inviteUsername + ']]',
 					path: nconf.get('relative_path') + '/invite/' + userData.invitedBySlug,
 					uid: uid,
 					score: 'votedUids',
