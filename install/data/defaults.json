@@ -132,6 +132,10 @@
         "value": 1
     },
     {
+        "field": "ghost:endDay",
+        "value": 3
+    },
+    {
         "field": "ghost:time",
         "value": 24
     },

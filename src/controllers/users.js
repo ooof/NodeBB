@@ -50,7 +50,17 @@ usersController.getOnlineUsers = function(req, res, next) {
 usersController.getGhostUsers = function(req, res, next) {
 	async.parallel({
 		users: function(next) {
-			user.getUsersFromSet('users:recent', req.uid, 0, 49, next);
+			async.waterfall([
+				function(next) {
+					var now = Date.now(),
+						max = now - parseInt(meta.config["ghost:day"], 10) * 24 * 60 * 60 * 1000,
+						min = max - parseInt(meta.config["ghost:time"], 10) * 60 * 60 * 1000;
+					db.getSortedSetRangeByScore('users:recent', 0, 49, min, max, next);
+				},
+				function(uids, next) {
+					user.getUsers(uids, req.uid, next);
+				}
+			], next);
 		},
 		count: function(next) {
 			var now = Date.now();
