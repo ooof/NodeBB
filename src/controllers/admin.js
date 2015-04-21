@@ -481,7 +481,7 @@ function generateData(type, callback) {
 		], callback);
 	} else if (type === 'vote.csv') {
 		var iids = [];
-		var upvoteIids = [];
+		var upvoteUids = [];
 		async.waterfall([
 			function (next) {
 				db.getSortedSetRangeWithScores('invite:posts:iid', 0, -1, next);
@@ -499,16 +499,16 @@ function generateData(type, callback) {
 				});
 				db.getSetsMembers(sortSets, next)
 			},
-			function (inviteUpvoteIids, next) {
-				upvoteIids = inviteUpvoteIids;
+			function (_upvoteUids, next) {
+				upvoteUids = _upvoteUids;
 				invite.getInvitesFields(iids, ['realUsername'], next);
 			},
 			function (inviteData, next) {
 				var index = 0;
 				async.eachSeries(inviteData, function (item, next) {
-					async.eachSeries(upvoteIids[index], function (upvoteItem, next) {
-						user.getUserFields(upvoteItem, ['username', 'uid'], function (err, userData) {
-							if (!parseInt(userData.uid, 10)) {
+					async.eachSeries(upvoteUids[index], function (upvoteUid, next) {
+						user.getUserFields(upvoteUid, ['username', 'uid'], function (err, userData) {
+							if (parseInt(userData.uid, 10) !== 0 && item.realUsername) {
 								data.push([userData.username, item.realUsername]);
 							}
 							next();
