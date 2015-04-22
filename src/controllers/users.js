@@ -71,11 +71,15 @@ usersController.getGhostUsers = function(req, res, next) {
 			return next(err);
 		}
 
+		var users = results.users.filter(function (user) {
+			return user.uid !== 0;
+		});
+
 		var userData = {
 			search_display: 'hidden',
 			user_display: 'hidden',
 			loadmore_display: results.count > 50 ? 'block' : 'hide',
-			users: results.users
+			users: users
 		};
 
 		res.render('users', userData);
