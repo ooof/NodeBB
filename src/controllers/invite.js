@@ -188,7 +188,7 @@ inviteController.details = function (req, res, next) {
 					inviteData.invitedTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 				}
 				if (inviteData.notJoined) {
-					inviteData.expiredTime = schedule.expire.text;
+					inviteData.expiredTime = schedule.expire.text();
 				}
 				date = new Date(parseInt(inviteData.timestamp, 10));
 				minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();

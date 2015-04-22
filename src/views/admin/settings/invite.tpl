@@ -19,7 +19,8 @@
             <div class="form-group">
                 <p class="help-block">提醒时间</p>
                 <label for="invite-warn-time"><strong>天数-数字</strong></label>
-                <input type="number" class="form-control" id="invite-warn-time" value="5" data-field="invite:warnTime"/><br />
+                <input type="number" class="form-control" id="invite-warn-time" value="5" data-field="invite:warnTime"/>
+                <p class="help-block">支持小数，单位为天</p><br />
                 <label for="invite-warn-text"><strong>天数对应文字</strong></label>
                 <input type="text" class="form-control" id="invite-warn-text" value="五天" data-field="invite:warnText"/><br />
             </div>

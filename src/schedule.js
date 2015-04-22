@@ -29,16 +29,26 @@ var Jobs = {};
 Jobs.init = function () {
 	Jobs.jobs = {};
 
-	// 提醒时间 默认 five days
+	// 提醒时间系统默认五天
 	Jobs.warn = {
-		time: 1000 * 60 * 60 * 24 * parseInt(meta.config['invite:warnTime'], 10),
-		text: meta.config['invite:warnText']
+		time: function () {
+			var warnTime = +meta.config['invite:warnTime'];
+			return 1000 * 60 * 60 * 24 * warnTime
+		},
+		text: function () {
+			return meta.config['invite:warnText'];
+		}
 	};
 
-	// 到期时间 默认 seven days
+	// 提醒时间系统默认七天
 	Jobs.expire = {
-		time: 1000 * 60 * 60 * 24 * parseInt(meta.config['invite:expireTime'], 10),
-		text: meta.config['invite:expireText']
+		time: function () {
+			var expireTime = +meta.config['invite:expireTime'];
+			return 1000 * 60 * 60 * 24 * expireTime
+		},
+		text: function () {
+			return meta.config['invite:expireText'];
+		}
 	};
 
 	if (process.env.NODE_ENV === 'development') {
@@ -148,7 +158,7 @@ function sendExpireEmail (inviteData, callback) {
 		template: 'inviteFailed',
 		username: inviteData.invitedByUsername,
 		invite_username: inviteData.username,
-		expire_time: Jobs.expire.text,
+		expire_time: Jobs.expire.text(),
 		invite_link: nconf.get('relative_path') + '/invite/' + inviteData.slug
 	};
 	if (plugins.hasListeners('action:email.send')) {
@@ -171,7 +181,7 @@ Jobs.setExpire = function (iid, date, sendData, next) {
 				function (next) {
 					// step: 5
 					user.notifications.sendNotification({
-						bodyShort: sendData.invite.username + '，您提名的 ' + inviteData.username + ' 邀请邮件已经发出' + Jobs.expire.text + '，但到目前还没有注册进入社区，该提名已过期。',
+						bodyShort: sendData.invite.username + '，您提名的 ' + inviteData.username + ' 邀请邮件已经发出' + Jobs.expire.text() + '，但到目前还没有注册进入社区，该提名已过期。',
 						path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
 						nid: 'invite:iid:' + iid + ':uid:' + inviteData.uid + ':expired',
 						uid: inviteData.uid,
@@ -194,7 +204,7 @@ Jobs.setExpire = function (iid, date, sendData, next) {
 							}
 							// step: 5
 							user.notifications.sendNotification({
-								bodyShort: username + '，您参与投票的 ' + inviteData.username + ' 的邀请邮件已经发出' + Jobs.expire.text + '，但到目前还没有注册进入社区，该提名已过期。',
+								bodyShort: username + '，您参与投票的 ' + inviteData.username + ' 的邀请邮件已经发出' + Jobs.expire.text() + '，但到目前还没有注册进入社区，该提名已过期。',
 								path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
 								nid: 'invite:iid:' + iid + ':uid:'+ uid + ':expired',
 								uid: uid,
@@ -224,7 +234,7 @@ Jobs.sendInviteNotification = function (inviteData, callback) {
 		function (username, next) {
 			sendData.invite.username = username;
 			user.notifications.sendNotification({
-				bodyShort: username + '，您提名的 ' + inviteData.username + ' 邀请邮件已经发出' + Jobs.warn.text + '，但到目前还没有注册进入社区，觉得需要的话，可以以您觉得合适的方式通知他本人查收一下邮件。',
+				bodyShort: username + '，您提名的 ' + inviteData.username + ' 邀请邮件已经发出' + Jobs.warn.text() + '，但到目前还没有注册进入社区，觉得需要的话，可以以您觉得合适的方式通知他本人查收一下邮件。',
 				path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
 				nid: 'invite:iid:' + iid + ':uid:' + inviteData.uid + ':warned',
 				uid: inviteData.uid,
@@ -255,7 +265,7 @@ Jobs.sendInviteNotification = function (inviteData, callback) {
 						return next();
 					}
 					user.notifications.sendNotification({
-						bodyShort: username + '，您参与投票的 ' + inviteData.username + ' 的邀请邮件已经发出' + Jobs.warn.text + '，但到目前还没有注册进入社区，觉得需要的话，可以以您觉得合适的方式通知他本人查收一下邮件。',
+						bodyShort: username + '，您参与投票的 ' + inviteData.username + ' 的邀请邮件已经发出' + Jobs.warn.text() + '，但到目前还没有注册进入社区，觉得需要的话，可以以您觉得合适的方式通知他本人查收一下邮件。',
 						path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
 						nid: 'invite:iid:' + iid + ':uid:'+ id + ':warned',
 						uid: id,
