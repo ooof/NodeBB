@@ -248,7 +248,7 @@ accountsController.getAccount = function(req, res, next) {
                 userData.voteText = '我曾投票支持 ' + userData.username + ' 进入社区';
 			// isVoteA B投票A
             } else if (results.isVoteA) {
-				userData.voteText = userData.username + ' 曾投票支持我进入社区';
+				userData.voteText = userData.username + ' 是我的提名人';
             }
 
 			// 提名关系
