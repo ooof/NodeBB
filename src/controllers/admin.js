@@ -531,7 +531,7 @@ function generateData(type, callback) {
 				user.getUidsFromHash('username:uid', next);
 			},
 			function (uids, next) {
-				user.getMultipleUserFields(uids, ['username', 'joindate', 'topiccount', 'followingCount', 'followerCount'], next)
+				user.getMultipleUserFields(uids, ['uid', 'username', 'joindate', 'topiccount', 'followingCount', 'followerCount'], next)
 			},
 			function (userData, next) {
 				userData.map(function (item, index) {
@@ -543,7 +543,7 @@ function generateData(type, callback) {
 						return item[key] ? item[key] : 0;
 					});
 				});
-				data.unshift(["用户 id", "注册时间", "发贴数量", "关注数量", "粉丝数量"]);
+				data.unshift(["ID", "用户名", "注册时间", "发贴数量", "关注数量", "粉丝数量"]);
 				next(null, data);
 			}
 		], callback);
