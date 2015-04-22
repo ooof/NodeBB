@@ -152,7 +152,7 @@ module.exports = function (Invite) {
 			},
 			function (next) {
 				// 邀请链接到期设置
-				db.pexpireAt('confirm:' + register_code, Math.floor(timestamp + jobs.expire.time), next);
+				db.pexpireAt('confirm:' + register_code, Math.floor(timestamp + jobs.expire.time()), next);
 			}
 		], function (err) {
 			if (err) {

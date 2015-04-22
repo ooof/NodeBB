@@ -92,11 +92,11 @@ Jobs.getInviteIids = function (callback) {
 			var invitedTime = item.value,
 				timestamp = Date.now();
 
-			if (timestamp - invitedTime < Jobs.warn.time) {
+			if (timestamp - invitedTime < Jobs.warn.time()) {
 				Jobs.setWarn(item.score, parseInt(item.value, 10));
-			} else if (timestamp - invitedTime >= Jobs.warn.time && timestamp - invitedTime < Jobs.expire.time) {
+			} else if (timestamp - invitedTime >= Jobs.warn.time() && timestamp - invitedTime < Jobs.expire.time()) {
 				warnIids.push(parseInt(item.score, 10));
-			} else if (timestamp - invitedTime >= Jobs.expire.time) {
+			} else if (timestamp - invitedTime >= Jobs.expire.time()) {
 				expireIids.push(parseInt(item.score, 10));
 			}
 		});
@@ -131,7 +131,7 @@ Jobs.setSchedules = function (iids) {
 
 Jobs.setWarn = function (iid, time, callback) {
 	callback = callback || function() {};
-	var date = new Date(time + Jobs.warn.time);
+	var date = new Date(time + Jobs.warn.time());
 
 	Jobs.jobs[iid] = schedule.scheduleJob(date, function (iid) {
 		db.getObject('invite:' + iid, function (err, inviteData) {
@@ -294,7 +294,7 @@ Jobs.sendInviteNotification = function (inviteData, callback) {
 			db.getObjectField('invite:' + iid, 'invitedTime', next);
 		},
 		function (time, next) {
-			var date = new Date(parseInt(time, 10) + Jobs.expire.time);
+			var date = new Date(parseInt(time, 10) + Jobs.expire.time());
 			Jobs.setExpire(iid, date, sendData, next);
 		}
 	], callback);
