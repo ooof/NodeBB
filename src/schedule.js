@@ -33,7 +33,7 @@ Jobs.init = function () {
 	Jobs.warn = {
 		time: function () {
 			var warnTime = +meta.config['invite:warnTime'];
-			return 1000 * 60 * 60 * 24 * warnTime
+			return 1000 * 60 * 60 * 24 * warnTime;
 		},
 		text: function () {
 			return meta.config['invite:warnText'];
@@ -44,7 +44,7 @@ Jobs.init = function () {
 	Jobs.expire = {
 		time: function () {
 			var expireTime = +meta.config['invite:expireTime'];
-			return 1000 * 60 * 60 * 24 * expireTime
+			return 1000 * 60 * 60 * 24 * expireTime;
 		},
 		text: function () {
 			return meta.config['invite:expireText'];
@@ -53,12 +53,20 @@ Jobs.init = function () {
 
 	if (process.env.NODE_ENV === 'development') {
 		Jobs.warn = {
-			time: 1000 * 60 * 2,
-			text: '2分钟'
+			time: function () {
+				return 1000 * 60 * 2;
+			},
+			text: function () {
+				return '2分钟';
+			}
 		};
 		Jobs.expire = {
-			time: 1000 * 60 * 6,
-			text: '6分钟'
+			time: function () {
+				return 1000 * 60 * 6;
+			},
+			text: function () {
+				return '6分钟';
+			}
 		}
 	}
 
