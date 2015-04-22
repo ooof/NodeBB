@@ -166,16 +166,16 @@ module.exports = function (Invite) {
 			}
 
 			var params = {
-				email: userData.email,
-				register_link: register_link,
 				site_title: meta.config.title || 'NodeBB',
+				uid: userData.uid,
+				template: 'invite',
 				username: userData.username,
 				from_username: userData.from_username,
-				uid: userData.uid,
+				register_link: register_link,
 				from_invite_username: userData.from_invite_username
 			};
 			if (plugins.hasListeners('action:email.send')) {
-				emailer.sendInvite(params, callback);
+				emailer.sendPlus(params, callback);
 			} else {
 				callback(new Error('[[error:no-emailers-configured]]'));
 			}

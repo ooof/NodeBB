@@ -20,6 +20,8 @@ var schedule = require('node-schedule'),
 	async = require('async'),
 	user = require('./user'),
 	invite = require('./invite'),
+	plugins = require('./plugins'),
+	emailer = require('./emailer'),
 	db = require('./database');
 
 var Jobs = {};
@@ -58,6 +60,7 @@ Jobs.init = function () {
 	});
 };
 
+// 根据 invite:time, 获取所有该列表中的提名id
 Jobs.getInviteIids = function (callback) {
 	db.getSortedSetRangeWithScores('invite:time', 0, -1, function (err, inviteTimes) {
 		if (err) {
@@ -125,15 +128,35 @@ Jobs.setWarn = function (iid, time, callback) {
 
 Jobs.setExpireField = function (iid, callback) {
 	callback = callback || function() {};
-	db.getObject('invite:' + iid, function (err, inviteData) {
+	invite.getInviteData(iid, function (err, inviteData) {
 		// 当已经邀请，但是没有加入，同时超过过期时间的时候
 		if (!!parseInt(inviteData.invited, 10) && !parseInt(inviteData.joined, 10)) {
 			invite.setInviteFields(inviteData.iid, {expired: 1, warned: 1});
+			sendExpireEmail(inviteData);
 		}
 		db.sortedSetRemove('invite:time', inviteData.invitedTime, callback());
 	});
 	// TODO send notification
 };
+
+// 邀请失败后，向提名人发送邮件告知
+function sendExpireEmail (inviteData, callback) {
+	callback = callback || function() {};
+	var params = {
+		site_title: (meta.config.title || 'NodeBB'),
+		uid: inviteData.uid,
+		template: 'inviteFailed',
+		username: inviteData.invitedByUsername,
+		invite_username: inviteData.username,
+		expire_time: Jobs.expire.text,
+		invite_link: nconf.get('relative_path') + '/invite/' + inviteData.slug
+	};
+	if (plugins.hasListeners('action:email.send')) {
+		emailer.sendPlus(params)
+	} else {
+		callback(new Error('[[error:no-emailers-configured]]'));
+	}
+}
 
 Jobs.setExpire = function (iid, date, sendData, next) {
 	Jobs.jobs[iid] = schedule.scheduleJob(date, function (iid) {

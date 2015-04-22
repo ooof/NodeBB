@@ -10,6 +10,7 @@ var async = require('async'),
 
 	db = require('../database'),
 	meta = require('../meta'),
+	plugins = require('../plugins'),
 	emailer = require('../emailer');
 
 (function(UserReset) {
@@ -57,19 +58,17 @@ var async = require('async'),
 				UserReset.generate(uid, next);
 			},
 			function(code, next) {
-				translator.translate('[[email:password-reset-requested, ' + (meta.config.title || 'NodeBB') + ']]', meta.config.defaultLang, function(subject) {
-					next(null, subject, code);
-				});
-			},
-			function(subject, code, next) {
-				var reset_link = nconf.get('url') + '/reset/' + code;
-				emailer.sendReset({
+				var params = {
 					site_title: (meta.config.title || 'NodeBB'),
-					reset_link: reset_link,
-					subject: subject,
+					uid: uid,
 					template: 'reset',
-					uid: uid
-				}, next);
+					reset_link: nconf.get('url') + '/reset/' + code
+				};
+				if (plugins.hasListeners('action:email.send')) {
+					emailer.sendPlus(params, 'reset', next);
+				} else {
+					callback(new Error('[[error:no-emailers-configured]]'));
+				}
 			}
 		], callback);
 	};
