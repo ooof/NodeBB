@@ -166,6 +166,7 @@ module.exports = function (Invite) {
 			}
 
 			var params = {
+				email: userData.email,
 				site_title: meta.config.title || 'NodeBB',
 				uid: userData.uid,
 				template: 'invite',

@@ -106,7 +106,7 @@ var	fs = require('fs'),
 
 			if (Plugins.hasListeners('action:email.send')) {
 				Plugins.fireHook('action:email.send', {
-					to: results.email,
+					to: params.email || results.email,
 					from: meta.config['email:from'] || 'no-reply@localhost.lan',
 					subject: results.subject,
 					html: results.html,
