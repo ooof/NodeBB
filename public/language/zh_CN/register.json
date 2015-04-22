@@ -1,7 +1,7 @@
 {
     "register": "注册",
     "help.email": "默认情况下，您的电子邮箱不会公开。",
-    "help.username_restrictions": "A unique username between %1 and %2 characters. Others can mention you with @<span id='yourUsername'>username</span>.",
+    "help.username_restrictions": "此用户名由系统随机设定，您无法修改，它人可以在此用户名前面加 @ 提到您。",
     "help.minimum_password_length": "请以下面的规则设置安全密码：<br>1.密码长度不得少于6位；<br>2.密码至少包含右侧字串中的三种：大写字母、小写字母、数字、特殊符号；<br>3.密码中可以使用的特殊符号：` ~ ! @ # $ % ^ & * ( ) _ + - = { } | [ ] \\ : \" ; ' < > ? , . /",
     "email_address": "电子邮箱地址",
     "email_address_placeholder": "输入电子邮箱地址",
