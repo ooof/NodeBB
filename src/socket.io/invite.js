@@ -142,6 +142,9 @@ SocketInvite.upvote = function (socket, data, callback) {
 		exists: function (next) {
 			invite.exists(data.iid, next);
 		},
+		inviteData: function (next) {
+			invite.getInviteData(data.iid, next);
+		},
 		isInvited: function (next) {
 			invite.isInvited(data.iid, next);
 		},
@@ -153,11 +156,11 @@ SocketInvite.upvote = function (socket, data, callback) {
 			return callback(err || new Error('[[error:invalid-pid]]'));
 		}
 
-		if (parseInt(results.isInvited.invited, 10)) {
+		if (parseInt(results.inviteData.invited, 10)) {
 			return callback(err || new Error('[[invite:error.has-invited]]'));
 		}
 
-		if (parseInt(results.isInvited.joined, 10)) {
+		if (parseInt(results.inviteData.joined, 10)) {
 			return callback(err || new Error('[[invite:error.has-joined]]'));
 		}
 
@@ -165,10 +168,7 @@ SocketInvite.upvote = function (socket, data, callback) {
 			return callback(new Error('[[error:post-deleted]]'));
 		}
 
-		invite.upVote({
-			uid: socket.uid,
-			iid: data.iid
-		}, callback);
+		invite.upVote(socket.uid, results.inviteData, callback);
 	});
 };
 

@@ -318,26 +318,26 @@ var async = require('async'),
 	UserNotifications.sendNotification = function(data, next) {
 		next = next || function() {};
 
-		// 给某一个人发送通知
+		// 给某一个用户发送通知
         if (data.score === 'somebody') {
 			createNotification(data, data.uid, next);
         }
 
-		// 给所有投票人发送通知
-		if (data.score === 'votedUids' || data.score === 'allVotedUids') {
+		// 给排除当前访问用户所有投票用户发送通知
+		if (data.score === 'votedUids') {
 			db.getSetMembers('invite:posts:' + data.iid + ':upvote:by', function (err, votedUids) {
 				if (err) {
 					return next(err);
 				}
 				var uids = votedUids.filter(function (uid) {
-					return data.score === 'allVotedUids' ? parseInt(uid, 10) : parseInt(uid, 10) !== parseInt(data.uid, 10);
+					return parseInt(uid, 10) !== parseInt(data.uid, 10);
 				});
 
 				createNotification(data, uids, next);
 			});
 		}
 
-		// 给排除自己以外的所有用户发送通知
+		// 给排除自己以外的全站所有用户发送通知
 		if (data.score === 'other') {
 			user.getUidsFromHash('username:uid', function (err, uids) {
 				if (err || !Array.isArray(uids) || !uids.length) {
@@ -345,7 +345,7 @@ var async = require('async'),
 				}
 
 				uids = uids.filter(function (uid) {
-					return uid !== data.uid;
+					return parseInt(uid, 10) !== parseInt(data.uid, 10);
 				});
 
 				createNotification(data, uids, next);

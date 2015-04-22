@@ -62,9 +62,8 @@ module.exports = function (Invite) {
 		db.getObjectField('username:iid:invite', username, callback);
 	};
 
-	Invite.inviteUser = function (inviteData, callback) {
-		var uid = inviteData.uid,
-			iid = inviteData.iid;
+	Invite.inviteUser = function (uid, inviteData, callback) {
+		var iid = inviteData.iid;
 
 		async.waterfall([
 			function (next) {
@@ -78,7 +77,7 @@ module.exports = function (Invite) {
 			},
 			function (next) {
 				// 给被提名人发送邮件邀请
-				Invite.sendInviteEmail(uid, iid, function (err) {
+				Invite.sendInviteEmail(inviteData.uid, iid, function (err) {
 					if (err) {
 						return next(err);
 					}
@@ -98,9 +97,7 @@ module.exports = function (Invite) {
 			uid: inviteData.uid,
 			iid: inviteData.iid,
 			score: 'other'
-		}, function () {
-			callback(null, inviteData);
-		});
+		}, callback);
 	};
 
 	// 通知参与提名的用户该提名已通过并已发出邀请
@@ -112,7 +109,7 @@ module.exports = function (Invite) {
 			nid: 'invited:uid:' + uid + ':iid:' + iid,
 			uid: uid,
 			iid: iid,
-			score: 'allVotedUids'
+			score: 'other'
 		}, callback);
 	};
 

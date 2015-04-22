@@ -8,12 +8,11 @@ var async = require('async'),
 	db = require('../database');
 
 module.exports = function (Invite) {
-	Invite.upVote = function (inviteData, callback) {
+	Invite.upVote = function (uid, inviteData, callback) {
 		// invite:posts:uid:{uid}:iid 创建并默认投票该邀请贴
 		// invite:posts:{iid}:upvote:by 投票支持邀请贴的所有用户
 
-		var uid = inviteData.uid,
-			iid = inviteData.iid;
+		var iid = inviteData.iid;
 
 		db.isSetMember('invite:posts:' + iid + ':upvote:by', uid, function (err, value) {
 			if (err) {
@@ -38,26 +37,30 @@ module.exports = function (Invite) {
 					db.incrObjectField('invite:' + iid, 'inviteCount', next);
 				},
 				function (count, next) {
-					inviteCount = count;
+					inviteCount = parseInt(count, 10);
 					// 获取用户总数
 					db.getObjectField('global', 'userCount', next);
 				},
 				function (userCount, next) {
 					// 判断是否通过投票比例
-					inviteData.passInvite = parseInt(inviteCount, 10) / parseInt(userCount, 10) >= (meta.config.votePercent ? meta.config.votePercent / 100 : 0.5);
+					inviteData.passInvite = inviteCount / parseInt(userCount, 10) >= (meta.config.votePercent ? meta.config.votePercent / 100 : 0.5);
 
 					// 通过投票比例则发出邀请，否则通知所有用户进行投票
 					if (inviteData.passInvite) {
-						return Invite.inviteUser(inviteData, next);
+						return Invite.inviteUser(uid, inviteData, next);
 					}
-
-					Invite.notificationUserUpvote(inviteData, callback);
+					// 当数量为1的时候，就是提名人默认投的票，此时通知全站用户参与投票
+					if (inviteCount === 1) {
+						return Invite.notificationUserUpvote(inviteData, next);
+					}
+					next();
 				},
 				function (next) {
-					db.getObjectFields('invite:' + iid, ['invited', 'username'], next);
+					Invite.getInviteFields(iid, ['invited', 'username'], next);
 				},
 				function (data, next) {
-					data.inviteCount = parseInt(inviteCount, 10);
+					data.inviteCount = inviteCount;
+					inviteData.inviteCount = inviteCount;
 					data.isInvited = !!parseInt(data.invited, 10);
 					websockets.in('invite_' + iid).emit('event:invite_upvote', data);
 					next(null, inviteData);

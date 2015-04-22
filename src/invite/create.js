@@ -88,7 +88,7 @@ module.exports = function (Invite) {
 						db.setObjectField('email:iid', email, iid, next);
 					},
 					function (next) {
-						Invite.upVote(inviteData, next);
+						Invite.upVote(uid, inviteData, next);
 					}
 				], callback);
 			});
