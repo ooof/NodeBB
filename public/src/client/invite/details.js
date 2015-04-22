@@ -36,9 +36,9 @@ define('forum/invite/details', ['composer', 'components', 'navigator', 'translat
 			var self = $(this);
 
 			if (index !== inviteCourseEls.length - 1) {
-				return self.text(self.text() + '；')
+				return self.html(self.html() + '；')
 			}
-			return self.text(self.text() + '。')
+			return self.html(self.html() + '。')
 		})
 	}
 
