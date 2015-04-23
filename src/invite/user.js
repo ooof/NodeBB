@@ -22,36 +22,65 @@ module.exports = function (Invite) {
 		});
 	};
 
-	Invite.emailExists = function(email, callback) {
-		if (email) {
-			async.waterfall([
-				function (next) {
-					user.email.exists(email, next);
-				}
-			], function (err, exists) {
-				if (err) {
-					return callback(err);
-				}
-
-				callback(null, exists);
-			});
-		}
-	};
+	function getDataForValidate (iid, callback) {
+		Invite.getInviteFields(iid, ['status', 'slug'], function (err, inviteData) {
+			if (err) {
+				return callback(err);
+			}
+			var data = {
+					exists: !!iid
+				},
+				slugTag = '<a href="' + nconf.get('relative_path') + 'invite/' + inviteData.slug + '" target="_blank">点击查看</a>';
+			if (inviteData.status==='voting') {
+				data.msg = '正在投票中，' + slugTag;
+			} else if (inviteData.status==='invited') {
+				data.msg = '已被提名，并已发送邮件邀请加入，' + slugTag;
+			} else if (inviteData.status==='joined') {
+				data.msg = '已加入，' + slugTag;
+			} else if (inviteData.status==='failed') {
+				data.exists = false;
+				data.msg = '已被提名，但邀请失败，可再次提名此人，' + slugTag;
+			} else {
+				data.msg = '';
+			}
+			callback (null, data);
+		})
+	}
 
 	Invite.usernameExists = function(username, callback) {
-		if (username) {
-			async.waterfall([
-				function (next) {
-					meta.userOrGroupExists(utils.slugify(username), next);
+		var data = {};
+		async.waterfall([
+			function (next) {
+				Invite.getIidByUsername(username, next);
+			},
+			function (iid, next) {
+				if (!iid) {
+					return callback(null, data)
 				}
-			], function (err, exists) {
-				if (err) {
-					return callback(err);
-				}
+				next(null, iid);
+			},
+			function (iid, next) {
+				getDataForValidate(iid, next);
+			}
+		], callback);
+	};
 
-				callback(null, exists);
-			})
-		}
+	Invite.emailExists = function(email, callback) {
+		var data = {};
+		async.waterfall([
+			function (next) {
+				Invite.getIidByEmail(email.toLowerCase(), next);
+			},
+			function (iid, next) {
+				if (!iid) {
+					return callback(null, data)
+				}
+				next(null, iid);
+			},
+			function (iid, next) {
+				getDataForValidate(iid, next);
+			}
+		], callback);
 	};
 
 	Invite.getIidByEmail = function(email, callback) {
@@ -59,6 +88,9 @@ module.exports = function (Invite) {
 	};
 
 	Invite.getIidByUsername = function(username, callback) {
+		if (!username) {
+			return callback();
+		}
 		db.getObjectField('username:iid:invite', username, callback);
 	};
 

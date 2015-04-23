@@ -73,7 +73,7 @@ module.exports = function (Invite) {
 
 				/**
 				 * invite:posts:iid 所有的邀请贴 iid
-				 * username:iid 邀请贴对应的用户名
+				 * username:iid:invite 邀请贴对应的用户名
 				 * invite:slug:iid 邀请贴对应的url标识符
 				 * email:iid 邀请贴对应的邮箱
 				 */
@@ -124,12 +124,12 @@ module.exports = function (Invite) {
 					return callback(new Error('[[error:username-too-long, ' + meta.config.maximumUsernameLength + ']]'));
 				}
 
-				Invite.usernameExists(username, function (err, exist) {
+				Invite.usernameExists(username, function (err, data) {
 					if (err) {
 						return next(err);
 					}
 
-					if (exist) {
+					if (data.exists) {
 						return next(new Error('[[error:username-taken]]'));
 					}
 
@@ -145,12 +145,12 @@ module.exports = function (Invite) {
 					return callback(new Error('[[error:invalid-email]]'));
 				}
 
-				Invite.emailExists(email, function (err, exist) {
+				Invite.emailExists(email, function (err, data) {
 					if (err) {
 						return next(err);
 					}
 
-					if (exist) {
+					if (data.exists) {
 						return callback(new Error('[[error:email-taken]]'));
 					}
 

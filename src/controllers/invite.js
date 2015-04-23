@@ -74,8 +74,9 @@ inviteController.list = function (req, res, next) {
 			var inviteData = [];
 
 			data.invite.map(function (value, index) {
-				data.invite[index].joined = parseInt(value.joined, 10);
-				data.invite[index].invited = parseInt(value.invited, 10);
+				data.invite[index].joined = !!parseInt(value.joined, 10);
+				data.invite[index].invited = !!parseInt(value.invited, 10);
+				data.invite[index].expired = !!parseInt(value.expired, 10);
 			});
 
 			// 已发邀请
@@ -107,9 +108,6 @@ inviteController.list = function (req, res, next) {
 				data.invite = inviteData;
 			}
 			data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[global:header.invite]]', url: '/invite'}]);
-			data.invite.map(function (item, index) {
-				return data.invite[index].expired = !!parseInt(item.expired, 10);
-			});
 
 			next(null, data);
 		}

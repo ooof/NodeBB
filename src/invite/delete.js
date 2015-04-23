@@ -56,7 +56,7 @@ module.exports = function (Invite) {
 			},
 			function (data, next) {
 				inviteData = data;
-				db.deleteObjectField('username:iid', inviteData.username, next);
+				db.deleteObjectField('username:iid:invite', inviteData.username, next);
 			},
 			function (next) {
 				db.deleteObjectField('invite:slug:iid', inviteData.slug, next);

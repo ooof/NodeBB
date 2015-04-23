@@ -12,8 +12,9 @@ define('composer', [
 	'composer/tags',
 	'composer/categoryList',
 	'composer/preview',
+	'forum/invite/composer',
 	'composer/resize'
-], function(taskbar, translator, controls, uploads, formatting, drafts, tags, categoryList, preview, resize) {
+], function(taskbar, translator, controls, uploads, formatting, drafts, tags, categoryList, preview, inviteComposer, resize) {
 	var composer = {
 		active: undefined,
 		posts: {},
@@ -360,6 +361,10 @@ define('composer', [
 			composerTemplate.attr('id', 'cmp-uuid-' + post_uuid);
 
 			$(document.body).append(composerTemplate);
+
+			if(composer.posts[post_uuid].hasOwnProperty('invite')) {
+				inviteComposer.init();
+			}
 
 			var postContainer = $(composerTemplate[0]),
 				bodyEl = postContainer.find('textarea'),

@@ -172,6 +172,20 @@ SocketInvite.upvote = function (socket, data, callback) {
 	});
 };
 
+// 检查用户名是否存在
+SocketInvite.usernameExists = function(socket, data, callback) {
+	if(data && data.username) {
+		invite.usernameExists(data.username, callback);
+	}
+};
+
+// 检查邮箱是否存在
+SocketInvite.emailExists = function(socket, data, callback) {
+	if(data && data.email) {
+		invite.emailExists(data.email, callback);
+	}
+};
+
 // 排序
 SocketInvite.setInviteSort = function(socket, sort, callback) {
 	if (socket.uid) {
