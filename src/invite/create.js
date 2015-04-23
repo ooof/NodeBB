@@ -32,6 +32,13 @@ module.exports = function (Invite) {
 
 			slug = iid + '/' + slug;
 
+			/**
+			 * invite status
+			 * 1. voting 正在投票
+			 * 2. invited 已发邀请
+			 * 3. joined 已进社区
+			 * 4. joined 邀请失败
+			 */
 			var inviteData = {
 				'iid': iid,
 				'uid': uid,
@@ -44,6 +51,7 @@ module.exports = function (Invite) {
 				'edited': 0,
 				'joined': 0,
 				'invited': 0,
+				'status': 'voting',
 				'slug': slug,
 				'timestamp': timestamp,
 				'lastvotetime': 0,
@@ -63,10 +71,12 @@ module.exports = function (Invite) {
 					return callback(err);
 				}
 
-				// invite:posts:iid 所有的邀请贴 iid
-				// username:iid 邀请贴对应的用户名
-				// invite:slug:iid 邀请贴对应的url标识符
-				// email:iid 邀请贴对应的邮箱
+				/**
+				 * invite:posts:iid 所有的邀请贴 iid
+				 * username:iid 邀请贴对应的用户名
+				 * invite:slug:iid 邀请贴对应的url标识符
+				 * email:iid 邀请贴对应的邮箱
+				 */
 
 				async.parallel([
 					function (next) {

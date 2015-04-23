@@ -9,7 +9,7 @@
   "list.status": "所有状态",
   "list.status_voting": "正在投票",
   "list.status_invited": "已发邀请",
-  "list.status_not_joined": "邀请失败",
+  "list.status_failed": "邀请失败",
   "list.status_joined": "已进社区",
   "list.posted_ago": "提名于%1",
 

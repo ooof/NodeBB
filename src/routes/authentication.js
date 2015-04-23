@@ -291,7 +291,7 @@
 				req.login({uid: uid}, next);
 			},
 			function(next) {
-				db.setObject('invite:' + userData.iid, {realUsername: userData.username, joined: 1, joinedTime: Date.now()}, next);
+				db.setObject('invite:' + userData.iid, {realUsername: userData.username, status: 'joined', joined: 1, joinedTime: Date.now()}, next);
 			},
 			// user:{uid}:invited 某个用户邀请并已加入的用户
 			function(next) {

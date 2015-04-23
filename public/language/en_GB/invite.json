@@ -9,7 +9,7 @@
   "list.status": "All status",
   "list.status_voting": "Voting",
   "list.status_invited": "Invited",
-  "list.status_not_joined": "Invited failed",
+  "list.status_failed": "Invited failed",
   "list.status_joined": "Joined",
   "list.posted_ago": "invited%1",
 

@@ -144,7 +144,7 @@ module.exports = function (Invite) {
 			},
 			function (username, next) {
 				userData.from_invite_username = username;
-				db.setObject('invite:' + iid, {invited: 1, invitedTime: timestamp}, next);
+				db.setObject('invite:' + iid, {invited: 1, invitedTime: timestamp, status: 'invited'}, next);
 			},
 			function(next) {
 				// invite:time 记录邀请时间和iid 该表用于执行定时任务

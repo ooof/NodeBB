@@ -99,8 +99,8 @@ inviteController.list = function (req, res, next) {
 				});
 				data.invite = inviteData;
 			}
-			// 正在投票
-			if(settings.inviteSort === 'not_joined') {
+			// 邀请失败
+			if(settings.inviteSort === 'failed') {
 				inviteData = data.invite.filter(function (item) {
 					return parseInt(item.expired, 10) === 1;
 				});
