@@ -47,6 +47,16 @@ module.exports = function (Invite) {
 		})
 	}
 
+	function registerUsernameExists(data, username, callback) {
+		user.exists(utils.slugify(username), function (err, exist) {
+			data.exists = exist;
+			if (exist) {
+				data.msg = '该用户已存在';
+			}
+			callback(null, data);
+		});
+	}
+
 	Invite.usernameExists = function(username, callback) {
 		var data = {};
 		async.waterfall([
@@ -55,7 +65,7 @@ module.exports = function (Invite) {
 			},
 			function (iid, next) {
 				if (!iid) {
-					return callback(null, data)
+					return registerUsernameExists(data, username, callback);
 				}
 				next(null, iid);
 			},
