@@ -322,22 +322,38 @@ var async = require('async'),
 
 	Notifications.deletePrevStepNotificationByIid = function (iid, callback) {
 		var key = 'notifications:iid:' + iid,
-			nid;
+			userData;
 
 		async.waterfall([
 			function (next) {
-				db.getObjectField(key, 'nid', next);
+				db.exists(key, next);
 			},
-			function (_nid, next) {
-				var type = Object.prototype.toString.call(_nid).slice(8, -1);
-				if (type === 'Null') {
+			function (exists, next) {
+				if (!exists) {
 					return callback();
 				}
-				nid = _nid;
-				db.sortedSetRemove('notifications', _nid, next);
+				db.getObjectFields(key, ['nid', 'uids'], next);
+			},
+			function (_userData, next) {
+				userData = _userData;
+				userData.uids = userData.uids.split(',');
+				db.sortedSetRemove('notifications', userData.nid, next);
 			},
 			function (next) {
-				db.deleteAll([key, 'notifications:' + nid], next);
+				async.each(userData.uids, function (uid, next) {
+					async.waterfall([
+						function (next) {
+							db.sortedSetRemove('uid:' + uid + ':notifications:unread', userData.nid, next);
+						},
+						function (next) {
+							User.notifications.pushCount(uid);
+							db.sortedSetRemove('uid:' + uid + ':notifications:read', userData.nid, next);
+						}
+					], next)
+				}, next);
+			},
+			function (next) {
+				db.deleteAll([key, 'notifications:' + userData.nid], next);
 			}
 		], callback);
 	};

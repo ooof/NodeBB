@@ -361,6 +361,7 @@ var async = require('async'),
 					notifications.deletePrevStepNotificationByIid(data.iid, next)
 				},
 				function (next) {
+					data.uids = uids;
 					db.setObject('notifications:iid:' + data.iid, data, next);
 				},
 				function (next) {
