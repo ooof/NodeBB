@@ -516,6 +516,7 @@ function generateData(type, callback) {
 									if (!!exists) {
 										data.push([userData.username, item.realUsername]);
 									}
+									next();
 								});
 							}
 							next();
