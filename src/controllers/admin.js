@@ -509,7 +509,14 @@ function generateData(type, callback) {
 					async.eachSeries(upvoteUids[index], function (upvoteUid, next) {
 						user.getUserFields(upvoteUid, ['username', 'uid'], function (err, userData) {
 							if (parseInt(userData.uid, 10) !== 0 && item.realUsername) {
-								data.push([userData.username, item.realUsername]);
+								return db.getObjectField('username:iid', item.realUsername, function (err, exists) {
+									if (err) {
+										return next(err);
+									}
+									if (!!exists) {
+										data.push([userData.username, item.realUsername]);
+									}
+								});
 							}
 							next();
 						})
