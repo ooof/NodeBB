@@ -1,6 +1,9 @@
 "use strict";
 
 module.exports = function(redisClient, module) {
+
+	var helpers = module.helpers.redis;
+
 	module.listPrepend = function(key, value, callback) {
 		callback = callback || function() {};
 		redisClient.lpush(key, value, function(err, res) {
@@ -37,5 +40,14 @@ module.exports = function(redisClient, module) {
 	module.getListRange = function(key, start, stop, callback) {
 		callback = callback || function() {};
 		redisClient.lrange(key, start, stop, callback);
+	};
+
+	module.listAppendMulti = function(key, value, callback) {
+		callback = callback || function() {};
+		if (!Array.isArray(value)) {
+			value = [value];
+		}
+
+		helpers.multiKeyValues(redisClient, 'rpush', key, value, callback);
 	};
 };

@@ -10,6 +10,15 @@ module.exports = function(redisClient, module) {
 		});
 	};
 
+	module.setAdds = function(key, value, callback) {
+		callback = callback || function() {};
+		if (!Array.isArray(value)) {
+			value = [value];
+		}
+
+		helpers.multiKeyValues(redisClient, 'sadd', key, value, callback);
+	};
+
 	module.setsAdd = function(keys, value, callback) {
 		callback = callback || function() {};
 		helpers.multiKeysValue(redisClient, 'sadd', keys, value, function(err, res) {
