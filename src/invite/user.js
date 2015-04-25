@@ -109,22 +109,17 @@ module.exports = function (Invite) {
 
 		async.waterfall([
 			function (next) {
-				if (inviteData.passInvite) {
-					return db.getObjectFields('invite:' + iid, ['slug', 'username'], next);
-				}
-				callback();
+				db.getObjectFields('invite:' + iid, ['slug', 'username'], next);
 			},
 			function (inviteData, next) {
 				Invite.notificationUserInvited(inviteData, uid, iid, next);
 			},
 			function (next) {
 				// 给被提名人发送邮件邀请
-				Invite.sendInviteEmail(inviteData.uid, iid, function (err) {
-					if (err) {
-						return next(err);
-					}
-					jobs.setWarn(iid, Date.now(), next);
-				});
+				Invite.sendInviteEmail(inviteData.uid, iid, next);
+			},
+			function (next) {
+				jobs.setWarn(iid, Date.now(), next);
 			}
 		], callback);
 	};
@@ -138,7 +133,8 @@ module.exports = function (Invite) {
 			nid: 'upvote:' + inviteData.iid,
 			uid: inviteData.uid,
 			iid: inviteData.iid,
-			score: 'other'
+			score: 'other',
+			step: 1
 		}, callback);
 	};
 
@@ -151,7 +147,8 @@ module.exports = function (Invite) {
 			nid: 'invited:uid:' + uid + ':iid:' + iid,
 			uid: uid,
 			iid: iid,
-			score: 'other'
+			score: 'other',
+			step: 2
 		}, callback);
 	};
 

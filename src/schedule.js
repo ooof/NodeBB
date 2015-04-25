@@ -133,10 +133,11 @@ Jobs.setWarn = function (iid, time, callback) {
 	callback = callback || function() {};
 	var date = new Date(time + Jobs.warn.time());
 
+    // 在发出邀请后，提醒时间内还未加入的， 通知提醒参与投票的人
 	Jobs.jobs[iid] = schedule.scheduleJob(date, function (iid) {
 		db.getObject('invite:' + iid, function (err, inviteData) {
 			if (!!parseInt(inviteData.joined, 10) && !parseInt(inviteData.invited, 10)) {
-				return false;
+				return;
 			}
 			Jobs.sendInviteNotification(inviteData);
 		});
@@ -176,7 +177,7 @@ function sendExpireEmail (inviteData, callback) {
 	}
 }
 
-Jobs.setExpire = function (iid, date, sendData, next) {
+Jobs.setExpire = function (iid, date, voters, next) {
 	Jobs.jobs[iid] = schedule.scheduleJob(date, function (iid) {
 		db.getObject('invite:' + iid, function (err, inviteData) {
 			if (!!parseInt(inviteData.joined, 10)) {
@@ -187,18 +188,6 @@ Jobs.setExpire = function (iid, date, sendData, next) {
 					Jobs.setExpireField(iid, next);
 				},
 				function (next) {
-					// step: 5
-					user.notifications.sendNotification({
-						bodyShort: sendData.invite.username + '，您提名的 ' + inviteData.username + ' 邀请邮件已经发出' + Jobs.expire.text() + '，但到目前还没有注册进入社区，该提名已过期。',
-						path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-						nid: 'invite:iid:' + iid + ':uid:' + inviteData.uid + ':expired',
-						uid: inviteData.uid,
-						iid: iid,
-						score: 'somebody'
-					}, next);
-				},
-				function (next) {
-					var voters = sendData.upvote.voters;
 					if (!Array.isArray(voters) || !voters.length) {
 						return next();
 					}
@@ -212,12 +201,13 @@ Jobs.setExpire = function (iid, date, sendData, next) {
 							}
 							// step: 5
 							user.notifications.sendNotification({
-								bodyShort: username + '，您参与投票的 ' + inviteData.username + ' 的邀请邮件已经发出' + Jobs.expire.text() + '，但到目前还没有注册进入社区，该提名已过期。',
+								bodyShort: username + '，您参与提名或投票 ' + inviteData.username + ' 的邀请邮件已经发出' + Jobs.expire.text() + '，但到目前还没有注册进入社区，该提名已过期。',
 								path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
 								nid: 'invite:iid:' + iid + ':uid:'+ uid + ':expired',
 								uid: uid,
 								iid: iid,
-								score: 'somebody'
+								score: 'somebody',
+								step: 5
 							}, next);
 						});
 					}, next);
@@ -227,53 +217,31 @@ Jobs.setExpire = function (iid, date, sendData, next) {
 	}.bind(null, iid));
 };
 
+// 提名通过发出通知
 Jobs.sendInviteNotification = function (inviteData, callback) {
 	callback = callback || function() {};
-	var iid = inviteData.iid;
-	var sendData = {
-		invite: {},
-		upvote: {}
-	};
+	var iid = inviteData.iid,
+		voters;
 
 	async.waterfall([
 		function (next) {
-			db.getObjectField('user:' + inviteData.uid, 'username', next)
+			db.getSetMembers('invite:posts:' + iid + ':upvote:by', next);
 		},
-		function (username, next) {
-			sendData.invite.username = username;
-			user.notifications.sendNotification({
-				bodyShort: username + '，您提名的 ' + inviteData.username + ' 邀请邮件已经发出' + Jobs.warn.text() + '，但到目前还没有注册进入社区，觉得需要的话，可以以您觉得合适的方式通知他本人查收一下邮件。',
-				path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-				nid: 'invite:iid:' + iid + ':uid:' + inviteData.uid + ':warned',
-				uid: inviteData.uid,
-				iid: iid,
-				score: 'somebody',
-				step: 4
-			}, next);
-		},
-		function (next) {
-			db.getSetMembers('invite:posts:' + iid + ':upvote:by', function (err, voters) {
-				var newVoters = voters.filter(function (voter) {
-					return parseInt(voter, 10) !== parseInt(inviteData.uid, 10);
-				});
-				next(null, newVoters);
-			});
-		},
-		function (voters, next) {
-			sendData.upvote.voters = voters;
+		function (_voters, next) {
+			voters = _voters;
 			if (!Array.isArray(voters) || !voters.length) {
 				return next();
 			}
-			async.map(voters, function (id, callback) {
+			async.each(voters, function (id, next) {
 				db.getObjectField('user:' + id, 'username', function (err, username) {
 					if (err) {
-						return callback(err);
+						return next(err);
 					}
 					if (!username) {
 						return next();
 					}
 					user.notifications.sendNotification({
-						bodyShort: username + '，您参与投票的 ' + inviteData.username + ' 的邀请邮件已经发出' + Jobs.warn.text() + '，但到目前还没有注册进入社区，觉得需要的话，可以以您觉得合适的方式通知他本人查收一下邮件。',
+						bodyShort: username + '，您参与提名或投票 ' + inviteData.username + ' 的邀请邮件已经发出' + Jobs.warn.text() + '，但到目前还没有注册进入社区，觉得需要的话，可以以您觉得合适的方式通知他本人查收一下邮件。',
 						path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
 						nid: 'invite:iid:' + iid + ':uid:'+ id + ':warned',
 						uid: id,
@@ -282,20 +250,24 @@ Jobs.sendInviteNotification = function (inviteData, callback) {
 						step: 4
 					}, next);
 				});
-			}, next());
+			}, next);
 		},
+		// 设置该提名贴已发出过期提醒通知
 		function (next) {
 			invite.setInviteField(iid, 'warned', 1, next);
 		},
+		// 取消定时提醒任务
 		function (next) {
 			Jobs.cancelJobsByIid(iid, next);
 		},
+		// 获取邀请邮件发出时间
 		function (next) {
 			db.getObjectField('invite:' + iid, 'invitedTime', next);
 		},
+		// 根据邀请邮件发出时间和过期时间定制过期任务
 		function (time, next) {
 			var date = new Date(parseInt(time, 10) + Jobs.expire.time());
-			Jobs.setExpire(iid, date, sendData, next);
+			Jobs.setExpire(iid, date, voters, next);
 		}
 	], callback);
 };

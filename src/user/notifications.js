@@ -14,6 +14,8 @@ var async = require('async'),
 	postTools = require('../postTools'),
 	topics = require('../topics'),
 	privileges = require('../privileges'),
+	jobs = require('../schedule'),
+	invite = require('../invite'),
 	utils = require('../../public/src/utils');
 
 (function(UserNotifications) {
@@ -317,23 +319,51 @@ var async = require('async'),
 
 	UserNotifications.sendNotification = function(data, next) {
 		next = next || function() {};
+		data.uid = parseInt(data.uid, 10);
+
+		function createNotification(data, callback) {
+			if (!Array.isArray(data.uids) || !data.uids.length) {
+				data.uids = [data.uids];
+			}
+
+			async.waterfall([
+				function (next) {
+					invite.deletePrevNotification(data, next);
+				},
+				function (next) {
+					invite.storeNotificationData(data, next);
+				},
+				function (next) {
+					notifications.create(data, function (err, notification) {
+						if (!err && notification) {
+							notifications.push(notification, data.uids);
+						}
+						next();
+					});
+				}
+			], callback);
+		}
 
 		// 给某一个用户发送通知
         if (data.score === 'somebody') {
-			createNotification(data, data.uid, next);
+			data.uids= data.uid;
+			createNotification(data, next);
         }
 
 		// 给排除当前访问用户所有投票用户发送通知
 		if (data.score === 'votedUids') {
-			db.getSetMembers('invite:posts:' + data.iid + ':upvote:by', function (err, votedUids) {
+			db.getSetMembers('invite:posts:' + data.iid + ':upvote:by', function (err, uids) {
 				if (err) {
 					return next(err);
 				}
-				var uids = votedUids.filter(function (uid) {
-					return parseInt(uid, 10) !== parseInt(data.uid, 10);
+				for (var i = 0, l = uids.length; i < l; i++) {
+					uids[i] = parseInt(uids[i], 10);
+				}
+				data.uids = uids.filter(function (uid) {
+					return uid !== data.uid;
 				});
 
-				createNotification(data, uids, next);
+				createNotification(data, next);
 			});
 		}
 
@@ -344,35 +374,16 @@ var async = require('async'),
 					return;
 				}
 
-				uids = uids.filter(function (uid) {
-					return parseInt(uid, 10) !== parseInt(data.uid, 10);
+				for (var i = 0, l = uids.length; i < l; i++) {
+					uids[i] = parseInt(uids[i], 10);
+				}
+
+				data.uids = uids.filter(function (uid) {
+					return uid !== data.uid;
 				});
 
-				createNotification(data, uids, next);
+				createNotification(data, next);
 			});
-		}
-
-		function createNotification(data, uids, next) {
-			delete data.uid;
-			delete data.score;
-
-			async.waterfall([
-				function (next) {
-					notifications.deletePrevStepNotificationByIid(data.iid, next)
-				},
-				function (next) {
-					data.uids = uids;
-					db.setObject('notifications:iid:' + data.iid, data, next);
-				},
-				function (next) {
-					notifications.create(data, function (err, notification) {
-						if (!err && notification) {
-							notifications.push(notification, uids);
-						}
-						next();
-					});
-				}
-			], next);
 		}
 	};
 
@@ -407,15 +418,23 @@ var async = require('async'),
 		});
 	};
 
-	UserNotifications.pushCount = function(uid) {
+	UserNotifications.pushCount = function(uids) {
 		var websockets = require('./../socket.io');
-		UserNotifications.getUnreadCount(uid, function(err, count) {
-			if (err) {
-				return winston.error(err.stack);
-			}
+		if (!Array.isArray(uids) || !uids.length) {
+			uids = [uids];
+		}
+		for (var i = 0, l = uids.length; i < l; i++) {
+			(function(i) {
+				var uid = uids[i];
+				UserNotifications.getUnreadCount(uid, function (err, count) {
+					if (err) {
+						return winston.error(err.stack);
+					}
 
-			websockets.in('uid_' + uid).emit('event:notifications.updateCount', count);
-		});
+					websockets.in('uid_' + uid).emit('event:notifications.updateCount', count);
+				});
+			})(i);
+		}
 	};
 
 }(exports));

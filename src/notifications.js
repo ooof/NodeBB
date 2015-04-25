@@ -319,44 +319,5 @@ var async = require('async'),
 			});
 		});
 	};
-
-	Notifications.deletePrevStepNotificationByIid = function (iid, callback) {
-		var key = 'notifications:iid:' + iid,
-			userData;
-
-		async.waterfall([
-			function (next) {
-				db.exists(key, next);
-			},
-			function (exists, next) {
-				if (!exists) {
-					return callback();
-				}
-				db.getObjectFields(key, ['nid', 'uids'], next);
-			},
-			function (_userData, next) {
-				userData = _userData;
-				userData.uids = userData.uids.split(',');
-				db.sortedSetRemove('notifications', userData.nid, next);
-			},
-			function (next) {
-				async.each(userData.uids, function (uid, next) {
-					async.waterfall([
-						function (next) {
-							db.sortedSetRemove('uid:' + uid + ':notifications:unread', userData.nid, next);
-						},
-						function (next) {
-							User.notifications.pushCount(uid);
-							db.sortedSetRemove('uid:' + uid + ':notifications:read', userData.nid, next);
-						}
-					], next)
-				}, next);
-			},
-			function (next) {
-				db.deleteAll([key, 'notifications:' + userData.nid], next);
-			}
-		], callback);
-	};
-
 }(exports));
 

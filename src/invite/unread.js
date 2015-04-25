@@ -5,6 +5,7 @@ var async = require('async'),
 	db = require('../database'),
 	user = require('../user'),
 	notifications = require('../notifications'),
+	jobs = require('../schedule'),
 	privileges = require('../privileges');
 
 module.exports = function(Invite) {
@@ -195,6 +196,78 @@ module.exports = function(Invite) {
 				});
 			});
 		});
+	};
+
+	Invite.storeNotificationData = function (data, callback) {
+		var key = 'notifications:uid:nid:iid:' + data.iid,
+			uidsNid = {};
+
+		// step = 4 代表用户已加入社区
+		if (data.step === 3) {
+			return db.delete(key, callback);
+		}
+
+		for (var i = 0, l = data.uids.length; i < l; i++) {
+			uidsNid[data.uids[i]] = data.nid;
+		}
+
+		db.setObject(key, uidsNid, function (err) {
+			if (err) {
+				return callback(err);
+			}
+			if (data.step > 3) {
+				return db.pexpire(key, jobs.expire.time(), callback);
+			}
+			callback();
+		});
+	};
+
+	Invite.deletePrevNotification = function (data, callback) {
+		var iid = data.iid,
+			uids = data.uids,
+			uidsNid;
+
+		if (data.step === 1) {
+			return callback();
+		}
+
+		if (!Array.isArray(uids) || !uids.length) {
+			uids = [uids];
+		}
+
+		async.waterfall([
+			function (next) {
+				db.getObjectFields('notifications:uid:nid:iid:' + iid, uids, next);
+			},
+			function (_uidsNid, next) {
+				uidsNid = _uidsNid;
+				db.deleteObjectFields('notifications:uid:nid:iid:' + iid, uids, next);
+			},
+			function (next) {
+				async.each(uids, function (uid, next) {
+					if (!uidsNid[uid]) {
+						return next();
+					}
+					async.waterfall([
+						function (next) {
+							notifications.markRead(uidsNid[uid], uid, function (err) {
+								if (err) {
+									return next(err);
+								}
+								next();
+							});
+						},
+						function (next) {
+							db.sortedSetRemove('uid:' + uid + ':notifications:read', uidsNid[uid], next);
+						},
+						function (next) {
+							user.notifications.pushCount(uid);
+							next();
+						}
+					], next);
+				}, next);
+			}
+		], callback);
 	};
 
 	Invite.markVoteNotificationsRead = function(tid, uid) {

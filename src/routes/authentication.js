@@ -314,7 +314,8 @@
 					uid: uid,
 					iid: userData.iid,
 					nid: 'joined:' + uid,
-					score: 'votedUids'
+					score: 'votedUids',
+					step: 3
 				});
 
 				plugins.fireHook('filter:register.complete', {uid: uid, referrer: req.body.referrer}, next);
