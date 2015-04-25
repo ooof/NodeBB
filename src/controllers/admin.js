@@ -506,21 +506,25 @@ function generateData(type, callback) {
 			function (inviteData, next) {
 				var index = 0;
 				async.eachSeries(inviteData, function (item, next) {
-					async.eachSeries(upvoteUids[index], function (upvoteUid, next) {
-						user.getUserFields(upvoteUid, ['username', 'uid'], function (err, userData) {
-							if (parseInt(userData.uid, 10) !== 0 && item.realUsername) {
-								return db.getObjectField('username:iid', item.realUsername, function (err, exists) {
-									if (err) {
-										return next(err);
-									}
-									if (!!exists) {
-										data.push([userData.username, item.realUsername]);
-									}
-									next();
-								});
+					async.eachSeries(upvoteUids[index], function (upvoteUid, callback) {
+						async.waterfall([
+							function (next) {
+								db.exists('user:' + upvoteUid, next);
+							},
+							function (exists, next) {
+								if (!exists) {
+									return callback();
+								}
+
+								user.getUserFields(upvoteUid, ['username', 'uid'], next)
+							},
+							function (userData, next) {
+								if (parseInt(userData.uid, 10) !== 0 && item.realUsername) {
+									data.push([userData.username, item.realUsername]);
+								}
+								next();
 							}
-							next();
-						})
+						], callback);
 					}, next);
 					index++;
 				}, next);
