@@ -29,6 +29,7 @@ var adminController = {
 	flags: {},
 	topics: {},
 	groups: {},
+	update: require('./update'),
 	invite: {},
 	appearance: {},
 	extend: {

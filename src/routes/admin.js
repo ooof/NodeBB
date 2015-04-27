@@ -61,6 +61,8 @@ function addRoutes(router, middleware, controllers) {
 
 	router.get('/manage/groups', controllers.admin.groups.get);
 
+	router.get('/manage/update', controllers.admin.update.get);
+
 	router.get('/settings/:term?', controllers.admin.settings.get);
 
 	router.get('/appearance/:term?', controllers.admin.appearance.get);
