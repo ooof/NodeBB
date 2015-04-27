@@ -8,28 +8,28 @@
         </div>
 
         <div class="update-group">
-            <button class="btn btn-primary" data-action="update-version-12">Update 1.2</button>
+            <button class="btn btn-primary" data-action="update-version-12" disabled>Update 1.2</button>
             <span class="tips">升级完成...</span>
         </div>
 
         <div class="update-group">
-            <button class="btn btn-primary" data-action="update-version-13">Update 1.3</button>
-            <span class="tips"></span>
+            <button class="btn btn-primary" data-action="update-version-13" disabled>Update 1.3</button>
+            <span class="tips">升级完成...</span>
         </div>
 
         <div class="update-group">
-            <button class="btn btn-primary" data-action="update-version-14">Update 1.4</button>
-            <span class="tips"></span>
+            <button class="btn btn-primary" data-action="update-version-14" disabled>Update 1.4</button>
+            <span class="tips">升级完成...</span>
         </div>
 
         <div class="update-group">
-            <button class="btn btn-primary" data-action="update-version-15">Update 1.5</button>
-            <span class="tips"></span>
+            <button class="btn btn-primary" data-action="update-version-15" disabled>Update 1.5</button>
+            <span class="tips">升级完成...</span>
         </div>
 
         <div class="update-group">
-            <button class="btn btn-primary" data-action="update-version-16">Update 1.6</button>
-            <span class="tips"></span>
+            <button class="btn btn-primary" data-action="update-version-16" disabled>Update 1.6</button>
+            <span class="tips">升级完成...</span>
         </div>
     </div>
 </div>
