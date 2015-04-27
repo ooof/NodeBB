@@ -22,25 +22,29 @@ module.exports = function (Invite) {
 		});
 	};
 
-	function getDataForValidate (iid, callback) {
-		Invite.getInviteField(iid, 'status', function (err, status) {
+	function getDataForValidate (iid, withSlug, callback) {
+		Invite.getInviteFields(iid, ['status', 'slug'], function (err, inviteData) {
 			if (err) {
 				return callback(err);
 			}
 			var data = {
 					exists: !!iid
-				};
-			if (status === 'voting') {
+				},
+				slugTag = '<a href="' + nconf.get('relative_path') + 'invite/' + inviteData.slug + '" target="_blank">点击查看</a>';
+			if (inviteData.status === 'voting') {
 				data.msg = '正在投票中';
-			} else if (status === 'invited') {
+			} else if (inviteData.status === 'invited') {
 				data.msg = '已被提名，并已发送邮件邀请加入';
-			} else if (status === 'joined') {
+			} else if (inviteData.status === 'joined') {
 				data.msg = '已加入';
-			} else if (status === 'failed') {
+			} else if (inviteData.status === 'failed') {
 				data.exists = false;
 				data.msg = '已被提名，但邀请失败，可再次提名此人';
 			} else {
 				data.msg = '';
+			}
+			if (withSlug && data.msg) {
+				data.msg = data.msg + '，' + slugTag;
 			}
 			callback (null, data);
 		})
@@ -69,7 +73,7 @@ module.exports = function (Invite) {
 				next(null, iid);
 			},
 			function (iid, next) {
-				getDataForValidate(iid, next);
+				getDataForValidate(iid, true, next);
 			}
 		], callback);
 	};
@@ -87,7 +91,7 @@ module.exports = function (Invite) {
 				next(null, iid);
 			},
 			function (iid, next) {
-				getDataForValidate(iid, next);
+				getDataForValidate(iid, false, next);
 			}
 		], callback);
 	};
