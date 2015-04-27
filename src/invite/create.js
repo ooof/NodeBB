@@ -37,7 +37,11 @@ module.exports = function (Invite) {
 			 * 1. voting 正在投票
 			 * 2. invited 已发邀请
 			 * 3. joined 已进社区
-			 * 4. joined 邀请失败
+			 * 4. failed 邀请失败
+			 *
+			 * uid 提名的用户id
+			 * invitedByUsername 提名的用户名
+			 * realUsername 被提名后，注册进入社区的用户名
 			 */
 			var inviteData = {
 				'iid': iid,
