@@ -28,6 +28,11 @@ module.exports = function(User) {
 			var gravatar = User.createGravatarURLFromEmail(data.email);
 			var timestamp = Date.now();
 
+			/**
+			 * invitedByUid 提名该用户的用户ID
+			 * invitedByUsername 提名该用户的用户名
+			 * invitedUsername 该用户对应的提名贴子中的用户名
+			 */
 			var userData = {
 				'username': data.username,
 				'userslug': data.userslug,

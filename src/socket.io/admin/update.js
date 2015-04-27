@@ -15,7 +15,7 @@ var async = require('async'),
 /**
  * user invite:{iid}
  *
- * status
+ * status 提名贴的状态显示
  */
 Update.version.V11 = function (socket, data, callback) {
 	async.waterfall([
@@ -52,6 +52,7 @@ Update.version.V11 = function (socket, data, callback) {
  * user user:{uid}
  *
  * invitedBy rename to invitedByUid
+ * invitedByUid 提名该用户的用户ID
  */
 Update.version.V12 = function (socket, data, callback) {
 	async.waterfall([
@@ -79,22 +80,13 @@ Update.version.V12 = function (socket, data, callback) {
 /**
  * invite invite:{iid}
  *
- * invitedByUsername
+ * invitedByUsername 提名人的用户名
  */
 
 Update.version.V13 = function (socket, data, callback) {
-	var iids = [];
-
 	async.waterfall([
 		function (next) {
-			db.getSortedSetRangeWithScores('invite:posts:iid', 0, -1, next);
-		},
-		function (inviteIids, next) {
-			iids = inviteIids.map(function (iid) {
-				return iid.value;
-			});
-
-			next(null, iids);
+			invite.getInviteIds('invite:posts:iid', false, 0, -1, next);
 		},
 		function (iids, next) {
 			var keys = iids.map(function (iid) {
@@ -124,46 +116,20 @@ Update.version.V13 = function (socket, data, callback) {
 /**
  * invite invite:{iid}
  *
- * realUsername
+ * realUsername 被提名后，注册进入社区的用户名
  */
 
 Update.version.V14 = function (socket, data, callback) {
-	var iids = [];
-
 	async.waterfall([
 		function (next) {
-			db.getSortedSetRangeWithScores('invite:posts:iid', 0, -1, next);
+			user.getUidsFromHash('username:uid', next);
 		},
-		function (inviteIids, next) {
-			iids = inviteIids.map(function (iid) {
-				return iid.value;
-			});
-
-			next(null, iids);
+		function (uids, next) {
+			user.getMultipleUserFields(uids, ['iid', 'username'], next);
 		},
-		function (iids, next) {
-			var keys = iids.map(function (iid) {
-				return 'invite:' + iid;
-			});
-			next(null, keys);
-		},
-		function (keys, next) {
-			async.each(keys, function (key, callback) {
-				async.waterfall([
-					function (next) {
-						db.getObjectField(key, 'uid, joined', next)
-					},
-					function (data, next) {
-						if (parseInt(data.joined, 10) === 0) {
-							return callback();
-						}
-						db.getObjectField('user:' + data.uid, 'username', next);
-					},
-					function (username, next) {
-						db.setObjectField(key, 'realUsername', username, next);
-					}
-				], callback)
-
+		function (userData, next) {
+			async.map(userData, function (item, next) {
+				invite.setInviteField(item.iid, 'realUsername', item.username, next);
 			}, next);
 		}
 	], callback);
@@ -172,19 +138,63 @@ Update.version.V14 = function (socket, data, callback) {
 /**
  * user user:{uid}
  *
- * invitedByUsername
+ * invitedByUsername 提名该用户的用户名
  */
 
 Update.version.V15 = function (socket, data, callback) {
+	async.waterfall([
+		function (next) {
+			user.getUidsFromHash('username:uid', next);
+		},
+		function (uids, next) {
+			user.getMultipleUserFields(uids, ['uid', 'invitedByUid'], next);
+		},
+		function (userData, next) {
+			async.map(userData, function (item, next) {
+				if (parseInt(item.invitedByUid, 10) === 0) {
+					return next();
+				}
+				async.waterfall([
+					function (next) {
+						user.getUserField(item.invitedByUid, 'username', next);
+					},
+					function (username, next) {
+						user.setUserField(item.uid, 'invitedByUsername', username, next);
+					}
+				], next);
+			}, next)
+		}
+	], callback);
 };
 
 /**
  * user user:{uid}
  *
- * invitedUsername
+ * invitedUsername 该用户对应的提名贴子中的用户名
  */
 
 Update.version.V16 = function (socket, data, callback) {
+	async.waterfall([
+		function (next) {
+			user.getUidsFromHash('username:uid', next);
+		},
+		function (uids, next) {
+			user.getMultipleUserFields(uids, ['uid', 'iid'], next);
+		},
+		function (userData, next) {
+			async.map(userData, function (item, next) {
+				async.waterfall([
+					function (next) {
+						invite.getInviteField(item.iid, 'username', next);
+					},
+					function (username, next) {
+						user.setUserField(item.uid, 'invitedUsername', username, next)
+					}
+				], next)
+
+			}, next);
+		}
+	], callback);
 };
 
 module.exports = Update;

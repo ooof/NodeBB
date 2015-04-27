@@ -44,7 +44,7 @@ define('admin/manage/update', [], function () {
 				if (err) {
 					return app.alertError(err.message);
 				}
-				updateV13.next().text('升级完成...')
+				updateV14.next().text('升级完成...')
 			});
 		});
 
@@ -53,7 +53,7 @@ define('admin/manage/update', [], function () {
 				if (err) {
 					return app.alertError(err.message);
 				}
-				updateV13.next().text('升级完成...')
+				updateV15.next().text('升级完成...')
 			});
 		});
 
@@ -62,7 +62,7 @@ define('admin/manage/update', [], function () {
 				if (err) {
 					return app.alertError(err.message);
 				}
-				updateV13.next().text('升级完成...')
+				updateV16.next().text('升级完成...')
 			});
 		});
 	};
