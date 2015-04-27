@@ -13,12 +13,12 @@
         </div>
 
         <div class="update-group">
-            <button class="btn btn-default" data-action="update-version-13">Update 1.4</button>
+            <button class="btn btn-default" data-action="update-version-13">Update 1.3</button>
             <span class="tips"></span>
         </div>
 
         <div class="update-group">
-            <button class="btn btn-default" data-action="update-version-14" disabled>Update 1.5</button>
+            <button class="btn btn-default" data-action="update-version-14" disabled>Update 1.4</button>
             <span class="tips"></span>
         </div>
 
