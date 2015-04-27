@@ -24,7 +24,7 @@ Update.version.V11 = function (socket, data, callback) {
 		function (next) {
 			var data = {
 				setKey: 'invite:posts:iid',
-				reverse: true,
+				reverse: false,
 				start: 0,
 				stop: -1,
 				uid: uid
@@ -32,25 +32,24 @@ Update.version.V11 = function (socket, data, callback) {
 			invite.getInvite(data, next);
 		},
 		function (data, next) {
-			data.invite.map(function (item) {
+			async.map(data.invite, function (item, next) {
 				var iid = item.iid;
 
 				if (parseInt(item.joined, 10) === 1) {
 					// 已进社区
-					invite.setInviteField(iid, 'status', 'joined')
+					return invite.setInviteField(iid, 'status', 'joined', next);
 				} else if (parseInt(item.expired, 10) === 1) {
 					// 邀请失败
-					invite.setInviteField(iid, 'status', 'failed')
+					return invite.setInviteField(iid, 'status', 'failed', next);
 				} else if (parseInt(item.joined, 10) === 0 && parseInt(item.invited, 10) === 1 && parseInt(item.expired, 10) === 0) {
 					// 已发邀请
-					invite.setInviteField(iid, 'status', 'invited')
+					return invite.setInviteField(iid, 'status', 'invited', next);
 				} else if (parseInt(item.invited, 10) === 0) {
 					// 正在投票
-					invite.setInviteField(iid, 'status', 'voting')
+					return invite.setInviteField(iid, 'status', 'voting', next);
 				}
-			});
-
-			next();
+				next();
+			}, next);
 		}
 	], callback);
 };
