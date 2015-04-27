@@ -23,23 +23,22 @@ module.exports = function (Invite) {
 	};
 
 	function getDataForValidate (iid, callback) {
-		Invite.getInviteFields(iid, ['status', 'slug'], function (err, inviteData) {
+		Invite.getInviteField(iid, 'status', function (err, status) {
 			if (err) {
 				return callback(err);
 			}
 			var data = {
 					exists: !!iid
-				},
-				slugTag = '<a href="' + nconf.get('relative_path') + 'invite/' + inviteData.slug + '" target="_blank">点击查看</a>';
-			if (inviteData.status==='voting') {
-				data.msg = '正在投票中，' + slugTag;
-			} else if (inviteData.status==='invited') {
-				data.msg = '已被提名，并已发送邮件邀请加入，' + slugTag;
-			} else if (inviteData.status==='joined') {
-				data.msg = '已加入，' + slugTag;
-			} else if (inviteData.status==='failed') {
+				};
+			if (status === 'voting') {
+				data.msg = '正在投票中';
+			} else if (status === 'invited') {
+				data.msg = '已被提名，并已发送邮件邀请加入';
+			} else if (status === 'joined') {
+				data.msg = '已加入';
+			} else if (status === 'failed') {
 				data.exists = false;
-				data.msg = '已被提名，但邀请失败，可再次提名此人，' + slugTag;
+				data.msg = '已被提名，但邀请失败，可再次提名此人';
 			} else {
 				data.msg = '';
 			}
