@@ -18,21 +18,15 @@ var async = require('async'),
  * status
  */
 Update.version.V11 = function (socket, data, callback) {
-	var uid = socket.uid || 0;
-
 	async.waterfall([
 		function (next) {
-			var data = {
-				setKey: 'invite:posts:iid',
-				reverse: false,
-				start: 0,
-				stop: -1,
-				uid: uid
-			};
-			invite.getInvite(data, next);
+			invite.getInviteIds('invite:posts:iid', false, 0, -1, next);
+		},
+		function (iids, next) {
+			invite.getInvitesData(iids, next);
 		},
 		function (data, next) {
-			async.map(data.invite, function (item, next) {
+			async.map(data, function (item, next) {
 				var iid = item.iid;
 
 				if (parseInt(item.joined, 10) === 1) {
