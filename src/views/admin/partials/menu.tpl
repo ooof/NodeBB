@@ -15,6 +15,7 @@
                         <li><a href="{relative_path}/admin/settings/email-body">邮件文本</a></li>
                         <li><a href="{relative_path}/admin/settings/ghost">前世幽灵</a></li>
                         <li><a href="{relative_path}/admin/settings/export">导出数据</a></li>
+                        <li><a href="{relative_path}/admin/manage/invite-notifications">提名通知</a></li>
                         <li><a href="{relative_path}/admin/manage/update">系统升级</a></li>
                     </ul>
                 </div>
