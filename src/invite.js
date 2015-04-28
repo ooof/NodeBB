@@ -115,16 +115,6 @@ var async = require('async'),
 		}
 	};
 
-	Invite.getInviteIndex = function (tid, callback) {
-		votes.getVoteField(tid, 'cid', function (err, cid) {
-			if (err) {
-				return callback(err);
-			}
-
-			db.sortedSetRevRank('cid:' + cid + ':tids', tid, callback);
-		});
-	};
-
 	Invite.getInviteByIids = function (iids, uid, callback) {
 		if (!Array.isArray(iids) || !iids.length) {
 			return callback(null, []);
