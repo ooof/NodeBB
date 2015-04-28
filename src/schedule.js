@@ -5,7 +5,7 @@
  */
 
 /**
- * 1. 获取所有题名 iids
+ * 1. 获取所有提名 iids
  * 2. 获取iids对应的邀请时间
  * 3. 过滤在 Jobs.warn.time - Jobs.expire.time 区间范围的 iids
  * 4. 判断是否发出提醒

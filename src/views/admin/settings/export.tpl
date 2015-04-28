@@ -1,7 +1,7 @@
 <!-- IMPORT admin/settings/header.tpl -->
 
 <div class="panel panel-default">
-    <div class="panel-heading">题名设置</div>
+    <div class="panel-heading">提名设置</div>
     <div class="panel-body">
         <form>
             <div class="form-group">
