@@ -481,43 +481,40 @@ function generateData(type, callback) {
 			}
 		], callback);
 	} else if (type === 'vote.csv') {
-		var iids = [];
-		var upvoteUids = [];
+		var iids = [],
+			inviteData = [];
 		async.waterfall([
 			function (next) {
-				db.getSortedSetRangeWithScores('invite:posts:iid', 0, -1, next);
-			},
-			function (inviteIids, next) {
-				iids = inviteIids.map(function (iid) {
-					return iid.value;
-				});
-
-				next(null, iids);
+				invite.getInviteIds('invite:posts:iid', false, 0, -1, next);
 			},
 			function (iids, next) {
-				var sortSets = iids.map(function (iid) {
-					return 'invite:posts:' + iid + ':upvote:by';
+				invite.getInvitesData(iids, next);
+			},
+			function (data, next) {
+				var sortSets = [];
+				data.map(function (item, index) {
+					if (item.status === 'joined') {
+						iids.push(item.iid);
+						sortSets.push('invite:posts:' + item.iid + ':upvote:by');
+						inviteData.push(data[index]);
+					}
 				});
 				db.getSetsMembers(sortSets, next)
 			},
-			function (_upvoteUids, next) {
-				upvoteUids = _upvoteUids;
-				invite.getInvitesFields(iids, ['realUsername'], next);
-			},
-			function (inviteData, next) {
+			function (upvoteUids, next) {
 				var index = 0;
 				async.eachSeries(inviteData, function (item, next) {
-					async.eachSeries(upvoteUids[index], function (upvoteUid, callback) {
+					async.eachSeries(upvoteUids[index], function (uid, callback) {
 						async.waterfall([
 							function (next) {
-								db.exists('user:' + upvoteUid, next);
+								db.exists('user:' + uid, next);
 							},
 							function (exists, next) {
 								if (!exists) {
 									return callback();
 								}
 
-								user.getUserFields(upvoteUid, ['username', 'uid'], next)
+								user.getUserFields(uid, ['username', 'uid'], next)
 							},
 							function (userData, next) {
 								if (parseInt(userData.uid, 10) !== 0 && item.realUsername) {
