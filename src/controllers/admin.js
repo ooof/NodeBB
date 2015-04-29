@@ -518,7 +518,14 @@ function generateData(type, callback) {
 							},
 							function (userData, next) {
 								if (parseInt(userData.uid, 10) !== 0 && item.realUsername) {
-									data.push([userData.username, item.realUsername]);
+									// 判断用户被邀请加入后，是否被删除
+									return db.isObjectField('username:uid', item.realUsername, function (err, exists) {
+										if (!exists) {
+											return callback();
+										}
+										data.push([userData.username, item.realUsername]);
+										next();
+									});
 								}
 								next();
 							}
