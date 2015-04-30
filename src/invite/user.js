@@ -115,7 +115,7 @@ module.exports = function (Invite) {
 				db.getObjectFields('invite:' + iid, ['slug', 'username'], next);
 			},
 			function (inviteData, next) {
-				Invite.notificationUserInvited(inviteData, uid, iid, next);
+				Invite.sendInvitedNotification(inviteData, uid, iid, next);
 			},
 			function (next) {
 				// 给被提名人发送邮件邀请

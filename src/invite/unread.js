@@ -199,6 +199,10 @@ module.exports = function(Invite) {
 	};
 
 	Invite.storeNotificationData = function (data, callback) {
+		if (!data.iid) {
+			return callback();
+		}
+
 		var key = 'notifications:uid:nid:iid:' + data.iid,
 			uidsNid = {};
 
@@ -223,6 +227,10 @@ module.exports = function(Invite) {
 	};
 
 	Invite.deletePrevNotification = function (data, callback) {
+		if (!data.iid) {
+			return callback();
+		}
+
 		var iid = data.iid,
 			uids = data.uids,
 			uidsNid;

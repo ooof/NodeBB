@@ -55,7 +55,7 @@ Jobs.init = function () {
 	if (process.env.NODE_ENV === 'development') {
 		Jobs.warn = {
 			time: function () {
-				return 1000 * 60 * 2;
+				return 1000 * 8 * 2;
 			},
 			text: function () {
 				return '2分钟';
@@ -63,7 +63,7 @@ Jobs.init = function () {
 		};
 		Jobs.expire = {
 			time: function () {
-				return 1000 * 60 * 6;
+				return 1000 * 5 * 6;
 			},
 			text: function () {
 				return '6分钟';
@@ -172,16 +172,10 @@ Jobs.setExpire = function (iid, date, voters, next) {
 							if (!username) {
 								return next();
 							}
-							// step: 5
-							user.notifications.sendNotification({
-								bodyShort: username + '，您参与提名或投票 ' + inviteData.username + ' 的邀请邮件已经发出' + Jobs.expire.text() + '，但到目前还没有注册进入社区，该提名已过期。',
-								path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-								nid: 'invite:iid:' + iid + ':uid:'+ uid + ':expired',
-								uid: uid,
-								iid: iid,
-								score: 'somebody',
-								step: 5
-							}, next);
+							invite.sendExpireNotification({
+								username: username,
+								uid: uid
+							}, inviteData, next);
 						});
 					}, next);
 				}
@@ -203,7 +197,6 @@ Jobs.setExpireField = function (iid, callback) {
 	// TODO send notification
 };
 
-// 提名通过发出通知
 Jobs.sendInviteNotification = function (inviteData, callback) {
 	callback = callback || function() {};
 	var iid = inviteData.iid,
@@ -218,23 +211,18 @@ Jobs.sendInviteNotification = function (inviteData, callback) {
 			if (!Array.isArray(voters) || !voters.length) {
 				return next();
 			}
-			async.each(voters, function (id, next) {
-				db.getObjectField('user:' + id, 'username', function (err, username) {
+			async.each(voters, function (uid, next) {
+				db.getObjectField('user:' + uid, 'username', function (err, username) {
 					if (err) {
 						return next(err);
 					}
 					if (!username) {
 						return next();
 					}
-					user.notifications.sendNotification({
-						bodyShort: username + '，您参与提名或投票 ' + inviteData.username + ' 的邀请邮件已经发出' + Jobs.warn.text() + '，但到目前还没有注册进入社区，觉得需要的话，可以以您觉得合适的方式通知他本人查收一下邮件。',
-						path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-						nid: 'invite:iid:' + iid + ':uid:'+ id + ':warned',
-						uid: id,
-						iid: iid,
-						score: 'somebody',
-						step: 4
-					}, next);
+					invite.sendWarnNotification({
+						username: username,
+						uid: uid
+					}, inviteData, next);
 				});
 			}, next);
 		},
@@ -248,7 +236,7 @@ Jobs.sendInviteNotification = function (inviteData, callback) {
 		},
 		// 获取邀请邮件发出时间
 		function (next) {
-			db.getObjectField('invite:' + iid, 'invitedTime', next);
+			invite.getInviteField(iid, 'invitedTime', next);
 		},
 		// 根据邀请邮件发出时间和过期时间定制过期任务
 		function (time, next) {

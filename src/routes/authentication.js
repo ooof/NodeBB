@@ -12,6 +12,7 @@
 		Password = require('../password'),
 		meta = require('../meta'),
 		user = require('../user'),
+		invite = require('../invite'),
 		jobs = require('../schedule'),
 		plugins = require('../plugins'),
 		db = require('../database'),
@@ -308,16 +309,9 @@
 				user.logIP(uid, req.ip);
 
 				// step: 3
-				user.notifications.sendNotification({
-					bodyShort: '[[invite:notification.joined, ' + userData.invitedByUsername + ', ' + userData.inviteUsername + ']]',
-					path: nconf.get('relative_path') + '/invite/' + userData.invitedBySlug,
-					uid: uid,
-					iid: userData.iid,
-					nid: 'joined:' + uid,
-					score: 'votedUids',
-					step: 3
-				});
-
+				invite.sendJoinedNotification(uid, userData, next);
+			},
+			function(next) {
 				plugins.fireHook('filter:register.complete', {uid: uid, referrer: req.body.referrer}, next);
 			}
 		], function(err, data) {

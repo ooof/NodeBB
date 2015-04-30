@@ -52,7 +52,7 @@ module.exports = function (Invite) {
 					}
 					// 当数量为1的时候，就是提名人默认投的票，此时通知全站用户参与投票
 					if (inviteCount === 1) {
-						return Invite.notificationUserUpvote(inviteData, next);
+						return Invite.sendUpvoteNotification(inviteData, next);
 					}
 					next();
 				},

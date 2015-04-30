@@ -345,10 +345,10 @@ var async = require('async'),
 		}
 
 		// 给某一个用户发送通知
-        if (data.score === 'somebody') {
-			data.uids= data.uid;
+		if (data.score === 'somebody') {
+			data.uids = data.uid;
 			createNotification(data, next);
-        }
+		}
 
 		// 给排除当前访问用户所有投票用户发送通知
 		if (data.score === 'votedUids') {
