@@ -15,6 +15,7 @@ var async = require('async'),
 	require('./invite/user')(Invite);
 	require('./invite/upvote')(Invite);
 	require('./invite/email')(Invite);
+	require('./invite/notifications')(Invite);
 
 	Invite.exists = function (iid, callback) {
 		db.isSortedSetMember('invite:posts:iid', iid, callback);
