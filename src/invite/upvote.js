@@ -38,6 +38,7 @@ module.exports = function (Invite) {
 				},
 				function (count, next) {
 					inviteCount = parseInt(count, 10);
+					inviteData.inviteCount = inviteCount;
 					// 获取用户总数
 					db.getObjectField('global', 'userCount', next);
 				},

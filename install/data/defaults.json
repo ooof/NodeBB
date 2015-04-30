@@ -160,27 +160,63 @@
         "value": "Inviting"
     },
     {
-        "field": "email:reset:html",
-        "value": "<p>您好,</p>\r\n\r\n<p>可能由于您忘记了密码，我们收到了重置您帐户密码的申请。 如果您没有提交密码重置的请求，请忽略这封邮件。</p>\r\n\r\n<p>如需继续重置密码，请点击下面的链接：</p>\r\n\r\n<blockquote>\r\n\t<a href=\"{reset_link}\">点击这里重置您的密码</a>\r\n</blockquote>\r\n\r\n<p>谢谢！</p>"
+        "field": "email:inviteSuccess:html",
+        "value": "<p>您好，{username}:</p>\r\n\r\n<p>您提名的{invite_username}，已达到票数，系统已发送邀请邮件！</p>"
     },
     {
-        "field": "email:reset:subject",
-        "value": "{username}，有朋友邀请您进入一个社区"
+        "field": "email:inviteSuccess:subject",
+        "value": "{username}，您提名的{invite_username}已通过"
     },
     {
-        "field": "email:reset:fromname",
-        "value": "Reset"
+        "field": "email:inviteSuccess:fromname",
+        "value": "InviteSuccess"
+    },
+    {
+        "field": "email:inviteWarn:html",
+        "value": "<p>您好，{username}:</p>\r\n\r\n<p>由于您提名的{invite_username}，在{warn_time}内未进入社区，此次提名即将过期！</p>"
+    },
+    {
+        "field": "email:inviteWarn:subject",
+        "value": "{username}，您提名的{invite_username}即将过期"
+    },
+    {
+        "field": "email:inviteWarn:fromname",
+        "value": "InviteWarn"
     },
     {
         "field": "email:inviteFailed:html",
-        "value": "<p>您好,</p>\r\n\r\n<p>由于您提名的{invite_username}，在{expire_time}内未进入社区，此次提名已经被系统标记为提名失败！</p>\r\n\r\n<blockquote>\r\n\t<a href=\"{invite_link}\">点击查看提名贴</a>\r\n</blockquote>\r\n\r\n<p>谢谢！</p>"
+        "value": "<p>您好，{username}:</p>\r\n\r\n<p>由于您提名的{invite_username}，在{expire_time}内未进入社区，此次提名已经被系统标记为提名失败！</p>"
     },
     {
         "field": "email:inviteFailed:subject",
-        "value": "{username}，您提名的{invite_username}失败"
+        "value": "{username}，您提名的{invite_username}已过期"
     },
     {
         "field": "email:inviteFailed:fromname",
         "value": "InviteFailed"
+    },
+    {
+        "field": "email:inviteExit:html",
+        "value": "<p>您好，{username}:</p>\r\n\r\n<p>您提名的{invite_username}已离开社区！</p>"
+    },
+    {
+        "field": "email:inviteExit:subject",
+        "value": "{username}，您提名的{invite_username}已离开社区"
+    },
+    {
+        "field": "email:inviteExit:fromname",
+        "value": "InviteExit"
+    },
+    {
+        "field": "email:reset:html",
+        "value": "<p>您好，{username}:</p>\r\n\r\n<p>可能由于您忘记了密码，我们收到了重置您帐户密码的申请。 如果您没有提交密码重置的请求，请忽略这封邮件。</p>\r\n\r\n<p>如需继续重置密码，请点击下面的链接：</p>\r\n\r\n<blockquote>\r\n\t<a href=\"{reset_link}\">点击这里重置您的密码</a>\r\n</blockquote>\r\n\r\n<p>谢谢！</p>"
+    },
+    {
+        "field": "email:reset:subject",
+        "value": "密码重置"
+    },
+    {
+        "field": "email:reset:fromname",
+        "value": "Reset"
     }
 ]

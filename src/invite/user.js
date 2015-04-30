@@ -122,6 +122,13 @@ module.exports = function (Invite) {
 				Invite.sendInviteEmail(inviteData.uid, iid, next);
 			},
 			function (next) {
+				// 如果有多个人投票时，给提名人发送邮件告知提名已通过
+				if (inviteData.inviteCount === 1) {
+					return next();
+				}
+				Invite.sendSuccessEmail(inviteData, next);
+			},
+			function (next) {
 				jobs.setWarn(iid, Date.now(), next);
 			}
 		], callback);
@@ -155,37 +162,41 @@ module.exports = function (Invite) {
 		}, callback);
 	};
 
-	// 向用户发出注册邀请
+	/**
+	 * 向用户发出注册邀请
+	 *
+	 * from_username 提名人的用户名
+	 * from_invite_username 提名人的被邀请的用户名
+	 */
 	Invite.sendInviteEmail = function (uid, iid, callback) {
-		var userData = {},
+		var inviteData = {},
 			register_code = utils.generateUUID(),
 			register_link = nconf.get('url') + '/register?code=' + register_code,
 			timestamp = Date.now();
 
 		async.waterfall([
 			function (next) {
-				invite.getInviteFields(iid, ['username', 'uid', 'email'], next);
+				invite.getInviteFields(iid, ['username', 'invitedByUsername', 'uid', 'email'], next);
 			},
 			function (data, next) {
-				userData = data;
+				inviteData = data;
+				inviteData.from_username = data.invitedByUsername;
 				db.setObject('confirm:' + register_code, {
 					email: data.email.toLowerCase(),
 					username: data.username
 				}, next);
 			},
 			function (next) {
-				user.getUserFields(userData.uid, ['iid', 'username'], next);
+				user.getUserField(inviteData.uid, iid, next);
 			},
-			function (data, next) {
-				userData.from_username = data.username;
-				if (data.iid) {
-					invite.getInviteField(data.iid, 'username', next);
-				} else {
-					next(null, '管理员');
+			function (iid, next) {
+				if (!!iid) {
+					return invite.getInviteField(iid, 'username', next);
 				}
+				next(null, '管理员');
 			},
 			function (username, next) {
-				userData.from_invite_username = username;
+				inviteData.from_invite_username = username;
 				db.setObject('invite:' + iid, {invited: 1, invitedTime: timestamp, status: 'invited'}, next);
 			},
 			function(next) {
@@ -201,21 +212,20 @@ module.exports = function (Invite) {
 				return callback(err);
 			}
 
-			// for test
-			if (userData.email.indexOf('@test.com') !== -1 && process.env.NODE_ENV === 'development') {
+			// for test when NODE_ENV is development
+			if (inviteData.email.indexOf('@test.com') !== -1 && process.env.NODE_ENV === 'development') {
 				console.log('invite development test');
 				return callback();
 			}
 
 			var params = {
-				email: userData.email,
-				site_title: meta.config.title || 'NodeBB',
-				uid: userData.uid,
+				email: inviteData.email,
+				uid: inviteData.uid,
 				template: 'invite',
-				username: userData.username,
-				from_username: userData.from_username,
+				username: inviteData.username,
+				from_username: inviteData.from_username,
 				register_link: register_link,
-				from_invite_username: userData.from_invite_username
+				from_invite_username: inviteData.from_invite_username
 			};
 			if (plugins.hasListeners('action:email.send')) {
 				emailer.sendPlus(params, callback);

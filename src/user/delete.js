@@ -5,6 +5,7 @@ var async = require('async'),
 	db = require('../database'),
 	posts = require('../posts'),
 	topics = require('../topics'),
+	invite = require('../invite'),
 	groups = require('../groups'),
 	plugins = require('../plugins'),
 	batch = require('../batch');
@@ -97,6 +98,10 @@ module.exports = function(User) {
 				function(next) {
 					// 向提名人发出通知，告知他提名的某位用户已被删除
 					sendNotificationToInviter(userData.invitedByUid, userData.invitedUsername, next);
+				},
+				function(next) {
+					// 向提名人发出邮件，告知他提名的某位用户已被删除
+					invite.sendExitEmail(uid, next);
 				},
 				function(next) {
 					plugins.fireHook('filter:user.delete', uid, next);
