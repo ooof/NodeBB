@@ -183,7 +183,7 @@ inviteController.details = function (req, res, next) {
 					var date = new Date(parseInt(inviteData.invitedTime, 10)),
 						minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
 						hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-					inviteData.invitedTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
+					inviteData.invitedTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 				}
 				if (inviteData.notJoined) {
 					inviteData.expiredTime = schedule.expire.text();
@@ -191,7 +191,7 @@ inviteController.details = function (req, res, next) {
 				date = new Date(parseInt(inviteData.timestamp, 10));
 				minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
 				hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-				inviteData.createdTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
+				inviteData.createdTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 
 				next(null, inviteData);
 			});

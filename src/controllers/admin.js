@@ -555,7 +555,7 @@ function generateData(type, callback) {
 					data[index] = Object.keys(item).map(function (key) {
 						if (key === 'joindate') {
 							var date = new Date(parseInt(item[key], 10));
-							return date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate();
+							return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
 						}
 						return item[key] ? item[key] : 0;
 					});
