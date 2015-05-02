@@ -218,5 +218,29 @@
     {
         "field": "email:reset:fromname",
         "value": "Reset"
+    },
+    {
+        "field": "notification:invite:upvote",
+        "value": "{invitedByUsername} 邀请 {username}，请投票表决"
+    },
+    {
+        "field": "notification:invite:invited",
+        "value": "提名 {username} 的表决已通过，邀请已经发出"
+    },
+    {
+        "field": "notification:invite:joined",
+        "value": "{invitedByUsername} 提名邀请的 {inviteUsername} 已经加入"
+    },
+    {
+        "field": "notification:invite:warn",
+        "value": "{upvoteByUsername}，您参与提名或投票{username}的邀请邮件已经发出{time}，但到目前还没有注册进入社区，觉得需要的话，可以以您觉得合适的方式通知他本人查收一下邮件"
+    },
+    {
+        "field": "notification:invite:expire",
+        "value": "{upvoteByUsername}，您参与提名或投票{username}的邀请邮件已经发出{time}，但到目前还没有注册进入社区，该提名已过期"
+    },
+    {
+        "field": "notification:invite:exit",
+        "value": "您提名的{username}已被删除"
     }
 ]
