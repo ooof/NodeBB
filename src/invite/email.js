@@ -141,7 +141,6 @@ module.exports = function (Invite) {
 
 	// 被提名的用户退出社区后，给提名人发送邮件告知
 	Invite.sendExitEmail = function (uid, callback) {
-		console.log(uid);
 		async.waterfall([
 			function (next) {
 				user.getUserField(uid, 'iid', next);
@@ -150,7 +149,6 @@ module.exports = function (Invite) {
 				Invite.getInviteFields(iid, ['uid', 'invitedByUsername', 'username', 'slug'], next);
 			},
 			function (inviteData, next) {
-				console.log(inviteData);
 				var params = {
 					uid: inviteData.uid,
 					template: 'inviteExit',
