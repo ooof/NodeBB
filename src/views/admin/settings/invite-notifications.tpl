@@ -1,36 +1,97 @@
 <!-- IMPORT admin/settings/header.tpl -->
 
 <div class="panel panel-default">
-    <div class="panel-heading">提名设置</div>
+    <div class="panel-heading">通知文本内容设置</div>
     <div class="panel-body">
         <form>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" checked data-field="invite:inviteSmart"> <strong>开启智能提名</strong>
-                </label>
-            </div><br />
-
-            <div class="form-group">
-                <label for="vote-percent"><strong>提名比例</strong></label>
-                <input type="range" id="vote-percent" min="0" max="100" value="50" data-field="votePercent"/>
-                <p class="help-block">小技巧：当管理员想直接邀请一个人的时候，可以设置数量为0%</p><br />
+            <div class="help-block">
+                <h4>1. 投票通知</h4>
             </div>
-
             <div class="form-group">
-                <p class="help-block">提醒时间</p>
-                <label for="invite-warn-time"><strong>天数-数字</strong></label>
-                <input type="number" class="form-control" id="invite-warn-time" value="5" data-field="invite:warnTime"/>
-                <p class="help-block">支持小数，单位为天</p><br />
-                <label for="invite-warn-text"><strong>天数对应文字</strong></label>
-                <input type="text" class="form-control" id="invite-warn-text" value="五天" data-field="invite:warnText"/><br />
+                <label for="email-invite-html"><strong>内容</strong></label>
+                <textarea class="form-control" id="email-invite-html" data-field="notification:invite:upvote" style="min-height:75px;"></textarea>
             </div>
+            <div class="help-block">
+                <p>通知全站用户参与提名</p>
+                <ol style="padding-left: 1.5em;">
+                    <li>username 被提名人用户名</li>
+                    <li>invitedByUsername 提名人用户名</li>
+                </ol>
+            </div>
+            <br>
 
+            <div class="help-block">
+                <h4>2. 提名成功</h4>
+            </div>
             <div class="form-group">
-                <p class="help-block">过期时间</p>
-                <label for="invite-expire-time"><strong>天数-数字</strong></label>
-                <input type="number" class="form-control" id="invite-expire-time" value="7" data-field="invite:expireTime"/><br />
-                <label for="invite-expire-text"><strong>天数对应文字</strong></label>
-                <input type="text" class="form-control" id="invite-expire-text" value="七天" data-field="invite:expireText"/><br />
+                <label for="email-invite-invited-html"><strong>内容</strong></label>
+                <textarea class="form-control" id="email-invite-invited-html" data-field="notification:invite:invited" style="min-height:75px;"></textarea>
+            </div>
+            <div class="help-block">
+                <p>通知所有投票用户提名已通过并已发出邀请</p>
+                <ol style="padding-left: 1.5em;">
+                    <li>username 被提名人用户名</li>
+                </ol>
+            </div>
+            <br>
+
+            <div class="help-block">
+                <h4>3. 已加入</h4>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-joined-html"><strong>内容</strong></label>
+                <textarea class="form-control" id="email-invite-joined-html" data-field="notification:invite:joined" style="min-height:75px;"></textarea>
+            </div>
+            <div class="help-block">
+                <p>通知所有投票用户提名已通过并已发出邀请</p>
+                <ol style="padding-left: 1.5em;">
+                    <li>username 被提名人用户名</li>
+                    <li>invitedByUsername 提名人用户名</li>
+                </ol>
+            </div>
+            <br>
+
+            <div class="help-block">
+                <h4>3. 即将过期提醒</h4>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-warn-html"><strong>内容</strong></label>
+                <textarea class="form-control" id="email-invite-warn-html" data-field="notification:invite:warn" style="min-height:75px;"></textarea>
+            </div>
+            <div class="help-block">
+                <ol style="padding-left: 1.5em;">
+                    <li>username 被提名人用户名</li>
+                    <li>upvoteByUsername 投票人用户名</li>
+                </ol>
+            </div>
+            <br>
+
+            <div class="help-block">
+                <h4>4. 已过期提醒</h4>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-failed-html"><strong>内容</strong></label>
+                <textarea class="form-control" id="email-invite-failed-html" data-field="notification:invite:expire" style="min-height:75px;"></textarea>
+            </div>
+            <div class="help-block">
+                <ol style="padding-left: 1.5em;">
+                    <li>username 被提名人用户名</li>
+                    <li>upvoteByUsername 投票人用户名</li>
+                </ol>
+            </div>
+            <br>
+
+            <div class="help-block">
+                <h4>5. 用户退出</h4>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-exit-html"><strong>内容</strong></label>
+                <textarea class="form-control" id="email-invite-exit-html" data-field="notification:invite:exit" style="min-height:75px;"></textarea>
+            </div>
+            <div class="help-block">
+                <ol style="padding-left: 1.5em;">
+                    <li>username 被提名人用户名</li>
+                </ol>
             </div>
         </form>
     </div>
