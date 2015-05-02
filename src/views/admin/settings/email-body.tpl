@@ -51,6 +51,7 @@
                     <li>发送邮件告知提名人票数达到，并已发送邀请成功</li>
                     <li>username 提名人用户名</li>
                     <li>invite_username 被提名的用户名</li>
+                    <li>count 投票数量</li>
                 </ol>
             </div>
             <br>

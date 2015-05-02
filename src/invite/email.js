@@ -93,7 +93,8 @@ module.exports = function (Invite) {
 			template: 'inviteSuccess',
 			username: inviteData.invitedByUsername,
 			invite_username: inviteData.username,
-			invite_link: nconf.get('relative_path') + '/invite/' + inviteData.slug
+			invite_link: nconf.get('relative_path') + '/invite/' + inviteData.slug,
+			count: inviteData.inviteCount
 		};
 
 		if (plugins.hasListeners('action:email.send')) {

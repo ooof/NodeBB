@@ -161,7 +161,7 @@
     },
     {
         "field": "email:inviteSuccess:html",
-        "value": "<p>您好，{username}:</p>\r\n\r\n<p>您提名的{invite_username}，已达到票数，系统已发送邀请邮件！</p>"
+        "value": "<p>您好，{username}:</p>\r\n\r\n<p>您提名的{invite_username}，已经获得 {count} 票支持，达到邀请票数，系统已发送邀请邮件！</p>"
     },
     {
         "field": "email:inviteSuccess:subject",
