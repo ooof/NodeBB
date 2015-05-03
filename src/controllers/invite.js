@@ -71,42 +71,19 @@ inviteController.list = function (req, res, next) {
 			invite.getInvite(data, next);
 		},
 		function (data, next) {
-			var inviteData = [];
-
 			data.invite.map(function (value, index) {
 				data.invite[index].joined = parseInt(value.joined, 10);
 				data.invite[index].invited = parseInt(value.invited, 10);
 				data.invite[index].expired = parseInt(value.expired, 10);
+				data.invite[index].deleted = value.status === 'deleted';
 			});
 
-			// 已发邀请
-			if(settings.inviteSort === 'invited') {
-				inviteData = data.invite.filter(function (item) {
-					return parseInt(item.joined, 10) === 0 && parseInt(item.invited, 10) === 1 && parseInt(item.expired, 10) === 0;
+			if (settings.inviteSort !== 'newest_to_oldest') {
+				data.invite = data.invite.filter(function (item) {
+					return item.status === settings.inviteSort;
 				});
-				data.invite = inviteData;
 			}
-			// 已进社区
-			if(settings.inviteSort === 'joined') {
-				inviteData = data.invite.filter(function (item) {
-					return parseInt(item.joined, 10) === 1;
-				});
-				data.invite = inviteData;
-			}
-			// 正在投票
-			if(settings.inviteSort === 'voting') {
-				inviteData = data.invite.filter(function (item) {
-					return parseInt(item.invited, 10) === 0;
-				});
-				data.invite = inviteData;
-			}
-			// 邀请失败
-			if(settings.inviteSort === 'failed') {
-				inviteData = data.invite.filter(function (item) {
-					return parseInt(item.expired, 10) === 1;
-				});
-				data.invite = inviteData;
-			}
+
 			data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[global:header.invite]]', url: '/invite'}]);
 
 			next(null, data);

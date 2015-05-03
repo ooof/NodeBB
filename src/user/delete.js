@@ -44,7 +44,7 @@ module.exports = function(User) {
 	}
 
 	User.deleteAccount = function(uid, callback) {
-		User.getUserFields(uid, ['uid', 'username', 'userslug', 'fullname', 'email', 'invitedByUid', 'invitedUsername'], function(err, userData) {
+		User.getUserFields(uid, ['uid', 'username', 'userslug', 'fullname', 'email', 'iid', 'invitedByUid', 'invitedUsername'], function(err, userData) {
 			if (err)  {
 				return callback(err);
 			}
@@ -98,6 +98,10 @@ module.exports = function(User) {
 				function(next) {
 					// 向提名人发出通知，告知他提名的某位用户已被删除
 					invite.sendExitNotificationToInviter(userData, next);
+				},
+				function(next) {
+					// 更改提名状态
+					invite.setInviteField(userData.iid, 'status', 'deleted', next);
 				},
 				function(next) {
 					// 向提名人发出邮件，告知他提名的某位用户已被删除
