@@ -169,6 +169,13 @@ inviteController.details = function (req, res, next) {
 				minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
 				hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
 				inviteData.createdTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
+				inviteData.inviterDeleted = inviteData.status === 'deleted';
+				if (inviteData.inviterDeleted) {
+					date = new Date(parseInt(inviteData.deletedTime, 10));
+					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+					inviteData.deletedTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
+				}
 
 				next(null, inviteData);
 			});

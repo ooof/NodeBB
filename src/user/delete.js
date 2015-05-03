@@ -104,6 +104,10 @@ module.exports = function(User) {
 					invite.setInviteField(userData.iid, 'status', 'deleted', next);
 				},
 				function(next) {
+					// 更新删除时间
+					invite.setInviteField(userData.iid, 'deletedTime', Date.now(), next);
+				},
+				function(next) {
 					// 向提名人发出邮件，告知他提名的某位用户已被删除
 					invite.sendExitEmail(uid, next);
 				},
