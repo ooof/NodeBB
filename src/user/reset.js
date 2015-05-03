@@ -65,7 +65,7 @@ var async = require('async'),
 					reset_link: nconf.get('url') + '/reset/' + code
 				};
 				if (plugins.hasListeners('action:email.send')) {
-					emailer.sendPlus(params, 'reset', next);
+					emailer.sendPlus(params, next);
 				} else {
 					callback(new Error('[[error:no-emailers-configured]]'));
 				}
