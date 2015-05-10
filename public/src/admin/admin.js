@@ -19,6 +19,7 @@
 
 			selectMenuItem(data.url);
 			setupHeaderMenu();
+			setupRestartLinks();
 		});
 
 		$(window).resize(setupHeaderMenu);
@@ -116,16 +117,21 @@
 	function selectMenuItem(url) {
 		url = url.replace(/\/\d+$/, '');
 
+		// If index is requested, load the dashboard
+		if (url === 'admin') {
+			url = 'admin/general/dashboard';
+		}
+
 		$('#main-menu .nav-list > li').removeClass('active').each(function() {
 			var menu = $(this),
 				category = menu.parents('.sidebar-nav'),
-				href = menu.children('a').attr('href');
+				href = menu.children('a').attr('href'),
+				isLink = menu.attr('data-link') === '1';
 
-			if (href && href.slice(1).indexOf(url) !== -1) {
+			if (!isLink && href && href.slice(1) === url) {
 				category.addClass('open');
 				menu.addClass('active');
 				modifyBreadcrumb(category.find('.nav-header').text(), menu.text());
-				return false;
 			}
 		});
 	}
@@ -149,5 +155,62 @@
 		} else {
 			$('.mobile-header').remove();
 		}
+	}
+
+	function setupRestartLinks() {
+		$('.restart').off('click').on('click', function() {
+			bootbox.confirm('Are you sure you wish to restart NodeBB?', function(confirm) {
+				if (confirm) {
+					app.alert({
+						alert_id: 'instance_restart',
+						type: 'info',
+						title: 'Restarting... <i class="fa fa-spin fa-refresh"></i>',
+						message: 'NodeBB is restarting.',
+						timeout: 5000
+					});
+
+					$(window).one('action:reconnected', function() {
+						app.alert({
+							alert_id: 'instance_restart',
+							type: 'success',
+							title: '<i class="fa fa-check"></i> Success',
+							message: 'NodeBB has successfully restarted.',
+							timeout: 5000
+						});
+					});
+
+					socket.emit('admin.restart');
+				}
+			});
+		});
+
+		$('.reload').off('click').on('click', function() {
+			app.alert({
+				alert_id: 'instance_reload',
+				type: 'info',
+				title: 'Reloading... <i class="fa fa-spin fa-refresh"></i>',
+				message: 'NodeBB is reloading.',
+				timeout: 5000
+			});
+
+			socket.emit('admin.reload', function(err) {
+				if (!err) {
+					app.alert({
+						alert_id: 'instance_reload',
+						type: 'success',
+						title: '<i class="fa fa-check"></i> Success',
+						message: 'NodeBB has successfully reloaded.',
+						timeout: 5000
+					});
+				} else {
+					app.alert({
+						alert_id: 'instance_reload',
+						type: 'danger',
+						title: '[[global:alert.error]]',
+						message: '[[error:reload-failed, ' + err.message + ']]'
+					});
+				}
+			});
+		});
 	}
 }());

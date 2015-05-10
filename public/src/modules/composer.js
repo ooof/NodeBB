@@ -155,7 +155,18 @@ define('composer', [
 		});
 	}
 
-	composer.addButton = function (iconClass, onClick) {
+	composer.findByTid = function(tid) {
+		// Iterates through the initialised composers and returns the uuid of the matching composer
+		for(var uuid in composer.posts) {
+			if (composer.posts.hasOwnProperty(uuid) && composer.posts[uuid].hasOwnProperty('tid') && parseInt(composer.posts[uuid].tid, 10) === parseInt(tid, 10)) {
+				return uuid;
+			}
+		}
+
+		return null;
+	};
+
+	composer.addButton = function(iconClass, onClick) {
 		formatting.addButton(iconClass, onClick);
 	};
 
@@ -201,13 +212,17 @@ define('composer', [
 		});
 	};
 
-	composer.addQuote = function (tid, topicSlug, postIndex, pid, title, username, text) {
-		var uuid = composer.active;
+	composer.addQuote = function(tid, topicSlug, postIndex, pid, title, username, text, uuid) {
+		uuid = uuid || composer.active;
 
 		if (uuid === undefined) {
 			composer.newReply(tid, pid, title, '[[modules:composer.user_said, ' + username + ']]\n' + text);
 			return;
+		} else if (uuid !== composer.active) {
+			// If the composer is not currently active, activate it
+			composer.load(uuid);
 		}
+
 		var postContainer = $('#cmp-uuid-' + uuid);
 		var bodyEl = postContainer.find('textarea');
 		var prevText = bodyEl.val();
@@ -235,7 +250,7 @@ define('composer', [
 				push({
 					tid: tid,
 					toPid: pid,
-					title: title,
+					title: $('<div/>').text(title).html(),
 					body: translated,
 					modified: false,
 					isMain: false,
@@ -255,7 +270,7 @@ define('composer', [
 				pid: pid,
 				uid: threadData.uid,
 				handle: threadData.handle,
-				title: $('<div/>').html(threadData.title).text(),
+				title: threadData.title,
 				body: threadData.body,
 				modified: false,
 				isMain: threadData.isMain,
@@ -347,7 +362,7 @@ define('composer', [
 		};
 
 		if (postData.title) {
-			data.title = $('<div/>').text(postData.title).html().replace(/%/g, '&#37;').replace(/,/g, '&#44;');
+			data.title = postData.title.replace(/%/g, '&#37;').replace(/,/g, '&#44;');
 		}
 
 		var composerTemplate = isInvite || isInviteEdit ? 'invite/composer' : 'composer';

@@ -22,12 +22,14 @@
 		},
 		{
 			name: 'mongo:username',
-			description: 'MongoDB username'
+			description: 'MongoDB username',
+			'default': nconf.get('mongo:username') || ''
 		},
 		{
 			name: 'mongo:password',
 			description: 'Password of your MongoDB database',
-			hidden: true
+			hidden: true,
+			before: function(value) { value = value || nconf.get('mongo:password') || ''; return value; }
 		},
 		{
 			name: "mongo:database",
@@ -71,7 +73,16 @@
 			nconf.set('mongo:database', '0');
 		}
 
-		var connString = 'mongodb://' + usernamePassword + nconf.get('mongo:host') + ':' + nconf.get('mongo:port') + '/' + nconf.get('mongo:database');
+		var hosts = nconf.get('mongo:host').split(',');
+		var ports = nconf.get('mongo:port').toString().split(',');
+		var servers = [];
+
+		for (var i = 0; i < hosts.length; i++) {
+			servers.push(hosts[i] + ':' + ports[i]);
+		}
+
+		var connString = 'mongodb://' + usernamePassword + servers.join() + '/' + nconf.get('mongo:database');
+
 		var connOptions = {
 			server: {
 				poolSize: parseInt(nconf.get('mongo:poolSize'), 10) || 10
@@ -131,7 +142,9 @@
 
 					async.apply(createIndex, 'searchpost', {content: 'text', uid: 1, cid: 1}, {background: true}),
 					async.apply(createIndex, 'searchpost', {id: 1}, {background: true})
-				], callback);
+				], function(err) {
+					callback(err);
+				});
 			}
 
 			function createIndex(collection, index, options, callback) {
@@ -145,9 +158,26 @@
 		});
 	};
 
+	module.info = function(db, callback) {
+		db.stats({scale:1024}, function(err, stats) {
+			if(err) {
+				return callback(err);
+			}
+
+			stats.avgObjSize = (stats.avgObjSize / 1024).toFixed(2);
+			stats.dataSize = (stats.dataSize / 1024).toFixed(2);
+			stats.storageSize = (stats.storageSize / 1024).toFixed(2);
+			stats.fileSize = (stats.fileSize / 1024).toFixed(2);
+			stats.indexSize = (stats.indexSize / 1024).toFixed(2);
+			stats.raw = JSON.stringify(stats, null, 4);
+			stats.mongo = true;
+
+			callback(null, stats);
+		});
+	};
+
 	module.close = function() {
 		db.close();
 	};
 
 }(exports));
-

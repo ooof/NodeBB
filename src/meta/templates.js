@@ -15,6 +15,7 @@ var mkdirp = require('mkdirp'),
 	Templates = {};
 
 Templates.compile = function(callback) {
+	callback = callback || function() {};
 	var fromFile = nconf.get('from-file') || '';
 
 	if (nconf.get('isPrimary') === 'false' || fromFile.match('tpl')) {
@@ -23,10 +24,7 @@ Templates.compile = function(callback) {
 		}
 
 		emitter.emit('templates:compiled');
-		if (callback) {
-			callback();
-		}
-		return;
+		return callback();
 	}
 
 	var coreTemplatesPath = nconf.get('core_templates_path'),
@@ -119,15 +117,20 @@ Templates.compile = function(callback) {
 			}, function(err) {
 				if (err) {
 					winston.error('[meta/templates] ' + err.stack);
-				} else {
-					compileIndex(viewsPath, function() {
-						winston.verbose('[meta/templates] Successfully compiled templates.');
-						emitter.emit('templates:compiled');
-						if (callback) {
-							callback();
-						}
-					});
+					return callback(err);
 				}
+
+				compileIndex(viewsPath, function() {
+					winston.verbose('[meta/templates] Successfully compiled templates.');
+
+					emitter.emit('templates:compiled');
+					if (process.send) {
+						process.send({
+							action: 'templates:compiled'
+						});
+					}
+					callback();
+				});
 			});
 		});
 	});

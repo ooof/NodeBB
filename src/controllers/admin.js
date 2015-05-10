@@ -3,6 +3,7 @@
 var async = require('async'),
 	fs = require('fs'),
 	path = require('path'),
+	nconf = require('nconf'),
 
 	user = require('../user'),
 	categories = require('../categories'),
@@ -16,7 +17,6 @@ var async = require('async'),
 	plugins = require('../plugins'),
 	widgets = require('../widgets'),
 	groups = require('../groups'),
-	pkg = require('../../package.json'),
 	csv = require('express-csv'),
 	invite = require('../invite'),
 	helpers = require('./helpers'),
@@ -38,6 +38,7 @@ var adminController = {
 	events: {},
 	logs: {},
 	database: {},
+	postCache: {},
 	plugins: {},
 	languages: {},
 	settings: {},
@@ -68,7 +69,7 @@ adminController.home = function(req, res, next) {
 			return next(err);
 		}
 		res.render('admin/general/dashboard', {
-			version: pkg.version,
+			version: nconf.get('version'),
 			notices: results.notices,
 			stats: results.stats
 		});
@@ -215,8 +216,29 @@ adminController.flags.get = function(req, res, next) {
 };
 
 adminController.database.get = function(req, res, next) {
-	db.info(function (err, data) {
-		res.render('admin/advanced/database', data);
+	async.parallel({
+		redis: function(next) {
+			if (nconf.get('redis')) {
+				var rdb = require('../database/redis');
+				var cxn = rdb.connect();
+				rdb.info(cxn, next);
+			} else {
+				next();
+			}
+		},
+		mongo: function(next) {
+			if (nconf.get('mongo')) {
+				var mdb = require('../database/mongo');
+				mdb.info(mdb.client, next);
+			} else {
+				next();
+			}
+		}
+	}, function(err, results) {
+		if (err) {
+			return next(err);
+		}
+		res.render('admin/advanced/database', results);
 	});
 };
 
@@ -238,6 +260,26 @@ adminController.logs.get = function(req, res, next) {
 		res.render('admin/advanced/logs', {
 			data: validator.escape(logs)
 		});
+	});
+};
+
+adminController.postCache.get = function(req, res, next) {
+	var cache = require('../posts/cache');
+	var avgPostSize = 0;
+	var percentFull = 0;
+	if (cache.itemCount > 0) {
+		avgPostSize = parseInt((cache.length / cache.itemCount), 10);
+		percentFull = ((cache.length / cache.max) * 100).toFixed(2);
+	}
+
+	res.render('admin/advanced/post-cache', {
+		cache: {
+			length: cache.length,
+			max: cache.max,
+			itemCount: cache.itemCount,
+			percentFull: percentFull,
+			avgPostSize: avgPostSize
+		}
 	});
 };
 

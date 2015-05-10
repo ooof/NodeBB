@@ -61,6 +61,7 @@ var async = require('async'),
 		}
 		topic.title = validator.escape(topic.title);
 		topic.relativeTime = utils.toISOString(topic.timestamp);
+		topic.lastposttimeISO = utils.toISOString(topic.lastposttime);
 		callback(null, topic);
 	}
 
@@ -129,7 +130,7 @@ var async = require('async'),
 	Topics.getTopics = function(tids, uid, callback) {
 		async.waterfall([
 			function(next) {
-				privileges.topics.filter('read', tids, uid, next);
+				privileges.topics.filterTids('read', tids, uid, next);
 			},
 			function(tids, next) {
 				Topics.getTopicsByTids(tids, uid, next);

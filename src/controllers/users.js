@@ -7,7 +7,8 @@ var async = require('async'),
 	meta = require('../meta'),
 	pagination = require('../pagination'),
 	plugins = require('../plugins'),
-	db = require('../database');
+	db = require('../database'),
+	helpers = require('./helpers');
 
 usersController.getOnlineUsers = function(req, res, next) {
 	var	websockets = require('../socket.io');
@@ -43,7 +44,7 @@ usersController.getOnlineUsers = function(req, res, next) {
 			anonymousUserCount: websockets.getOnlineAnonCount()
 		};
 
-		res.render('users', userData);
+		render(req, res, userData, next);
 	});
 };
 
@@ -115,7 +116,7 @@ usersController.getUsers = function(set, count, req, res, next) {
 		userData.users.sort(function (a, b) {
 			return a.username.localeCompare(b.username);
 		});
-		res.render('users', userData);
+		render(req, res, userData, next);
 	});
 };
 
@@ -140,6 +141,9 @@ function getUsersAndCount(set, uid, count, callback) {
 }
 
 usersController.getUsersForSearch = function(req, res, next) {
+	if (!req.uid) {
+		return helpers.notAllowed(req, res);
+	}
 	var resultsPerPage = parseInt(meta.config.userSearchResultsPerPage, 10) || 20;
 
 	getUsersAndCount('users:joindate', req.uid, resultsPerPage, function(err, data) {
@@ -154,9 +158,18 @@ usersController.getUsersForSearch = function(req, res, next) {
 			users: data.users
 		};
 
-		res.render('users', userData);
+		render(req, res, userData, next);
 	});
 };
+
+function render(req, res, data, next) {
+	plugins.fireHook('filter:users.build', {req: req, res: res, templateData: data}, function(err, data) {
+		if (err) {
+			return next(err);
+		}
+		res.render('users', data.templateData);
+	});
+}
 
 
 

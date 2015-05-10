@@ -18,11 +18,10 @@ var topicsController = {},
 
 topicsController.get = function(req, res, next) {
 	var tid = req.params.topic_id,
-		page = 1,
 		sort = req.query.sort,
 		userPrivileges;
 
-	if (req.params.post_index && !utils.isNumber(req.params.post_index)) {
+	if ((req.params.post_index && !utils.isNumber(req.params.post_index)) || !utils.isNumber(tid)) {
 		return helpers.notFound(req, res);
 	}
 
@@ -43,27 +42,24 @@ topicsController.get = function(req, res, next) {
 		function (results, next) {
 			userPrivileges = results.privileges;
 
-			if (userPrivileges.disabled || (req.params.slug && tid + '/' + req.params.slug !== results.topic.slug)) {
-				return helpers.notFound(req, res);
-			}
-
 			if (!userPrivileges.read || (parseInt(results.topic.deleted, 10) && !userPrivileges.view_deleted)) {
 				return helpers.notAllowed(req, res);
 			}
 
-			if (!req.params.slug && results.topic.slug && results.topic.slug !== tid + '/') {
+			if ((!req.params.slug || results.topic.slug !== tid + '/' + req.params.slug) && (results.topic.slug && results.topic.slug !== tid + '/')) {
 				return helpers.redirect(res, '/topic/' + encodeURI(results.topic.slug));
 			}
 
 			var settings = results.settings;
 			var postCount = parseInt(results.topic.postcount, 10);
 			var pageCount = Math.max(1, Math.ceil((postCount - 1) / settings.postsPerPage));
+			var page = parseInt(req.query.page, 10) || 1;
 
 			if (utils.isNumber(req.params.post_index) && (req.params.post_index < 1 || req.params.post_index > postCount)) {
 				return helpers.redirect(res, '/topic/' + req.params.topic_id + '/' + req.params.slug + (req.params.post_index > postCount ? '/' + postCount : ''));
 			}
 
-			if (settings.usePagination && (req.query.page < 1 || req.query.page > pageCount)) {
+			if (settings.usePagination && (page < 1 || page > pageCount)) {
 				return helpers.notFound(req, res);
 			}
 
@@ -86,16 +82,16 @@ topicsController.get = function(req, res, next) {
 			}
 
 			var postIndex = 0;
-			page = parseInt(req.query.page, 10) || 1;
+
 			req.params.post_index = parseInt(req.params.post_index, 10) || 0;
 			if (reverse && req.params.post_index === 1) {
 				req.params.post_index = 0;
 			}
 			if (!settings.usePagination) {
 				if (reverse) {
-					postIndex = Math.max(0, postCount - (req.params.post_index || postCount) - (settings.postsPerPage - 1));
+					postIndex = Math.max(0, postCount - (req.params.post_index || postCount) - (settings.postsPerPage / 2));
 				} else {
-					postIndex = Math.max(0, (req.params.post_index || 1) - (settings.postsPerPage + 1));
+					postIndex = Math.max(0, (req.params.post_index || 1) - (settings.postsPerPage / 2));
 				}
 			} else if (!req.query.page) {
 				var index = 0;

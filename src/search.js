@@ -114,7 +114,7 @@ function searchInContent(data, callback) {
 						pids = pids.slice(start, start + 10);
 					}
 
-					posts.getPostSummaryByPids(pids, data.uid, {stripTags: true, parse: false}, next);
+					posts.getPostSummaryByPids(pids, data.uid, {}, next);
 				},
 				function(posts, next) {
 					next(null, {matches: posts, matchCount: matchCount, pageCount: Math.max(1, Math.ceil(parseInt(matchCount, 10) / 10))});
@@ -149,8 +149,8 @@ function filterAndSort(pids, data, callback) {
 }
 
 function getMatchedPosts(pids, data, callback) {
-	var postFields = ['pid', 'tid', 'timestamp'];
-	var topicFields = [];
+	var postFields = ['pid', 'tid', 'timestamp', 'deleted'];
+	var topicFields = ['deleted'];
 	var categoryFields = [];
 
 	if (data.replies) {
@@ -180,7 +180,9 @@ function getMatchedPosts(pids, data, callback) {
 			db.getObjectsFields(keys, postFields, next);
 		},
 		function(_posts, next) {
-			posts = _posts;
+			posts = _posts.filter(function(post) {
+				return post && parseInt(post.deleted, 10) !== 1;
+			});
 
 			async.parallel({
 				users: function(next) {
@@ -194,10 +196,6 @@ function getMatchedPosts(pids, data, callback) {
 					}
 				},
 				topics: function(next) {
-					if (!topicFields.length) {
-						return next();
-					}
-
 					var topics;
 					async.waterfall([
 						function(next) {
@@ -266,6 +264,10 @@ function getMatchedPosts(pids, data, callback) {
 				if (results.users && results.users[index]) {
 					post.user = results.users[index];
 				}
+			});
+
+			posts = posts.filter(function(post) {
+				return post && post.topic && parseInt(post.topic.deleted, 10) !== 1;
 			});
 
 			next(null, posts);

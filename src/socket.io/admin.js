@@ -105,12 +105,12 @@ SocketAdmin.themes.updateBranding = function(socket, data, callback) {
 };
 
 SocketAdmin.plugins.toggleActive = function(socket, plugin_id, callback) {
-	require('../postTools').resetCache();
+	require('../posts/cache').reset();
 	plugins.toggleActive(plugin_id, callback);
 };
 
 SocketAdmin.plugins.toggleInstall = function(socket, data, callback) {
-	require('../postTools').resetCache();
+	require('../posts/cache').reset();
 	plugins.toggleInstall(data.id, data.version, callback);
 };
 

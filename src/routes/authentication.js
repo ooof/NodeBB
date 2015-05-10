@@ -42,44 +42,42 @@
 		var router = express.Router();
 		router.hotswapId = 'auth';
 
-		plugins.ready(function() {
-			loginStrategies.length = 0;
+		loginStrategies.length = 0;
 
-			if (plugins.hasListeners('action:auth.overrideLogin')) {
-				winston.warn('[authentication] Login override detected, skipping local login strategy.');
-				plugins.fireHook('action:auth.overrideLogin');
-			} else {
-				passport.use(new passportLocal({passReqToCallback: true}, Auth.login));
+		if (plugins.hasListeners('action:auth.overrideLogin')) {
+			winston.warn('[authentication] Login override detected, skipping local login strategy.');
+			plugins.fireHook('action:auth.overrideLogin');
+		} else {
+			passport.use(new passportLocal({passReqToCallback: true}, Auth.login));
+		}
+
+		plugins.fireHook('filter:auth.init', loginStrategies, function(err) {
+			if (err) {
+				winston.error('filter:auth.init - plugin failure');
+				return callback(err);
 			}
 
-			plugins.fireHook('filter:auth.init', loginStrategies, function(err) {
-				if (err) {
-					winston.error('filter:auth.init - plugin failure');
-					return callback(err);
-				}
-
-				loginStrategies.forEach(function(strategy) {
-					if (strategy.url) {
-						router.get(strategy.url, passport.authenticate(strategy.name, {
-							scope: strategy.scope
-						}));
-					}
-
-					router.get(strategy.callbackURL, passport.authenticate(strategy.name, {
-						successReturnToOrRedirect: nconf.get('relative_path') + '/',
-						failureRedirect: nconf.get('relative_path') + '/login'
+			loginStrategies.forEach(function(strategy) {
+				if (strategy.url) {
+					router.get(strategy.url, passport.authenticate(strategy.name, {
+						scope: strategy.scope
 					}));
-				});
-
-				router.post('/logout', Auth.middleware.applyCSRF, logout);
-				router.post('/register', Auth.middleware.applyCSRF, register);
-				router.post('/login', Auth.middleware.applyCSRF, login);
-
-				hotswap.replace('auth', router);
-				if (typeof callback === 'function') {
-					callback();
 				}
+
+				router.get(strategy.callbackURL, passport.authenticate(strategy.name, {
+					successReturnToOrRedirect: nconf.get('relative_path') + '/',
+					failureRedirect: nconf.get('relative_path') + '/login'
+				}));
 			});
+
+			router.post('/logout', Auth.middleware.applyCSRF, logout);
+			router.post('/register', Auth.middleware.applyCSRF, register);
+			router.post('/login', Auth.middleware.applyCSRF, login);
+
+			hotswap.replace('auth', router);
+			if (typeof callback === 'function') {
+				callback();
+			}
 		});
 	};
 
@@ -103,11 +101,23 @@
 				user.auth.logAttempt(uid, req.ip, next);
 			},
 			function(next) {
-				db.getObjectFields('user:' + uid, ['password', 'banned', 'passwordExpiry'], next);
+				async.parallel({
+					userData: function(next) {
+						db.getObjectFields('user:' + uid, ['password', 'banned', 'passwordExpiry'], next);
+					},
+					isAdmin: function(next) {
+						user.isAdministrator(uid, next);
+					}
+				}, next);
 			},
-			function(_userData, next) {
-				userData = _userData;
+			function(result, next) {
+				userData = result.userData;
 				userData.uid = uid;
+				userData.isAdmin = result.isAdmin;
+
+				if (!result.isAdmin && parseInt(meta.config.allowLocalLogin, 10) === 0) {
+					return next(new Error('[[error:local-login-disabled]]'));
+				}
 
 				if (!userData || !userData.password) {
 					return next(new Error('[[error:invalid-user-data]]'));
@@ -138,10 +148,6 @@
 	});
 
 	function login(req, res, next) {
-		if (parseInt(meta.config.allowLocalLogin, 10) === 0) {
-			return res.status(404).send('');
-		}
-
 		// Handle returnTo data
 		if (req.body.hasOwnProperty('returnTo') && !req.session.returnTo) {
 			req.session.returnTo = req.body.returnTo;
@@ -149,7 +155,7 @@
 
 		if (plugins.hasListeners('action:auth.overrideLogin')) {
 			return Auth.continueLogin(req, res, next);
-		};
+		}
 
 		var loginWith = meta.config.allowLoginWith || 'username-email';
 
@@ -213,7 +219,14 @@
 						plugins.fireHook('action:user.loggedIn', userData.uid);
 					}
 
-					res.status(200).send(nconf.get('relative_path') + '/');
+					if (!req.session.returnTo) {
+						res.status(200).send(nconf.get('relative_path') + '/');
+					} else {
+						var next = req.session.returnTo;
+						delete req.session.returnTo;
+
+						res.status(200).send(next);
+					}
 				});
 			}
 		})(req, res, next);
@@ -312,6 +325,8 @@
 				invite.sendJoinedNotification(uid, userData, next);
 			},
 			function(next) {
+				user.notifications.sendWelcomeNotification(uid);
+
 				plugins.fireHook('filter:register.complete', {uid: uid, referrer: req.body.referrer}, next);
 			}
 		], function(err, data) {

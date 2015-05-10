@@ -115,6 +115,10 @@ var async = require('async'),
 						return next(err);
 					}
 
+					uids = uids.filter(function(uid) {
+						return uid && parseInt(uid, 10);
+					});
+
 					if (options.truncateUserList) {
 						var userListCount = parseInt(options.userListCount, 10) || 4;
 						if (uids.length > userListCount) {
@@ -530,18 +534,21 @@ var async = require('async'),
 			if (data.hasOwnProperty('ownerUid')) {
 				tasks.push(async.apply(db.setAdd, 'group:' + data.name + ':owners', data.ownerUid));
 				tasks.push(async.apply(db.sortedSetAdd, 'group:' + data.name + ':members', now, data.ownerUid));
+				tasks.push(async.apply(db.setObjectField, 'group:' + data.name, 'memberCount', 1));
+
+				groupData.ownerUid = data.ownerUid;
 			}
 
 			if (!data.hidden) {
 				tasks.push(async.apply(db.setObjectField, 'groupslug:groupname', slug, data.name));
 			}
 
-			async.parallel(tasks, function(err) {
+			async.series(tasks, function(err) {
 				if (!err) {
 					plugins.fireHook('action:group.create', groupData);
 				}
 
-				callback(err);
+				callback(err, groupData);
 			});
 		});
 	};
@@ -753,17 +760,18 @@ var async = require('async'),
 						tasks.push(async.apply(db.setAdd, 'group:' + groupName + ':owners', uid));
 					}
 					async.parallel(tasks, next);
+				},
+				function(results, next) {
+					user.setGroupTitle(groupName, uid, next);
+				},
+				function(next) {
+					plugins.fireHook('action:group.join', {
+						groupName: groupName,
+						uid: uid
+					});
+					next();
 				}
-			], function(err, results) {
-				if (err) {
-					return callback(err);
-				}
-				plugins.fireHook('action:group.join', {
-					groupName: groupName,
-					uid: uid
-				});
-				callback();
-			});
+			], callback);
 		}
 
 		callback = callback || function() {};

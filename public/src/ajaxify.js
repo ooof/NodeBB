@@ -55,11 +55,16 @@ $(document).ready(function() {
 
 			app.template = data.template.name;
 
-			require(['translator', 'search'], function(translator, search) {
+			require(['translator'], function(translator) {
 				translator.load(config.defaultLang, data.template.name);
 				renderTemplate(url, data.template.name, data, callback);
-				search.topicDOM.end();
 			});
+		});
+
+		require(['search'], function(search) {
+			if (search.topicDOM.active && !url.startsWith('topic/')) {
+				search.topicDOM.end();
+			}
 		});
 
 		return true;
@@ -152,7 +157,7 @@ $(document).ready(function() {
 			$(window).trigger('action:ajaxify.end', {url: url});
 		});
 
-		$(window).trigger('action:ajaxify.contentLoaded', {url: url});
+		$(window).trigger('action:ajaxify.contentLoaded', {url: url, tpl: tpl_url});
 
 		app.processPage();
 	};

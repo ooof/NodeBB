@@ -13,7 +13,6 @@ var fs = require('fs'),
 	topics = require('../topics'),
 	groups = require('../groups'),
 	messaging = require('../messaging'),
-	postTools = require('../postTools'),
 	utils = require('../../public/src/utils'),
 	meta = require('../meta'),
 	plugins = require('../plugins'),
@@ -100,9 +99,9 @@ function getUserDataByUserSlug(userslug, callerUID, callback) {
 			userData.username = validator.escape(userData.username);
 			userData.email = validator.escape(userData.email);
 			userData.fullname = validator.escape(userData.fullname);
-			userData.websiteName = validator.escape(userData.websiteName);
 			userData.location = validator.escape(userData.location);
 			userData.signature = validator.escape(userData.signature);
+			userData.aboutme = validator.escape(userData.aboutme || '');
 
 			callback(null, userData);
 		});
@@ -118,6 +117,10 @@ accountsController.getUserByUID = function(req, res, next) {
 	}, function(err, results) {
 		if (err) {
 			return next(err);
+		}
+
+		if (!results.userData) {
+			return helpers.notFound(req, res);
 		}
 
 		results.userData.email = results.settings.showemail ? results.userData.email : undefined;
@@ -226,7 +229,14 @@ accountsController.getAccount = function(req, res, next) {
 				posts.getPostsFromSet('uid:' + userData.theirid + ':posts', req.uid, 0, 9, next);
 			},
 			signature: function(next) {
-				postTools.parseSignature(userData, req.uid, next);
+				posts.parseSignature(userData, req.uid, next);
+			},
+			aboutme: function(next) {
+				if (userData.aboutme) {
+					plugins.fireHook('filter:parse.raw', userData.aboutme, next);
+				} else {
+					next();
+				}
 			}
 		}, function(err, results) {
 			if(err) {
@@ -237,7 +247,7 @@ accountsController.getAccount = function(req, res, next) {
 			userData.posts = results.posts.posts.filter(function (p) {
 				return p && parseInt(p.deleted, 10) !== 1;
 			});
-
+			userData.aboutme = results.aboutme;
 			userData.nextStart = results.posts.nextStart;
 			userData.isFollowing = results.isFollowing;
 			userData.inviteCount = results.inviteData.inviteCount;
@@ -353,22 +363,51 @@ accountsController.getGroups = function(req, res, next) {
 };
 
 function getFromUserSet(tpl, set, method, type, req, res, next) {
-	accountsController.getBaseUser(req.params.userslug, req.uid, function(err, userData) {
+	async.parallel({
+		settings: function(next) {
+			user.getSettings(req.uid, next);
+		},
+		userData: function(next) {
+			accountsController.getBaseUser(req.params.userslug, req.uid, next);
+		}
+	}, function(err, results) {
 		if (err) {
 			return next(err);
 		}
-
+		var userData = results.userData;
 		if (!userData) {
 			return helpers.notFound(req, res);
 		}
 
-		method('uid:' + userData.uid + ':' + set, req.uid, 0, 19, function(err, data) {
+		var setName = 'uid:' + userData.uid + ':' + set;
+
+		var page = Math.max(1, parseInt(req.query.page, 10) || 1);
+		var itemsPerPage = (tpl === 'account/topics' || tpl === 'account/watched') ? results.settings.topicsPerPage : results.settings.postsPerPage;
+
+		async.parallel({
+			itemCount: function(next) {
+				if (results.settings.usePagination) {
+					db.sortedSetCard(setName, next);
+				} else {
+					next(null, 0);
+				}
+			},
+			data: function(next) {
+				var start = (page - 1) * itemsPerPage;
+				var stop = start + itemsPerPage - 1;
+				method(setName, req.uid, start, stop, next);
+			}
+		}, function(err, results) {
 			if (err) {
 				return next(err);
 			}
 
-			userData[type] = data[type];
-			userData.nextStart = data.nextStart;
+			userData[type] = results.data[type];
+			userData.nextStart = results.data.nextStart;
+			var pageCount = Math.ceil(results.itemCount / itemsPerPage);
+
+			var pagination = require('../pagination');
+			userData.pagination = pagination.create(page, pageCount);
 
 			res.render(tpl, userData);
 		});
@@ -432,38 +471,59 @@ accountsController.accountEdit = function(req, res, next) {
 };
 
 accountsController.accountSettings = function(req, res, next) {
-	accountsController.getBaseUser(req.params.userslug, req.uid, function(err, userData) {
+	var userData;
+	async.waterfall([
+		function(next) {
+			accountsController.getBaseUser(req.params.userslug, req.uid, next);
+		},
+		function(_userData, next) {
+			userData = _userData;
+			if (!userData) {
+				return helpers.notFound(req, res);
+			}
+			async.parallel({
+				settings: function(next) {
+					user.getSettings(userData.uid, next);
+				},
+				userGroups: function(next) {
+					groups.getUserGroups([userData.uid], next);
+				},
+				languages: function(next) {
+					languages.list(next);
+				}
+			}, next);
+		},
+		function(results, next) {
+			userData.languages = results.languages;
+			userData.userGroups = results.userGroups[0];
+			plugins.fireHook('filter:user.settings', {settings: results.settings, uid: req.uid}, next);
+		},
+		function(data, next) {
+			userData.settings = data.settings;
+			userData.disableEmailSubscriptions = parseInt(meta.config.disableEmailSubscriptions, 10) === 1;
+			next();
+		}
+	], function(err) {
 		if (err) {
 			return next(err);
 		}
 
-		if (!userData) {
-			return helpers.notFound(req, res);
-		}
+		userData.dailyDigestFreqOptions = [
+			{value: 'off', name: '[[user:digest_off]]', selected: 'off' === userData.settings.dailyDigestFreq},
+			{value: 'day', name: '[[user:digest_daily]]', selected: 'day' === userData.settings.dailyDigestFreq},
+			{value: 'week', name: '[[user:digest_weekly]]', selected: 'week' === userData.settings.dailyDigestFreq},
+			{value: 'month', name: '[[user:digest_monthly]]', selected: 'month' === userData.settings.dailyDigestFreq}
+		];
 
-		async.parallel({
-			settings: function(next) {
-				plugins.fireHook('filter:user.settings', [], next);
-			},
-			userGroups: function(next) {
-				groups.getUserGroups([userData.uid], next);
-			},
-			languages: function(next) {
-				languages.list(next);
-			}
-		}, function(err, results) {
-			if (err) {
-				return next(err);
-			}
-
-			userData.settings = results.settings;
-			userData.languages = results.languages;
-			userData.userGroups = results.userGroups[0];
-
-			userData.disableEmailSubscriptions = parseInt(meta.config.disableEmailSubscriptions, 10) === 1;
-
-			res.render('account/settings', userData);
+		userData.userGroups.forEach(function(group) {
+			group.selected = group.name === userData.settings.groupTitle;
 		});
+
+		userData.languages.forEach(function(language) {
+			language.selected = language.code === userData.settings.userLang;
+		});
+
+		res.render('account/settings', userData);
 	});
 };
 

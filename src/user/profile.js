@@ -3,6 +3,7 @@
 
 var async = require('async'),
 	validator = require('validator'),
+	url = require('url'),
 	S = require('string'),
 
 	utils = require('../../public/src/utils'),
@@ -15,7 +16,7 @@ var async = require('async'),
 module.exports = function(User) {
 
 	User.updateProfile = function(uid, data, callback) {
-		var fields = ['username', 'email', 'fullname', 'website', 'location', 'birthday', 'signature'];
+		var fields = ['username', 'email', 'fullname', 'website', 'location', 'birthday', 'signature', 'aboutme'];
 
 		plugins.fireHook('filter:user.updateProfile', {uid: uid, data: data, fields: fields}, function(err, data) {
 			if (err) {
@@ -24,6 +25,14 @@ module.exports = function(User) {
 
 			fields = data.fields;
 			data = data.data;
+
+			function isAboutMeValid(next) {
+				if (data.aboutme !== undefined && data.aboutme.length > meta.config.maximumAboutMeLength) {
+					next(new Error('[[error:about-me-too-long, ' + meta.config.maximumAboutMeLength + ']]'));
+				} else {
+					next();
+				}
+			}
 
 			function isSignatureValid(next) {
 				if (data.signature !== undefined && data.signature.length > meta.config.maximumSignatureLength) {
@@ -91,7 +100,7 @@ module.exports = function(User) {
 				});
 			}
 
-			async.series([isSignatureValid, isEmailAvailable, isUsernameAvailable], function(err, results) {
+			async.series([isAboutMeValid, isSignatureValid, isEmailAvailable, isUsernameAvailable], function(err) {
 				if (err) {
 					return callback(err);
 				}
@@ -121,9 +130,22 @@ module.exports = function(User) {
 				} else if (field === 'signature') {
 					data[field] = S(data[field]).stripTags().s;
 				} else if (field === 'website') {
-					if (!data[field].startsWith('http://') && !data[field].startsWith('https://')) {
-						data[field] = 'http://' + data[field];
+					if (data[field].length > 0) {
+						var urlObj = url.parse(data[field], false, true);
+						if (!urlObj.protocol) {
+							urlObj.protocol = 'http';
+							urlObj.slashes = true;
+						}
+						if (!urlObj.hostname && urlObj.pathname) {
+							urlObj.hostname = urlObj.pathname;
+							urlObj.pathname = null;
+						}
+						if (urlObj.pathname === '/') {
+							urlObj.pathname = null;
+						}
 					}
+
+					data[field] = url.format(urlObj);
 				}
 
 				User.setUserField(uid, field, data[field], next);
@@ -143,7 +165,7 @@ module.exports = function(User) {
 				return callback();
 			}
 
-			db.deleteObjectField('email:uid', userData.email.toLowerCase(), function(err) {
+			db.sortedSetRemove('email:uid', userData.email.toLowerCase(), function(err) {
 				if (err) {
 					return callback(err);
 				}
@@ -154,7 +176,7 @@ module.exports = function(User) {
 						User.setUserField(uid, 'gravatarpicture', gravatarpicture, next);
 					},
 					function(next) {
-						db.setObjectField('email:uid', newEmail.toLowerCase(), uid, next);
+						db.sortedSetAdd('email:uid', uid, newEmail.toLowerCase(), next);
 					},
 					function(next) {
 						User.setUserField(uid, 'email', newEmail, next);
@@ -183,42 +205,42 @@ module.exports = function(User) {
 		}
 
 		User.getUserFields(uid, ['username', 'userslug'], function(err, userData) {
-			function update(field, object, value, callback) {
-				async.series([
-					function(next) {
-						db.deleteObjectField(field + ':uid', userData[field], next);
-					},
-					function(next) {
-						User.setUserField(uid, field, value, next);
-					},
-					function(next) {
-						db.setObjectField(object, value, uid, next);
-					}
-				], callback);
-			}
-
 			if (err) {
 				return callback(err);
 			}
 
 			async.parallel([
 				function(next) {
-					if (newUsername === userData.username) {
-						return next();
-					}
-
-					update('username', 'username:uid', newUsername, next);
+					updateUidMapping('username', uid, newUsername, userData.username, next);
 				},
 				function(next) {
 					var newUserslug = utils.slugify(newUsername);
-					if (newUserslug === userData.userslug) {
-						return next();
-					}
-
-					update('userslug', 'userslug:uid', newUserslug, next);
+					updateUidMapping('userslug', uid, newUserslug, userData.userslug, next);
 				}
 			], callback);
 		});
+	}
+
+	function updateUidMapping(field, uid, value, oldValue, callback) {
+		if (value === oldValue) {
+			return callback();
+		}
+
+		async.series([
+			function(next) {
+				db.sortedSetRemove(field + ':uid', oldValue, next);
+			},
+			function(next) {
+				User.setUserField(uid, field, value, next);
+			},
+			function(next) {
+				if (value) {
+					db.sortedSetAdd(field + ':uid', uid, value, next);
+				} else {
+					next();
+				}
+			}
+		], callback);
 	}
 
 	function updateFullname(uid, newFullname, callback) {
@@ -227,20 +249,7 @@ module.exports = function(User) {
 				User.getUserField(uid, 'fullname', next);
 			},
 			function(fullname, next) {
-				if (newFullname === fullname) {
-					return callback();
-				}
-				db.deleteObjectField('fullname:uid', fullname, next);
-			},
-			function(next) {
-				User.setUserField(uid, 'fullname', newFullname, next);
-			},
-			function(next) {
-				if (newFullname) {
-					db.setObjectField('fullname:uid', newFullname, uid, next);
-				} else {
-					next();
-				}
+				updateUidMapping('fullname', uid, newFullname, fullname, next);
 			}
 		], callback);
 	}

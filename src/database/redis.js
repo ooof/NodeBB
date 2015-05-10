@@ -28,7 +28,8 @@
 		{
 			name: 'redis:password',
 			description: 'Password of your Redis database',
-			hidden: true
+			hidden: true,
+			before: function(value) { value = value || nconf.get('redis:password') || ''; return value; }
 		},
 		{
 			name: "redis:database",
@@ -112,6 +113,28 @@
 
 	module.close = function() {
 		redisClient.quit();
+	};
+
+	module.info = function(cxn, callback) {
+		cxn.info(function (err, data) {
+			if (err) {
+				return callback(err);
+			}
+
+			var lines = data.toString().split("\r\n").sort();
+			var redisData = {};
+			lines.forEach(function (line) {
+				var parts = line.split(':');
+				if (parts[1]) {
+					redisData[parts[0]] = parts[1];
+				}
+			});
+
+			redisData.raw = JSON.stringify(redisData, null, 4);
+			redisData.redis = true;
+
+			callback(null, redisData);
+		});
 	};
 
 	module.helpers = module.helpers || {};
