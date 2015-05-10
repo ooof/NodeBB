@@ -509,7 +509,7 @@ function generateData(type, callback) {
 	if (type === 'invite.csv') {
 		async.waterfall([
 			function (next) {
-				user.getUidsFromHash('username:uid', next);
+				user.getUidsFromSet('users:joindate', 0, -1, next);
 			},
 			function (uids, next) {
 				user.getMultipleUserFields(uids, ['username', 'invitedByUsername'], next);
@@ -559,9 +559,10 @@ function generateData(type, callback) {
 								user.getUserFields(uid, ['username', 'uid'], next)
 							},
 							function (userData, next) {
-								if (parseInt(userData.uid, 10) !== 0 && item.realUsername) {
+								var _uid = parseInt(userData.uid, 10);
+								if (_uid !== 0 && item.realUsername) {
 									// 判断用户被邀请加入后，是否被删除
-									return db.isObjectField('username:uid', item.realUsername, function (err, exists) {
+									return db.exists('user:' + _uid, function (err, exists) {
 										if (!exists) {
 											return callback();
 										}
@@ -587,7 +588,7 @@ function generateData(type, callback) {
 	} else if (type === 'user.csv') {
 		async.waterfall([
 			function (next) {
-				user.getUidsFromHash('username:uid', next);
+				user.getUidsFromSet('users:joindate', 0, -1, next);
 			},
 			function (uids, next) {
 				user.getMultipleUserFields(uids, ['uid', 'username', 'joindate', 'topiccount', 'followingCount', 'followerCount'], next)

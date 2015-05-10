@@ -369,7 +369,7 @@ var async = require('async'),
 
 		// 给排除自己以外的全站所有用户发送通知
 		if (data.score === 'other') {
-			user.getUidsFromHash('username:uid', function (err, uids) {
+			user.getUidsFromSet('users:joindate', 0, -1, function (err, uids) {
 				if (err || !Array.isArray(uids) || !uids.length) {
 					return;
 				}

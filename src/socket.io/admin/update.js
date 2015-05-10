@@ -57,7 +57,7 @@ Update.version.V11 = function (socket, data, callback) {
 Update.version.V12 = function (socket, data, callback) {
 	async.waterfall([
 		function (next) {
-			user.getUidsFromHash('username:uid', next);
+			user.getUidsFromSet('users:joindate', 0, -1, next);
 		},
 		function (uids, next) {
 			user.getMultipleUserFields(uids, ['uid', 'invitedBy'], next);
@@ -122,7 +122,7 @@ Update.version.V13 = function (socket, data, callback) {
 Update.version.V14 = function (socket, data, callback) {
 	async.waterfall([
 		function (next) {
-			user.getUidsFromHash('username:uid', next);
+			user.getUidsFromSet('users:joindate', 0, -1, next);
 		},
 		function (uids, next) {
 			user.getMultipleUserFields(uids, ['iid', 'username'], next);
@@ -144,7 +144,7 @@ Update.version.V14 = function (socket, data, callback) {
 Update.version.V15 = function (socket, data, callback) {
 	async.waterfall([
 		function (next) {
-			user.getUidsFromHash('username:uid', next);
+			user.getUidsFromSet('users:joindate', 0, -1, next);
 		},
 		function (uids, next) {
 			user.getMultipleUserFields(uids, ['uid', 'invitedByUid'], next);
@@ -176,7 +176,7 @@ Update.version.V15 = function (socket, data, callback) {
 Update.version.V16 = function (socket, data, callback) {
 	async.waterfall([
 		function (next) {
-			user.getUidsFromHash('username:uid', next);
+			user.getUidsFromSet('users:joindate', 0, -1, next);
 		},
 		function (uids, next) {
 			user.getMultipleUserFields(uids, ['uid', 'iid'], next);
