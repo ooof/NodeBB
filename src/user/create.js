@@ -105,7 +105,7 @@ module.exports = function(User) {
 					function(next) {
 						async.parallel([
 							function(next) {
-								db.setObjectField('username:iid', userData.username, data.iid, next);
+								db.sortedSetAdd('username:iid', data.iid, userData.username, next);
 							},
 							function(next) {
 								db.sortedSetAdd('username:uid', userData.uid, userData.username, next);

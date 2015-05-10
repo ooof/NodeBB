@@ -995,6 +995,7 @@ Upgrade.upgrade = function(callback) {
 					async.apply(upgradeHashToSortedSet, 'fullname:uid'),
 					async.apply(upgradeHashToSortedSet, 'username:uid'),
 					async.apply(upgradeHashToSortedSet, 'userslug:uid'),
+					async.apply(upgradeHashToSortedSet, 'username:iid')
 				], function(err) {
 					if (err) {
 						return next(err);
