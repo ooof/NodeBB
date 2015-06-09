@@ -269,11 +269,7 @@ function enableDefaultTheme(next) {
 			return next(err);
 		}
 
-<<<<<<< HEAD
-		winston.info('Enabling default theme: Sim');
-=======
-		process.stdout.write('Enabling default theme: Lavender\n');
->>>>>>> 9ca7243124a3de29b16de0dd280b56ea14bf6c14
+		process.stdout.write('Enabling default theme: Sim\n');
 		meta.themes.set({
 			type: 'local',
 			id: 'nodebb-theme-sim'
@@ -498,7 +494,6 @@ function setCopyrightWidget(next) {
 			next();
 		}
 	});
-<<<<<<< HEAD
 }
 
 function setSendgirdConfig (next) {
@@ -506,8 +501,6 @@ function setSendgirdConfig (next) {
 		apiUser: 'cismous',
 		apiKey: 'xhPnlHbo0GPxzge82Gp2'
 	}, next)
-=======
->>>>>>> 9ca7243124a3de29b16de0dd280b56ea14bf6c14
 }
 
 install.setup = function (callback) {
