@@ -1,18 +1,21 @@
 /*
- NodeBB - A better forum platform for the modern web
- https://github.com/NodeBB/NodeBB/
- Copyright (C) 2013-2014  NodeBB Inc.
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+	NodeBB - A better forum platform for the modern web
+	https://github.com/NodeBB/NodeBB/
+	Copyright (C) 2013-2014  NodeBB Inc.
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 "use strict";
 /*global require, global, process*/
@@ -105,6 +108,7 @@ function loadConfig() {
 
 function start() {
 	loadConfig();
+	var db = require('./src/database');
 
 	// nconf defaults, if not set in config
 	if (!nconf.get('upload_path')) {
@@ -142,24 +146,24 @@ function start() {
 		switch (message.action) {
 			case 'reload':
 				meta.reload();
-				break;
+			break;
 			case 'js-propagate':
 				meta.js.cache = message.cache;
 				meta.js.map = message.map;
 				meta.js.hash = message.hash;
 				emitter.emit('meta:js.compiled');
 				winston.verbose('[cluster] Client-side javascript and mapping propagated to worker %s', process.pid);
-				break;
+			break;
 			case 'css-propagate':
 				meta.css.cache = message.cache;
 				meta.css.acpCache = message.acpCache;
 				meta.css.hash = message.hash;
 				emitter.emit('meta:css.compiled');
 				winston.verbose('[cluster] Stylesheets propagated to worker %s', process.pid);
-				break;
+			break;
 			case 'templates:compiled':
 				emitter.emit('templates:compiled');
-				break;
+			break;
 		}
 	});
 
@@ -172,9 +176,8 @@ function start() {
 	});
 
 	async.waterfall([
-		function(next) {
-			require('./src/database').init(next);
-		},
+		async.apply(db.init),
+		async.apply(db.checkCompatibility),
 		function(next) {
 			require('./src/meta').configs.init(next);
 		},
@@ -200,7 +203,12 @@ function start() {
 		}
 	], function(err) {
 		if (err) {
-			winston.error(err.stack);
+			if (err.stacktrace !== false) {
+				winston.error(err.stack);
+			} else {
+				winston.error(err.message);
+			}
+
 			process.exit();
 		}
 	});

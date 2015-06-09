@@ -1,4 +1,4 @@
-/**/
+
 'use strict';
 
 var path = require('path'),
@@ -20,6 +20,7 @@ var path = require('path'),
 
 	schedule = require('./schedule'),
 	avatar = require('./avatar'),
+
 	helpers = require('../public/src/modules/helpers');
 
 if (nconf.get('ssl')) {
@@ -43,9 +44,6 @@ server.on('error', function(err) {
 	}
 });
 
-if (server.setTimeout) {
-	server.setTimeout(10000);
-}
 
 module.exports.listen = function() {
 	emailer.registerApp(app);

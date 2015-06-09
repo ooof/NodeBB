@@ -24,7 +24,17 @@ define('composer', [
 
 	$(window).off('resize', onWindowResize).on('resize', onWindowResize);
 
-	$(window).on('popstate', function (ev, data) {
+	$(window).on('action:composer.topics.post', function(ev, data) {
+		localStorage.removeItem('category:' + data.data.cid + ':bookmark');
+		localStorage.removeItem('category:' + data.data.cid + ':bookmark:clicked');
+	});
+
+	$(window).on('action:composer.invite.post', function (ev, data) {
+		console.log(data);
+		ajaxify.go('invite/' + data.data.slug);
+	});
+
+	$(window).on('popstate', function(ev, data) {
 		var env = utils.findBootstrapEnvironment();
 
 		if (composer.active && (env === 'xs' || env === 'sm')) {
@@ -37,23 +47,10 @@ define('composer', [
 				bootbox.confirm(translated, function (confirm) {
 					if (confirm) {
 						discard(composer.active);
-					} else {
-						history.pushState({}, '');
 					}
 				});
 			});
 		}
-	});
-
-	$(window).on('action:composer.topics.post', function (ev, data) {
-		localStorage.removeItem('category:' + data.data.cid + ':bookmark');
-		localStorage.removeItem('category:' + data.data.cid + ':bookmark:clicked');
-		ajaxify.go('topic/' + data.data.slug);
-		removeComposerHistory();
-	});
-
-	$(window).on('action:composer.invite.post', function (ev, data) {
-		ajaxify.go('invite/' + data.data.slug);
 	});
 
 	function removeComposerHistory() {
@@ -135,13 +132,7 @@ define('composer', [
 		}
 
 		composer.posts[uuid] = post;
-
 		composer.load(uuid);
-
-		var env = utils.findBootstrapEnvironment();
-		if (env === 'xs' || env ==='sm') {
-			history.pushState({}, '');
-		}
 	}
 
 	function composerAlert(post_uuid, message) {
@@ -361,132 +352,139 @@ define('composer', [
 			isAdminOrMod: app.user.isAdmin || postData.isMod
 		};
 
-		if (postData.title) {
-			data.title = postData.title.replace(/%/g, '&#37;').replace(/,/g, '&#44;');
+		if (data.mobile) {
+			ajaxify.go('compose', function() {
+				renderComposer();
+			});
+		} else {
+			renderComposer();
 		}
 
-		var composerTemplate = isInvite || isInviteEdit ? 'invite/composer' : 'composer';
+		function renderComposer() {
+			var composerTemplate = isInvite || isInviteEdit ? 'invite/composer' : 'composer';
 
-		parseAndTranslate(composerTemplate, data, function (composerTemplate) {
-			if ($('#cmp-uuid-' + post_uuid).length) {
-				return;
-			}
-			composerTemplate = $(composerTemplate);
-
-			composerTemplate.attr('id', 'cmp-uuid-' + post_uuid);
-
-			$(document.body).append(composerTemplate);
-
-			if(composer.posts[post_uuid].hasOwnProperty('invite')) {
-				inviteComposer.init();
-			}
-
-			var postContainer = $(composerTemplate[0]),
-				bodyEl = postContainer.find('textarea'),
-				draft = drafts.getDraft(postData.save_id),
-				submitBtn = postContainer.find('.composer-submit');
-
-			preview.handleToggler(postContainer);
-			tags.init(postContainer, composer.posts[post_uuid]);
-			categoryList.init(postContainer, composer.posts[post_uuid]);
-
-			updateTitle(postData, postContainer);
-			if (isInvite || isInviteEdit) {
-				updateInvite(postData, postContainer);
-			}
-
-			activate(post_uuid);
-			resize.reposition(postContainer);
-
-			if (config.allowFileUploads || config.hasImageUploadPlugin) {
-				uploads.initialize(post_uuid);
-			}
-
-			formatting.addHandler(postContainer);
-
-			if (allowTopicsThumbnail) {
-				uploads.toggleThumbEls(postContainer, composer.posts[post_uuid].topic_thumb || '');
-			}
-
-			postContainer.on('change', 'input, textarea', function () {
-				composer.posts[post_uuid].modified = true;
-			});
-
-			submitBtn.on('click', function () {
-				var action = $(this).attr('data-action');
-
-				switch (action) {
-					case 'post-lock':
-						$(this).attr('disabled', true);
-						post(post_uuid, {lock: true});
-						break;
-
-					case 'post':	// intentional fall-through
-					default:
-						$(this).attr('disabled', true);
-						post(post_uuid);
-						break;
-				}
-			});
-
-			postContainer.on('click', 'a[data-switch-action]', function () {
-				var action = $(this).attr('data-switch-action'),
-					label = $(this).html();
-
-				submitBtn.attr('data-action', action).html(label);
-			});
-
-			postContainer.find('.composer-discard').on('click', function () {
-				if (!composer.posts[post_uuid].modified) {
-					removeComposerHistory();
-					discard(post_uuid);
+			parseAndTranslate(composerTemplate, data, function(composerTemplate) {
+				if ($('#cmp-uuid-' + post_uuid).length) {
 					return;
 				}
-				var btn = $(this).prop('disabled', true);
-				translator.translate('[[modules:composer.discard]]', function (translated) {
-					bootbox.confirm(translated, function (confirm) {
-						if (confirm) {
-							removeComposerHistory();
-							discard(post_uuid);
-						}
-						btn.prop('disabled', false);
+				composerTemplate = $(composerTemplate);
+
+				composerTemplate.attr('id', 'cmp-uuid-' + post_uuid);
+
+				$(document.body).append(composerTemplate);
+
+				// 邀请
+				if(composer.posts[post_uuid].hasOwnProperty('invite')) {
+					inviteComposer.init();
+				}
+
+				var postContainer = $(composerTemplate[0]),
+					bodyEl = postContainer.find('textarea'),
+					draft = drafts.getDraft(postData.save_id),
+					submitBtn = postContainer.find('.composer-submit');
+
+				preview.handleToggler(postContainer);
+				tags.init(postContainer, composer.posts[post_uuid]);
+				categoryList.init(postContainer, composer.posts[post_uuid]);
+
+				// 邀请
+				if (isInvite || isInviteEdit) {
+					updateInvite(postData, postContainer);
+				}
+
+				activate(post_uuid);
+				resize.reposition(postContainer);
+
+				if (config.allowFileUploads || config.hasImageUploadPlugin) {
+					uploads.initialize(post_uuid);
+				}
+
+				formatting.addHandler(postContainer);
+
+				if (allowTopicsThumbnail) {
+					uploads.toggleThumbEls(postContainer, composer.posts[post_uuid].topic_thumb || '');
+				}
+
+				postContainer.on('change', 'input, textarea', function() {
+					composer.posts[post_uuid].modified = true;
+				});
+
+				submitBtn.on('click', function() {
+					var action = $(this).attr('data-action');
+
+					switch(action) {
+						case 'post-lock':
+							$(this).attr('disabled', true);
+							post(post_uuid, {lock: true});
+							break;
+
+						case 'post':	// intentional fall-through
+						default:
+							$(this).attr('disabled', true);
+							post(post_uuid);
+							break;
+					}
+				});
+
+				postContainer.on('click', 'a[data-switch-action]', function() {
+					var action = $(this).attr('data-switch-action'),
+						label = $(this).html();
+
+					submitBtn.attr('data-action', action).html(label);
+				});
+
+				postContainer.find('.composer-discard').on('click', function() {
+					if (!composer.posts[post_uuid].modified) {
+						removeComposerHistory();
+						discard(post_uuid);
+						return;
+					}
+					var btn = $(this).prop('disabled', true);
+					translator.translate('[[modules:composer.discard]]', function(translated) {
+						bootbox.confirm(translated, function(confirm) {
+							if (confirm) {
+								removeComposerHistory();
+								discard(post_uuid);
+							}
+							btn.prop('disabled', false);
+						});
 					});
 				});
+
+				postContainer.on('click', function() {
+					if (!taskbar.isActive(post_uuid)) {
+						taskbar.updateActive(post_uuid);
+					}
+				});
+
+				bodyEl.on('input propertychange', function() {
+					preview.render(postContainer);
+				});
+
+				bodyEl.on('scroll', function() {
+					preview.matchScroll(postContainer);
+				});
+
+				bodyEl.val(draft ? draft : postData.body);
+
+				preview.render(postContainer, function() {
+					preview.matchScroll(postContainer);
+				});
+
+				drafts.init(postContainer, postData);
+
+				resize.handleResize(postContainer);
+
+				handleHelp(postContainer);
+
+				$(window).trigger('action:composer.loaded', {
+					post_uuid: post_uuid
+				});
+
+				formatting.addComposerButtons();
+				focusElements(postContainer);
 			});
-
-			postContainer.on('click', function () {
-				if (!taskbar.isActive(post_uuid)) {
-					taskbar.updateActive(post_uuid);
-				}
-			});
-
-			bodyEl.on('input propertychange', function () {
-				preview.render(postContainer);
-			});
-
-			bodyEl.on('scroll', function () {
-				preview.matchScroll(postContainer);
-			});
-
-			bodyEl.val(draft ? draft : postData.body);
-
-			preview.render(postContainer, function() {
-				preview.matchScroll(postContainer);
-			});
-
-			drafts.init(postContainer, postData);
-
-			resize.handleResize(postContainer);
-
-			handleHelp(postContainer);
-
-			$(window).trigger('action:composer.loaded', {
-				post_uuid: post_uuid
-			});
-
-			formatting.addComposerButtons();
-			focusElements(postContainer);
-		});
+		}
 	}
 
 	function parseAndTranslate(template, data, callback) {
@@ -669,6 +667,12 @@ define('composer', [
 
 			discard(post_uuid);
 			drafts.removeDraft(postData.save_id);
+
+			if (action === 'topics.post') {
+				ajaxify.go('topic/' + data.slug);
+			} else {
+				removeComposerHistory();
+			}
 
 			$(window).trigger('action:composer.' + action, {composerData: composerData, data: data});
 		});

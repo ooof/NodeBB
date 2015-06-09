@@ -104,7 +104,12 @@ module.exports = function (Invite) {
 					function (next) {
 						Invite.upVote(uid, inviteData, next);
 					}
-				], callback);
+				], function (err, result) {
+					if (err) {
+						return callback(err);
+					}
+					callback(null, result[6]);
+				});
 			});
 		});
 	};

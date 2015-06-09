@@ -4,7 +4,7 @@ var ajaxify = ajaxify || {};
 
 $(document).ready(function() {
 
-	/*global app, templates, utils, socket, translator, config, RELATIVE_PATH*/
+	/*global app, templates, utils, socket, config, RELATIVE_PATH*/
 
 	var location = document.location || window.location,
 		rootUrl = location.protocol + '//' + (location.hostname || location.host) + (location.port ? ':' + location.port : ''),
@@ -80,6 +80,7 @@ $(document).ready(function() {
 		}
 		return false;
 	};
+
 
 	ajaxify.start = function(url, quiet, search) {
 		url = ajaxify.removeRelativePath(url.replace(/^\/|\/$/g, ''));
@@ -205,6 +206,7 @@ $(document).ready(function() {
 				}
 
 				data.relative_path = RELATIVE_PATH;
+				$(window).trigger('action:ajaxify.dataLoaded', {url: url, data: data});
 
 				if (callback) {
 					callback(null, data);
@@ -259,7 +261,11 @@ $(document).ready(function() {
 			}
 
 			if (!e.ctrlKey && !e.shiftKey && !e.metaKey && e.which === 1) {
-				if (this.host === '' || (this.host === window.location.host && this.protocol === window.location.protocol)) {
+				if (
+					this.host === '' ||	// Relative paths are always internal links...
+					(this.host === window.location.host && this.protocol === window.location.protocol &&	// Otherwise need to check that protocol and host match
+					(RELATIVE_PATH.length > 0 ? this.pathname.indexOf(RELATIVE_PATH) === 0 : true))	// Subfolder installs need this additional check
+				) {
 					// Internal link
 					var url = this.href.replace(rootUrl + '/', '');
 

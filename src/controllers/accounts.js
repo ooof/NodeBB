@@ -226,7 +226,7 @@ accountsController.getAccount = function(req, res, next) {
 				user.isFollowing(req.uid, userData.theirid, next);
 			},
 			posts: function(next) {
-				posts.getPostsFromSet('uid:' + userData.theirid + ':posts', req.uid, 0, 9, next);
+				posts.getPostSummariesFromSet('uid:' + userData.theirid + ':posts', req.uid, 0, 9, next);
 			},
 			signature: function(next) {
 				posts.parseSignature(userData, req.uid, next);
@@ -325,11 +325,11 @@ function getFollow(tpl, name, req, res, next) {
 }
 
 accountsController.getFavourites = function(req, res, next) {
-	getFromUserSet('account/favourites', 'favourites', posts.getPostsFromSet, 'posts', req, res, next);
+	getFromUserSet('account/favourites', 'favourites', posts.getPostSummariesFromSet, 'posts', req, res, next);
 };
 
 accountsController.getPosts = function(req, res, next) {
-	getFromUserSet('account/posts', 'posts', posts.getPostsFromSet, 'posts', req, res, next);
+	getFromUserSet('account/posts', 'posts', posts.getPostSummariesFromSet, 'posts', req, res, next);
 };
 
 accountsController.getWatchedTopics = function(req, res, next) {
@@ -494,12 +494,13 @@ accountsController.accountSettings = function(req, res, next) {
 			}, next);
 		},
 		function(results, next) {
+			userData.settings = results.settings;
 			userData.languages = results.languages;
 			userData.userGroups = results.userGroups[0];
-			plugins.fireHook('filter:user.settings', {settings: results.settings, uid: req.uid}, next);
+			plugins.fireHook('filter:user.settings', {settings: results.settings, customSettings: [], uid: req.uid}, next);
 		},
 		function(data, next) {
-			userData.settings = data.settings;
+			userData.customSettings = data.customSettings;
 			userData.disableEmailSubscriptions = parseInt(meta.config.disableEmailSubscriptions, 10) === 1;
 			next();
 		}

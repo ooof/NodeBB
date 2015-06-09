@@ -54,6 +54,9 @@ module.exports = function(User) {
 					db.sortedSetRemove('username:uid', userData.username, next);
 				},
 				function(next) {
+					db.sortedSetRemove('username:sorted', userData.username.toLowerCase() + ':' + uid, next);
+				},
+				function(next) {
 					db.sortedSetRemove('userslug:uid', userData.userslug, next);
 				},
 				function(next) {
@@ -61,7 +64,10 @@ module.exports = function(User) {
 				},
 				function(next) {
 					if (userData.email) {
-						db.sortedSetRemove('email:uid', userData.email.toLowerCase(), next);
+						async.parallel([
+							async.apply(db.sortedSetRemove, 'email:uid', userData.email.toLowerCase()),
+							async.apply(db.sortedSetRemove, 'email:sorted', userData.email.toLowerCase() + ':' + uid)
+						], next);
 					} else {
 						next();
 					}
@@ -74,6 +80,9 @@ module.exports = function(User) {
 						'users:banned',
 						'users:online'
 					], uid, next);
+				},
+				function(next) {
+					db.decrObjectField('global', 'userCount', next);
 				},
 				function(next) {
 					var keys = [
@@ -119,14 +128,7 @@ module.exports = function(User) {
 					return callback(err);
 				}
 
-				async.parallel([
-					function(next) {
-						db.deleteAll(['followers:' + uid, 'following:' + uid, 'user:' + uid], next);
-					},
-					function(next) {
-						User.updateUserCount(next);
-					}
-				], callback);
+				db.deleteAll(['followers:' + uid, 'following:' + uid, 'user:' + uid], callback);
 			});
 		});
 	};

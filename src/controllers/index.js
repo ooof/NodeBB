@@ -28,7 +28,6 @@ var Controllers = {
 	users: require('./users'),
 	groups: require('./groups'),
 	accounts: require('./accounts'),
-	static: require('./static'),
 	api: require('./api'),
 	admin: require('./admin')
 };
@@ -154,6 +153,9 @@ Controllers.register = function(req, res, next) {
 	});
 };
 
+Controllers.compose = function(req, res, next) {
+	res.render('composer', {});
+};
 
 Controllers.confirmEmail = function(req, res, next) {
 	user.email.confirm(req.params.code, function (err) {
