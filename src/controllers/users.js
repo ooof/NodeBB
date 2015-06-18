@@ -107,6 +107,7 @@ usersController.getUsers = function(set, start, stop, req, res, next) {
 		var pageCount = Math.ceil(data.count / (parseInt(meta.config.userSearchResultsPerPage, 10) || 20));
 		var userData = {
 			search_display: 'hidden',
+			ghost_display: 'hidden',
 			loadmore_display: data.count > (stop - start + 1) ? 'block' : 'hide',
 			users: data.users,
 			pagination: pagination.create(1, pageCount)
