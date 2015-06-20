@@ -83,6 +83,10 @@ usersController.getGhostUsers = function(req, res, next) {
 			users: users
 		};
 
+		userData.users.sort(function (a, b) {
+			return a.username.localeCompare(b.username);
+		});
+
 		res.render('users', userData);
 	});
 };
@@ -112,10 +116,7 @@ usersController.getUsers = function(set, start, stop, req, res, next) {
 			users: data.users,
 			pagination: pagination.create(1, pageCount)
 		};
-		userData['route_' + set] = true;
-		userData.users.sort(function (a, b) {
-			return a.username.localeCompare(b.username);
-		});
+		userData[set] = true;
 		render(req, res, userData, next);
 	});
 };
