@@ -31,5 +31,12 @@
             <button class="btn btn-primary" data-action="update-version-16" disabled>Update 1.6</button>
             <span class="tips">升级完成...</span>
         </div>
+
+        <div class="update-group">
+            <button class="btn btn-primary" data-action="update-version-17">Update 1.7</button>
+            <span class="tips"></span>
+            <!--<span class="tips">升级完成...</span>-->
+            <div class="tips">重置所有用户的订阅设置</div>
+        </div>
     </div>
 </div>

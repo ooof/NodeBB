@@ -197,4 +197,33 @@ Update.version.V16 = function (socket, data, callback) {
 	], callback);
 };
 
+Update.version.V17 = function (socket, data, callback) {
+	async.waterfall([
+		function (next) {
+			user.getUidsFromSet('users:joindate', 0, -1, next);
+		},
+		function (uids, next) {
+			async.each(uids, function (uid, callback) {
+				async.waterfall([
+					function (next) {
+						db.setObject('user:' + uid + ':settings', {
+							dailyDigestFreq: 'day',
+							sendChatNotifications: 1,
+							sendPostNotifications: 1
+						}, next);
+					},
+					function (next) {
+						user.updateDigestSetting(uid, 'day', next);
+					}
+				], callback);
+			}, function(err) {
+				if (err) {
+					return next(err);
+				}
+				next();
+			});
+		}
+	], callback);
+};
+
 module.exports = Update;
