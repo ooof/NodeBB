@@ -55,7 +55,7 @@ Jobs.init = function () {
 	if (process.env.NODE_ENV === 'development') {
 		Jobs.warn = {
 			time: function () {
-				return 1000 * 8 * 2;
+				return 1000 * 60 * 2;
 			},
 			text: function () {
 				return '2分钟';
@@ -63,7 +63,7 @@ Jobs.init = function () {
 		};
 		Jobs.expire = {
 			time: function () {
-				return 1000 * 5 * 6;
+				return 1000 * 60 * 6;
 			},
 			text: function () {
 				return '6分钟';
