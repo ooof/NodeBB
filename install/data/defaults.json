@@ -224,6 +224,18 @@
         "value": "Reset"
     },
     {
+        "field": "email:reset:success:html",
+        "value": "<p>{username}，您好:</p>\r\n\r\n<p>您在 {date} 上的密码被成功修改。</p>\r\n\r\n<p>如果你没有授权此操作，请立即联系管理员。</p>\r\n\r\n<p>谢谢！</p>"
+    },
+    {
+        "field": "email:reset:success:subject",
+        "value": "密码重置成功"
+    },
+    {
+        "field": "email:reset:success:fromname",
+        "value": "ResetSuccess"
+    },
+    {
         "field": "notification:invite:upvote",
         "value": "{invitedByUsername} 邀请 {username}，请投票表决"
     },

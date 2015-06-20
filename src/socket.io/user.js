@@ -109,11 +109,12 @@ SocketUser.reset.commit = function(socket, data, callback) {
 			parsedDate = now.getFullYear() + '/' + (now.getMonth()+1) + '/' + now.getDate();
 
 		user.getUserField(uid, 'username', function(err, username) {
-			emailer.send('reset_notify', uid, {
+			emailer.sendPlus({
 				username: username,
 				date: parsedDate,
 				site_title: meta.config.title || 'NodeBB',
-				subject: '[[email:reset.notify.subject]]'
+				uid: uid,
+				template: 'reset:success'
 			});
 		});
 

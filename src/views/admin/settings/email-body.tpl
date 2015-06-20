@@ -133,7 +133,7 @@
             <br>
 
             <div class="help-block">
-                <h4>重置密码</h4>
+                <h4>6. 重置密码</h4>
             </div>
             <div class="form-group">
                 <label for="email-reset-fromname"><strong>发件人姓名</strong></label>
@@ -150,6 +150,28 @@
             <div class="help-block">
                 <ol style="padding-left: 1.5em;">
                     <li>reset_link 重置密码链接</li>
+                </ol>
+            </div>
+            <br>
+
+            <div class="help-block">
+                <h4>7. 重置成功</h4>
+            </div>
+            <div class="form-group">
+                <label for="email-reset-success-fromname"><strong>收件人姓名</strong></label>
+                <input type="text" class="form-control" id="email-reset-success-fromname" data-field="email:reset:success:fromname"/>
+            </div>
+            <div class="form-group">
+                <label for="email-reset-success-subject"><strong>邮件标题</strong></label>
+                <input type="text" class="form-control" id="email-reset-success-subject" data-field="email:reset:success:subject"/>
+            </div>
+            <div class="form-group">
+                <label for="email-reset-success-html"><strong>邮件内容</strong></label>
+                <textarea class="form-control" id="email-reset-success-html" data-field="email:reset:success:html" style="min-height:130px;"></textarea>
+            </div>
+            <div class="help-block">
+                <ol style="padding-left: 1.5em;">
+                    <li>date 重置密码成功日期</li>
                 </ol>
             </div>
         </form>
