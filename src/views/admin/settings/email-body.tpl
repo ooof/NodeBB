@@ -5,7 +5,7 @@
     <div class="panel-body">
         <form>
             <div class="help-block">
-                <h4>1. 提名邮件</h4>
+                <h4>提名邮件</h4>
             </div>
             <div class="form-group">
                 <label for="email-invite-fromname"><strong>发件人姓名</strong></label>
@@ -32,7 +32,56 @@
             <br>
 
             <div class="help-block">
-                <h4>2. 提名成功</h4>
+                <h4>通知提名人</h4>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-notify-fromname"><strong>收件人姓名</strong></label>
+                <input type="text" class="form-control" id="email-invite-notify-fromname" data-field="email:invite:notify:fromname"/>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-notify-subject"><strong>邮件标题</strong></label>
+                <input type="text" class="form-control" id="email-invite-notify-subject" data-field="email:invite:notify:subject"/>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-notify-html"><strong>邮件内容</strong></label>
+                <textarea class="form-control" id="email-invite-notify-html" data-field="email:invite:notify:html" style="min-height:130px;"></textarea>
+            </div>
+            <div class="help-block">
+                <ol style="padding-left: 1.5em;">
+                    <li>username 被提名人用户名</li>
+                    <li>invitedByUsername 提名人用户名</li>
+                    <li>link 提名帖链接</li>
+                </ol>
+            </div>
+            <br>
+
+            <div class="help-block">
+                <h4>通知全站投票</h4>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-upvote-fromname"><strong>收件人姓名</strong></label>
+                <input type="text" class="form-control" id="email-invite-upvote-fromname" data-field="email:invite:upvote:fromname"/>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-upvote-subject"><strong>邮件标题</strong></label>
+                <input type="text" class="form-control" id="email-invite-upvote-subject" data-field="email:invite:upvote:subject"/>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-upvote-html"><strong>邮件内容</strong></label>
+                <textarea class="form-control" id="email-invite-upvote-html" data-field="email:invite:upvote:html" style="min-height:130px;"></textarea>
+            </div>
+            <div class="help-block">
+                <ol style="padding-left: 1.5em;">
+                    <li>emailUsername 收件人用户名</li>
+                    <li>username 被提名人用户名</li>
+                    <li>invitedByUsername 提名人用户名</li>
+                    <li>link 提名帖链接</li>
+                </ol>
+            </div>
+            <br>
+
+            <div class="help-block">
+                <h4>提名成功</h4>
             </div>
             <div class="form-group">
                 <label for="email-invite-success-fromname"><strong>发件人姓名</strong></label>
@@ -57,7 +106,7 @@
             <br>
 
             <div class="help-block">
-                <h4>3. 提名过期提醒</h4>
+                <h4>提名过期提醒</h4>
             </div>
             <div class="form-group">
                 <label for="email-invite-warn-fromname"><strong>发件人姓名</strong></label>
@@ -83,7 +132,7 @@
             <br>
 
             <div class="help-block">
-                <h4>4. 提名失败</h4>
+                <h4>提名失败</h4>
             </div>
             <div class="form-group">
                 <label for="email-invite-failed-fromname"><strong>发件人姓名</strong></label>
@@ -109,7 +158,7 @@
             <br>
 
             <div class="help-block">
-                <h4>5. 用户退出</h4>
+                <h4>用户退出</h4>
             </div>
             <div class="form-group">
                 <label for="email-invite-exit-fromname"><strong>发件人姓名</strong></label>
@@ -133,7 +182,7 @@
             <br>
 
             <div class="help-block">
-                <h4>6. 重置密码</h4>
+                <h4>重置密码</h4>
             </div>
             <div class="form-group">
                 <label for="email-reset-fromname"><strong>发件人姓名</strong></label>
@@ -155,7 +204,7 @@
             <br>
 
             <div class="help-block">
-                <h4>7. 重置成功</h4>
+                <h4>重置成功</h4>
             </div>
             <div class="form-group">
                 <label for="email-reset-success-fromname"><strong>收件人姓名</strong></label>
@@ -174,6 +223,7 @@
                     <li>date 重置密码成功日期</li>
                 </ol>
             </div>
+            <br>
         </form>
     </div>
 </div>

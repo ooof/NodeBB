@@ -168,6 +168,30 @@
         "value": "<p>您好，{username}:</p>\r\n\r\n<p>您提名的{invite_username}，已经获得 {count} 票支持，达到邀请票数，系统已发送邀请邮件！</p>"
     },
     {
+        "field": "email:invite:notify:html",
+        "value": "<p>您好，{invitedByUsername}:</p>\r\n\r\n<p>您提名邀请的 {username} 我们已经给他发出邀请邮件，如果五天之后，他还没有接受邀请进入，我们会再次提醒你。</p>"
+    },
+    {
+        "field": "email:invite:notify:subject",
+        "value": "我们已经给您提名的{username}发出邀请邮件"
+    },
+    {
+        "field": "email:invite:notify:fromname",
+        "value": "InviteNotify"
+    },
+    {
+        "field": "email:invite:upvote:html",
+        "value": "<p>您好，{emailUsername}:</p>\r\n\r\n<p>{invitedByUsername} 邀请 {username}，请投票表决。</p>\r\n\r\n<blockquote>\r\n\t<a href=\"{link}\">点击进入</a>\r\n</blockquote>\r\n\r\n<p>谢谢！</p>"
+    },
+    {
+        "field": "email:invite:upvote:subject",
+        "value": "请投票表决"
+    },
+    {
+        "field": "email:invite:upvote:fromname",
+        "value": "InviteUpvote"
+    },
+    {
         "field": "email:inviteSuccess:subject",
         "value": "{username}，您提名的{invite_username}已通过"
     },
