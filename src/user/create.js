@@ -105,6 +105,16 @@ module.exports = function(User) {
 					function(next) {
 						async.parallel([
 							function(next) {
+								db.setObject('user:' + userData.uid + ':settings', {
+									dailyDigestFreq: 'day',
+									sendChatNotifications: 1,
+									sendPostNotifications: 1
+								}, next);
+							},
+							function (next) {
+								User.updateDigestSetting(userData.uid, 'day', next);
+							},
+							function(next) {
 								db.incrObjectField('global', 'userCount', next);
 							},
 							function(next) {

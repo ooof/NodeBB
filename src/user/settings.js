@@ -141,6 +141,8 @@ module.exports = function(User) {
 		], callback);
 	}
 
+	User.updateDigestSetting = updateDigestSetting;
+
 	User.setSetting = function(uid, key, value, callback) {
 		db.setObjectField('user:' + uid + ':settings', key, value, callback);
 	};
