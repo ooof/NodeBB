@@ -56,7 +56,8 @@ inviteController.list = function (req, res, next) {
 				reverse = true;
 
 			var start = (page - 1) * settings.topicsPerPage + inviteIndex,
-				end = start + settings.topicsPerPage - 1;
+				end = -1;
+				//end = start + settings.topicsPerPage - 1;
 
 			next(null, {
 				setKey: setKey,
