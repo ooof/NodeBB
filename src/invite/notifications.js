@@ -89,7 +89,8 @@ module.exports = function (Invite) {
 			function (next) {
 				parseBodyShort({
 					template: 'invited',
-					username: inviteData.username
+					username: inviteData.username,
+					invitedByUsername: inviteData.invitedByUsername
 				}, next);
 			},
 			function (bodyShort, next) {
@@ -197,6 +198,26 @@ module.exports = function (Invite) {
 					nid: 'user:deleted:' + userData.uid,
 					uid: userData.invitedByUid,
 					score: 'somebody'
+				}, next);
+			}
+		], callback);
+	};
+
+	// 通知投票人
+	Invite.sendExitNotificationToUpvote = function (userData, callback) {
+		async.waterfall([
+			function (next) {
+				parseBodyShort({
+					template: 'exit:2',
+					username: userData.invitedUsername
+				}, next);
+			},
+			function (bodyShort, next) {
+				user.notifications.sendNotification({
+					bodyShort: bodyShort,
+					nid: 'user:deleted:upvote:' + userData.uid,
+					uid: userData.invitedByUid,
+					score: 'votedUids'
 				}, next);
 			}
 		], callback);

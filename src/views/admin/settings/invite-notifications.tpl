@@ -82,7 +82,7 @@
             <br>
 
             <div class="help-block">
-                <h4>5. 用户退出</h4>
+                <h4>5. 用户退出后通知提名人</h4>
             </div>
             <div class="form-group">
                 <label for="email-invite-exit-html"><strong>内容</strong></label>
@@ -93,6 +93,21 @@
                     <li>username 被提名人用户名</li>
                 </ol>
             </div>
+            <br>
+
+            <div class="help-block">
+                <h4>6. 用户退出后通知投票人</h4>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-exit-2-html"><strong>内容</strong></label>
+                <textarea class="form-control" id="email-invite-exit-2-html" data-field="notification:invite:exit:2" style="min-height:75px;"></textarea>
+            </div>
+            <div class="help-block">
+                <ol style="padding-left: 1.5em;">
+                    <li>username 被提名人用户名</li>
+                </ol>
+            </div>
+            <br>
         </form>
     </div>
 </div>

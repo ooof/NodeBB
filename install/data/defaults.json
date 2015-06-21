@@ -184,7 +184,7 @@
     },
     {
         "field": "email:invite:success:subject",
-        "value": "我们已经给您提名的{invite_username}发出邀请邮件"
+        "value": "我们已经给您提名的{}发出邀请邮件"
     },
     {
         "field": "email:invite:success:fromname",
@@ -275,7 +275,7 @@
     },
     {
         "field": "notification:invite:invited",
-        "value": "提名 {username} 的表决已通过，邀请已经发出"
+        "value": "{invitedByUsername} 提名 {username} 的表决已通过，邀请已经发出"
     },
     {
         "field": "notification:invite:joined",
@@ -293,5 +293,9 @@
     {
         "field": "notification:invite:exit",
         "value": "您提名的{username}已被删除"
+    },
+    {
+        "field": "notification:invite:exit:2",
+        "value": "您投票的{username}已被删除"
     }
 ]
