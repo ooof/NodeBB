@@ -105,7 +105,7 @@ module.exports = function (Invite) {
 		}
 	};
 
-	// 提名成功后给提名人发送邮件
+	// 提名人成功加入社区后给提名人发送邮件
 	Invite.sendInvitedSuccessEmail = function (inviteData, callback) {
 		callback = callback || function() {};
 		var params = {
