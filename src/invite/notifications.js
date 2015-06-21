@@ -24,6 +24,44 @@ module.exports = function (Invite) {
 		// step: 1
 		async.waterfall([
 			function (next) {
+				user.getUidsFromSet('users:joindate', 0, -1, function (err, uids) {
+					if (err || !Array.isArray(uids) || !uids.length) {
+						return;
+					}
+
+					for (var i = 0, l = uids.length; i < l; i++) {
+						uids[i] = parseInt(uids[i], 10);
+					}
+
+					uids = uids.filter(function (uid) {
+						return uid !== inviteData.uid;
+					});
+
+					next(null, uids);
+				});
+			},
+			function (uids, next) {
+				async.each(uids, function (uid, next) {
+					user.getUserFields(uid, ['username', 'email'], function (err, data) {
+						var params = {
+							email: data.email,
+							uid: uid,
+							template: 'invite:upvote',
+							username: inviteData.username,
+							link: nconf.get('url') + '/invite/' + inviteData.slug,
+							emailUsername: data.username,
+							invitedByUsername: inviteData.invitedByUsername
+						};
+						emailer.sendPlus(params, next);
+					});
+				}, function (err) {
+					if (err) {
+						return next(err);
+					}
+					next();
+				});
+			},
+			function (next) {
 				parseBodyShort({
 					template: 'upvote',
 					username: inviteData.username,
@@ -33,7 +71,7 @@ module.exports = function (Invite) {
 			function (bodyShort, next) {
 				user.notifications.sendNotification({
 					bodyShort: bodyShort,
-					path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
+					path: nconf.get('url') + '/invite/' + inviteData.slug,
 					nid: 'upvote:' + inviteData.iid,
 					uid: inviteData.uid,
 					iid: inviteData.iid,
@@ -57,7 +95,7 @@ module.exports = function (Invite) {
 			function (bodyShort, next) {
 				user.notifications.sendNotification({
 					bodyShort: bodyShort,
-					path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
+					path: nconf.get('url') + '/invite/' + inviteData.slug,
 					nid: 'invited:uid:' + uid + ':iid:' + iid,
 					uid: uid,
 					iid: iid,
@@ -81,7 +119,7 @@ module.exports = function (Invite) {
 			function (bodyShort, next) {
 				user.notifications.sendNotification({
 					bodyShort: bodyShort,
-					path: nconf.get('relative_path') + '/invite/' + userData.invitedBySlug,
+					path: nconf.get('url') + '/invite/' + userData.invitedBySlug,
 					uid: uid,
 					iid: userData.iid,
 					nid: 'joined:' + uid,
@@ -107,8 +145,8 @@ module.exports = function (Invite) {
 			function (bodyShort, next) {
 				user.notifications.sendNotification({
 					bodyShort: bodyShort,
-					path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-					nid: 'invite:iid:' + inviteData.iid + ':uid:'+ userData.uid + ':warned',
+					path: nconf.get('url') + '/invite/' + inviteData.slug,
+					nid: 'invite:iid:' + inviteData.iid + ':uid:' + userData.uid + ':warned',
 					uid: userData.uid,
 					iid: inviteData.iid,
 					score: 'somebody',
@@ -133,8 +171,8 @@ module.exports = function (Invite) {
 			function (bodyShort, next) {
 				user.notifications.sendNotification({
 					bodyShort: bodyShort,
-					path: nconf.get('relative_path') + '/invite/' + inviteData.slug,
-					nid: 'invite:iid:' + inviteData.iid + ':uid:'+ userData.uid + ':expired',
+					path: nconf.get('url') + '/invite/' + inviteData.slug,
+					nid: 'invite:iid:' + inviteData.iid + ':uid:' + userData.uid + ':expired',
 					uid: userData.uid,
 					iid: inviteData.iid,
 					score: 'somebody',
