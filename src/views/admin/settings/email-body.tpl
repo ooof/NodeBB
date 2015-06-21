@@ -24,7 +24,7 @@
                     <li>emailUsername 收件人用户名</li>
                     <li>username 被提名人用户名</li>
                     <li>invitedByUsername 提名人用户名</li>
-                    <li>link 提名帖链接</li>
+                    <li>invite_link 提名帖链接</li>
                 </ol>
             </div>
             <br>
@@ -57,7 +57,7 @@
             <br>
 
             <div class="help-block">
-                <h4>告知提名人提名成功</h4>
+                <h4>告知提名成功</h4>
             </div>
             <div class="form-group">
                 <label for="email-invite-success-fromname"><strong>发件人姓名</strong></label>
@@ -77,6 +77,7 @@
                     <li>username 提名人用户名</li>
                     <li>invite_username 被提名的用户名</li>
                     <li>count 投票数量</li>
+                    <li>warn_time 提醒时间</li>
                 </ol>
             </div>
             <br>
@@ -110,15 +111,15 @@
             </div>
             <div class="form-group">
                 <label for="email-invite-warn-fromname"><strong>发件人姓名</strong></label>
-                <input type="text" class="form-control" id="email-invite-warn-fromname" data-field="email:inviteWarn:fromname"/>
+                <input type="text" class="form-control" id="email-invite-warn-fromname" data-field="email:invite:warn:fromname"/>
             </div>
             <div class="form-group">
                 <label for="email-invite-warn-subject"><strong>邮件标题</strong></label>
-                <input type="text" class="form-control" id="email-invite-warn-subject" data-field="email:inviteWarn:subject"/>
+                <input type="text" class="form-control" id="email-invite-warn-subject" data-field="email:invite:warn:subject"/>
             </div>
             <div class="form-group">
                 <label for="email-invite-warn-html"><strong>邮件内容</strong></label>
-                <textarea class="form-control" id="email-invite-warn-html" data-field="email:inviteWarn:html" style="min-height:130px;"></textarea>
+                <textarea class="form-control" id="email-invite-warn-html" data-field="email:invite:warn:html" style="min-height:130px;"></textarea>
             </div>
             <div class="help-block">
                 <ol style="padding-left: 1.5em;">
@@ -136,15 +137,15 @@
             </div>
             <div class="form-group">
                 <label for="email-invite-failed-fromname"><strong>发件人姓名</strong></label>
-                <input type="text" class="form-control" id="email-invite-failed-fromname" data-field="email:inviteFailed:fromname"/>
+                <input type="text" class="form-control" id="email-invite-failed-fromname" data-field="email:invite:failed:fromname"/>
             </div>
             <div class="form-group">
                 <label for="email-invite-failed-subject"><strong>邮件标题</strong></label>
-                <input type="text" class="form-control" id="email-invite-failed-subject" data-field="email:inviteFailed:subject"/>
+                <input type="text" class="form-control" id="email-invite-failed-subject" data-field="email:invite:failed:subject"/>
             </div>
             <div class="form-group">
                 <label for="email-invite-failed-html"><strong>邮件内容</strong></label>
-                <textarea class="form-control" id="email-invite-failed-html" data-field="email:inviteFailed:html" style="min-height:130px;"></textarea>
+                <textarea class="form-control" id="email-invite-failed-html" data-field="email:invite:failed:html" style="min-height:130px;"></textarea>
             </div>
             <div class="help-block">
                 <ol style="padding-left: 1.5em;">

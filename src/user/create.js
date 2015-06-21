@@ -9,6 +9,7 @@ var async = require('async'),
 	meta = require('../meta'),
 	notifications = require('../notifications'),
 	avatar = require('../avatar'),
+	invite = require('../invite'),
 	translator = require('../../public/src/modules/translator');
 
 module.exports = function(User) {
@@ -148,6 +149,17 @@ module.exports = function(User) {
 								} else {
 									next();
 								}
+							},
+							function(next) {
+								if (userData.iid === 0) {
+									return next();
+								}
+								invite.getInviteFields(userData.iid, ['slug', 'uid', 'username', 'invitedByUsername'], function (err, inviteData) {
+									if (err) {
+										return next(err);
+									}
+									invite.sendInvitedSuccessEmail(inviteData, next);
+								});
 							},
 							function(next) {
 								if (!data.password) {

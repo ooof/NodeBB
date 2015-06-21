@@ -90,11 +90,12 @@ module.exports = function (Invite) {
 		callback = callback || function() {};
 		var params = {
 			uid: inviteData.uid,
-			template: 'inviteSuccess',
+			template: 'invite:success',
 			username: inviteData.invitedByUsername,
 			invite_username: inviteData.username,
 			invite_link: nconf.get('url') + '/invite/' + inviteData.slug,
-			count: inviteData.inviteCount
+			count: inviteData.inviteCount,
+			warn_time: jobs.warn.text()
 		};
 
 		if (plugins.hasListeners('action:email.send')) {
@@ -109,7 +110,7 @@ module.exports = function (Invite) {
 		callback = callback || function() {};
 		var params = {
 			uid: inviteData.uid,
-			template: 'inviteSuccess',
+			template: 'invited:success',
 			username: inviteData.invitedByUsername,
 			invite_username: inviteData.username,
 			link: nconf.get('url') + '/invite/' + inviteData.slug

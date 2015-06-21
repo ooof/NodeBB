@@ -158,7 +158,7 @@
     },
     {
         "field": "email:invite:upvote:html",
-        "value": "<p>您好，{emailUsername}:</p>\r\n\r\n<p>{invitedByUsername} 邀请 {username}，请投票表决。</p>\r\n\r\n<blockquote>\r\n\t<a href=\"{link}\">点击进入</a>\r\n</blockquote>\r\n\r\n<p>谢谢！</p>"
+        "value": "<p>您好，{emailUsername}:</p>\r\n\r\n<p>{invitedByUsername} 邀请 {username}，请投票表决。</p>\r\n\r\n<blockquote>\r\n\t<a href=\"{invite_link}\">点击进入</a>\r\n</blockquote>\r\n\r\n<p>谢谢！</p>"
     },
     {
         "field": "email:invite:upvote:fromname",
@@ -180,7 +180,7 @@
 
     {
         "field": "email:invite:success:html",
-        "value": "<p>您好，{username}:</p>\r\n\r\n<p>您提名的{invite_username}，已经获得 {count} 票支持，达到邀请票数，系统已发送邀请邮件！如果五天之后，他还没有接受邀请进入，我们会再次提醒你。</p>"
+        "value": "<p>您好，{username}:</p>\r\n\r\n<p>您提名的{invite_username}，已经获得 {count} 票支持，达到邀请票数，系统已发送邀请邮件！如果{warn_time}之后，他还没有接受邀请进入，我们会再次提醒你。</p>"
     },
     {
         "field": "email:invite:success:subject",
@@ -197,7 +197,7 @@
     },
     {
         "field": "email:invited:success:subject",
-        "value": "您提名的{username}已接受邀请加入"
+        "value": "您提名的{invite_username}已接受邀请加入"
     },
     {
         "field": "email:invited:success:fromname",
@@ -205,28 +205,28 @@
     },
 
     {
-        "field": "email:inviteWarn:html",
+        "field": "email:invite:warn:html",
         "value": "<p>您好，{username}:</p>\r\n\r\n<p>由于您提名的{invite_username}，在{warn_time}内未进入社区，此次提名即将过期！</p>"
     },
     {
-        "field": "email:inviteWarn:subject",
+        "field": "email:invite:warn:subject",
         "value": "{username}，您提名的{invite_username}即将过期"
     },
     {
-        "field": "email:inviteWarn:fromname",
+        "field": "email:invite:warn:fromname",
         "value": "InviteWarn"
     },
 
     {
-        "field": "email:inviteFailed:html",
+        "field": "email:invite:failed:html",
         "value": "<p>您好，{username}:</p>\r\n\r\n<p>由于您提名的{invite_username}，在{expire_time}内未进入社区，此次提名已经被系统标记为提名失败！</p>"
     },
     {
-        "field": "email:inviteFailed:subject",
+        "field": "email:invite:failed:subject",
         "value": "{username}，您提名的{invite_username}已过期"
     },
     {
-        "field": "email:inviteFailed:fromname",
+        "field": "email:invite:failed:fromname",
         "value": "InviteFailed"
     },
 
