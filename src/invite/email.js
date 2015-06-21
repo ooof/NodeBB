@@ -93,8 +93,26 @@ module.exports = function (Invite) {
 			template: 'inviteSuccess',
 			username: inviteData.invitedByUsername,
 			invite_username: inviteData.username,
-			invite_link: nconf.get('relative_path') + '/invite/' + inviteData.slug,
+			invite_link: nconf.get('url') + '/invite/' + inviteData.slug,
 			count: inviteData.inviteCount
+		};
+
+		if (plugins.hasListeners('action:email.send')) {
+			emailer.sendPlus(params, callback);
+		} else {
+			callback(new Error('[[error:no-emailers-configured]]'));
+		}
+	};
+
+	// 提名成功后给提名人发送邮件
+	Invite.sendInvitedSuccessEmail = function (inviteData, callback) {
+		callback = callback || function() {};
+		var params = {
+			uid: inviteData.uid,
+			template: 'inviteSuccess',
+			username: inviteData.invitedByUsername,
+			invite_username: inviteData.username,
+			link: nconf.get('url') + '/invite/' + inviteData.slug
 		};
 
 		if (plugins.hasListeners('action:email.send')) {
@@ -112,7 +130,7 @@ module.exports = function (Invite) {
 			template: 'inviteWarn',
 			username: inviteData.invitedByUsername,
 			invite_username: inviteData.username,
-			invite_link: nconf.get('relative_path') + '/invite/' + inviteData.slug,
+			invite_link: nconf.get('url') + '/invite/' + inviteData.slug,
 			warn_time: jobs.warn.text()
 		};
 		if (plugins.hasListeners('action:email.send')) {
@@ -130,7 +148,7 @@ module.exports = function (Invite) {
 			template: 'inviteFailed',
 			username: inviteData.invitedByUsername,
 			invite_username: inviteData.username,
-			invite_link: nconf.get('relative_path') + '/invite/' + inviteData.slug,
+			invite_link: nconf.get('url') + '/invite/' + inviteData.slug,
 			expire_time: jobs.expire.text()
 		};
 		if (plugins.hasListeners('action:email.send')) {
@@ -155,7 +173,7 @@ module.exports = function (Invite) {
 					template: 'inviteExit',
 					username: inviteData.invitedByUsername,
 					invite_username: inviteData.username,
-					invite_link: nconf.get('relative_path') + '/invite/' + inviteData.slug
+					invite_link: nconf.get('url') + '/invite/' + inviteData.slug
 				};
 				if (plugins.hasListeners('action:email.send')) {
 					emailer.sendPlus(params, next);
