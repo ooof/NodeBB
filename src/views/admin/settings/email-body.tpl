@@ -5,7 +5,32 @@
     <div class="panel-body">
         <form>
             <div class="help-block">
-                <h4>提名邮件</h4>
+                <h4>通知全站投票</h4>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-upvote-fromname"><strong>收件人姓名</strong></label>
+                <input type="text" class="form-control" id="email-invite-upvote-fromname" data-field="email:invite:upvote:fromname"/>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-upvote-subject"><strong>邮件标题</strong></label>
+                <input type="text" class="form-control" id="email-invite-upvote-subject" data-field="email:invite:upvote:subject"/>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-upvote-html"><strong>邮件内容</strong></label>
+                <textarea class="form-control" id="email-invite-upvote-html" data-field="email:invite:upvote:html" style="min-height:130px;"></textarea>
+            </div>
+            <div class="help-block">
+                <ol style="padding-left: 1.5em;">
+                    <li>emailUsername 收件人用户名</li>
+                    <li>username 被提名人用户名</li>
+                    <li>invitedByUsername 提名人用户名</li>
+                    <li>link 提名帖链接</li>
+                </ol>
+            </div>
+            <br>
+
+            <div class="help-block">
+                <h4>发送提名邮件</h4>
             </div>
             <div class="form-group">
                 <label for="email-invite-fromname"><strong>发件人姓名</strong></label>
@@ -32,68 +57,19 @@
             <br>
 
             <div class="help-block">
-                <h4>通知提名人</h4>
-            </div>
-            <div class="form-group">
-                <label for="email-invite-notify-fromname"><strong>收件人姓名</strong></label>
-                <input type="text" class="form-control" id="email-invite-notify-fromname" data-field="email:invite:notify:fromname"/>
-            </div>
-            <div class="form-group">
-                <label for="email-invite-notify-subject"><strong>邮件标题</strong></label>
-                <input type="text" class="form-control" id="email-invite-notify-subject" data-field="email:invite:notify:subject"/>
-            </div>
-            <div class="form-group">
-                <label for="email-invite-notify-html"><strong>邮件内容</strong></label>
-                <textarea class="form-control" id="email-invite-notify-html" data-field="email:invite:notify:html" style="min-height:130px;"></textarea>
-            </div>
-            <div class="help-block">
-                <ol style="padding-left: 1.5em;">
-                    <li>username 被提名人用户名</li>
-                    <li>invitedByUsername 提名人用户名</li>
-                    <li>link 提名帖链接</li>
-                </ol>
-            </div>
-            <br>
-
-            <div class="help-block">
-                <h4>通知全站投票</h4>
-            </div>
-            <div class="form-group">
-                <label for="email-invite-upvote-fromname"><strong>收件人姓名</strong></label>
-                <input type="text" class="form-control" id="email-invite-upvote-fromname" data-field="email:invite:upvote:fromname"/>
-            </div>
-            <div class="form-group">
-                <label for="email-invite-upvote-subject"><strong>邮件标题</strong></label>
-                <input type="text" class="form-control" id="email-invite-upvote-subject" data-field="email:invite:upvote:subject"/>
-            </div>
-            <div class="form-group">
-                <label for="email-invite-upvote-html"><strong>邮件内容</strong></label>
-                <textarea class="form-control" id="email-invite-upvote-html" data-field="email:invite:upvote:html" style="min-height:130px;"></textarea>
-            </div>
-            <div class="help-block">
-                <ol style="padding-left: 1.5em;">
-                    <li>emailUsername 收件人用户名</li>
-                    <li>username 被提名人用户名</li>
-                    <li>invitedByUsername 提名人用户名</li>
-                    <li>link 提名帖链接</li>
-                </ol>
-            </div>
-            <br>
-
-            <div class="help-block">
-                <h4>提名成功</h4>
+                <h4>告知提名人提名成功</h4>
             </div>
             <div class="form-group">
                 <label for="email-invite-success-fromname"><strong>发件人姓名</strong></label>
-                <input type="text" class="form-control" id="email-invite-success-fromname" data-field="email:inviteSuccess:fromname"/>
+                <input type="text" class="form-control" id="email-invite-success-fromname" data-field="email:invite:success:fromname"/>
             </div>
             <div class="form-group">
                 <label for="email-invite-success-subject"><strong>邮件标题</strong></label>
-                <input type="text" class="form-control" id="email-invite-success-subject" data-field="email:inviteSuccess:subject"/>
+                <input type="text" class="form-control" id="email-invite-success-subject" data-field="email:invite:success:subject"/>
             </div>
             <div class="form-group">
                 <label for="email-invite-success-html"><strong>邮件内容</strong></label>
-                <textarea class="form-control" id="email-invite-success-html" data-field="email:inviteSuccess:html" style="min-height:130px;"></textarea>
+                <textarea class="form-control" id="email-invite-success-html" data-field="email:invite:success:html" style="min-height:130px;"></textarea>
             </div>
             <div class="help-block">
                 <ol style="padding-left: 1.5em;">
@@ -101,6 +77,30 @@
                     <li>username 提名人用户名</li>
                     <li>invite_username 被提名的用户名</li>
                     <li>count 投票数量</li>
+                </ol>
+            </div>
+            <br>
+
+            <div class="help-block">
+                <h4>告知提名人被提名人成功加入</h4>
+            </div>
+            <div class="form-group">
+                <label for="email-invited-success-fromname"><strong>发件人姓名</strong></label>
+                <input type="text" class="form-control" id="email-invited-success-fromname" data-field="email:invited:success:fromname"/>
+            </div>
+            <div class="form-group">
+                <label for="email-invited-success-subject"><strong>邮件标题</strong></label>
+                <input type="text" class="form-control" id="email-invited-success-subject" data-field="email:invited:success:subject"/>
+            </div>
+            <div class="form-group">
+                <label for="email-invited-success-html"><strong>邮件内容</strong></label>
+                <textarea class="form-control" id="email-invited-success-html" data-field="email:invited:success:html" style="min-height:130px;"></textarea>
+            </div>
+            <div class="help-block">
+                <ol style="padding-left: 1.5em;">
+                    <li>发送邮件告知提名人票数达到，并已发送邀请成功</li>
+                    <li>username 提名人用户名</li>
+                    <li>invite_username 被提名的用户名</li>
                 </ol>
             </div>
             <br>

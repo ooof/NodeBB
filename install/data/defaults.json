@@ -151,6 +151,20 @@
         "field": "feeds:disableRSS",
         "value": 1
     },
+
+    {
+        "field": "email:invite:upvote:subject",
+        "value": "请投票表决"
+    },
+    {
+        "field": "email:invite:upvote:html",
+        "value": "<p>您好，{emailUsername}:</p>\r\n\r\n<p>{invitedByUsername} 邀请 {username}，请投票表决。</p>\r\n\r\n<blockquote>\r\n\t<a href=\"{link}\">点击进入</a>\r\n</blockquote>\r\n\r\n<p>谢谢！</p>"
+    },
+    {
+        "field": "email:invite:upvote:fromname",
+        "value": "InviteUpvote"
+    },
+
     {
         "field": "email:invite:html",
         "value": "<p>您好, {username}:</p>\r\n\r\n<p>您的朋友邀请您进入一个有趣的社区！</p>\r\n\r\n<blockquote>\r\n\t<a href=\"{register_link}\">点击进入</a>\r\n</blockquote>\r\n\r\n<p>谢谢！</p>"
@@ -163,42 +177,33 @@
         "field": "email:invite:fromname",
         "value": "Inviting"
     },
+
     {
-        "field": "email:inviteSuccess:html",
-        "value": "<p>您好，{username}:</p>\r\n\r\n<p>您提名的{invite_username}，已经获得 {count} 票支持，达到邀请票数，系统已发送邀请邮件！</p>"
+        "field": "email:invite:success:html",
+        "value": "<p>您好，{username}:</p>\r\n\r\n<p>您提名的{invite_username}，已经获得 {count} 票支持，达到邀请票数，系统已发送邀请邮件！如果五天之后，他还没有接受邀请进入，我们会再次提醒你。</p>"
     },
     {
-        "field": "email:invite:notify:html",
-        "value": "<p>您好，{invitedByUsername}:</p>\r\n\r\n<p>您提名邀请的 {username} 我们已经给他发出邀请邮件，如果五天之后，他还没有接受邀请进入，我们会再次提醒你。</p>"
-    },
-    {
-        "field": "email:invite:notify:subject",
+        "field": "email:invite:success:subject",
         "value": "我们已经给您提名的{username}发出邀请邮件"
     },
     {
-        "field": "email:invite:notify:fromname",
-        "value": "InviteNotify"
-    },
-    {
-        "field": "email:invite:upvote:html",
-        "value": "<p>您好，{emailUsername}:</p>\r\n\r\n<p>{invitedByUsername} 邀请 {username}，请投票表决。</p>\r\n\r\n<blockquote>\r\n\t<a href=\"{link}\">点击进入</a>\r\n</blockquote>\r\n\r\n<p>谢谢！</p>"
-    },
-    {
-        "field": "email:invite:upvote:subject",
-        "value": "请投票表决"
-    },
-    {
-        "field": "email:invite:upvote:fromname",
-        "value": "InviteUpvote"
-    },
-    {
-        "field": "email:inviteSuccess:subject",
-        "value": "{username}，您提名的{invite_username}已通过"
-    },
-    {
-        "field": "email:inviteSuccess:fromname",
+        "field": "email:invite:success:fromname",
         "value": "InviteSuccess"
     },
+
+    {
+        "field": "email:invited:success:html",
+        "value": "<p>您好，{username}:</p>\r\n\r\n<p>您提名的{invite_username}，已接受邀请并加入社区。</p>\r\n\r\n<p>谢谢！</p>"
+    },
+    {
+        "field": "email:invited:success:subject",
+        "value": "您提名的{username}已接受邀请加入"
+    },
+    {
+        "field": "email:invited:success:fromname",
+        "value": "InvitedSuccess"
+    },
+
     {
         "field": "email:inviteWarn:html",
         "value": "<p>您好，{username}:</p>\r\n\r\n<p>由于您提名的{invite_username}，在{warn_time}内未进入社区，此次提名即将过期！</p>"
@@ -211,6 +216,7 @@
         "field": "email:inviteWarn:fromname",
         "value": "InviteWarn"
     },
+
     {
         "field": "email:inviteFailed:html",
         "value": "<p>您好，{username}:</p>\r\n\r\n<p>由于您提名的{invite_username}，在{expire_time}内未进入社区，此次提名已经被系统标记为提名失败！</p>"
@@ -223,6 +229,7 @@
         "field": "email:inviteFailed:fromname",
         "value": "InviteFailed"
     },
+
     {
         "field": "email:inviteExit:html",
         "value": "<p>您好，{username}:</p>\r\n\r\n<p>您提名的{invite_username}已离开社区！</p>"
@@ -235,6 +242,7 @@
         "field": "email:inviteExit:fromname",
         "value": "InviteExit"
     },
+
     {
         "field": "email:reset:html",
         "value": "<p>您好，{username}:</p>\r\n\r\n<p>可能由于您忘记了密码，我们收到了重置您帐户密码的申请。 如果您没有提交密码重置的请求，请忽略这封邮件。</p>\r\n\r\n<p>如需继续重置密码，请点击下面的链接：</p>\r\n\r\n<blockquote>\r\n\t<a href=\"{reset_link}\">点击这里重置您的密码</a>\r\n</blockquote>\r\n\r\n<p>谢谢！</p>"
@@ -247,6 +255,7 @@
         "field": "email:reset:fromname",
         "value": "Reset"
     },
+
     {
         "field": "email:reset:success:html",
         "value": "<p>{username}，您好:</p>\r\n\r\n<p>您在 {date} 上的密码被成功修改。</p>\r\n\r\n<p>如果你没有授权此操作，请立即联系管理员。</p>\r\n\r\n<p>谢谢！</p>"
@@ -259,6 +268,7 @@
         "field": "email:reset:success:fromname",
         "value": "ResetSuccess"
     },
+
     {
         "field": "notification:invite:upvote",
         "value": "{invitedByUsername} 邀请 {username}，请投票表决"
@@ -271,6 +281,7 @@
         "field": "notification:invite:joined",
         "value": "{invitedByUsername} 提名邀请的 {inviteUsername} 已经加入"
     },
+
     {
         "field": "notification:invite:warn",
         "value": "{upvoteByUsername}，您参与提名或投票{username}的邀请邮件已经发出{time}，但到目前还没有注册进入社区，觉得需要的话，可以以您觉得合适的方式通知他本人查收一下邮件"
