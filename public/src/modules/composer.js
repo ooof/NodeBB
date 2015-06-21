@@ -233,6 +233,9 @@ define('composer', [
 	};
 
 	composer.newReply = function (tid, pid, title, text) {
+		// remove poll button in composer
+		composer.type = 'reply';
+
 		socket.emit('topics.isModerator', tid, function (err, isMod) {
 			if (err) {
 				return app.alertError(err.message);
@@ -372,6 +375,15 @@ define('composer', [
 				composerTemplate.attr('id', 'cmp-uuid-' + post_uuid);
 
 				$(document.body).append(composerTemplate);
+
+				// remove poll button when composer is reply
+				function removePollButton () {
+					$('[data-format="bar-chart-o"]').hide();
+				}
+
+				if (composer.type === 'reply') {
+					setTimeout(removePollButton, 10);
+				}
 
 				// 邀请
 				if(composer.posts[post_uuid].hasOwnProperty('invite')) {
