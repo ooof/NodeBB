@@ -37,21 +37,6 @@ var	async = require('async'),
 				return winston.error('[user/jobs] Could not send digests (' + interval + '): ' + err.message);
 			}
 
-			// Fix relative paths in topic data
-			data.topics.topics = data.topics.topics.map(function(topicObj) {
-				if (topicObj.hasOwnProperty('teaser') && topicObj.teaser !== undefined) {
-					if (utils.isRelativeUrl(topicObj.teaser.user.picture)) {
-						topicObj.teaser.user.picture = nconf.get('url') + topicObj.teaser.user.picture;
-					}
-				} else {
-					if (utils.isRelativeUrl(topicObj.user.picture)) {
-						topicObj.user.picture = nconf.get('url') + topicObj.user.picture;
-					}
-				}
-
-				return topicObj;
-			});
-
 			data.interval = interval;
 
 			if (data.subscribers.length) {
