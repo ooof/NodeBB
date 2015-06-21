@@ -215,8 +215,10 @@ module.exports = function (Invite) {
 			function (bodyShort, next) {
 				user.notifications.sendNotification({
 					bodyShort: bodyShort,
+					path: nconf.get('url') + '/invite/' + userData.invitedBySlug,
 					nid: 'user:deleted:upvote:' + userData.uid,
 					uid: userData.invitedByUid,
+					iid: userData.iid,
 					score: 'votedUids'
 				}, next);
 			}

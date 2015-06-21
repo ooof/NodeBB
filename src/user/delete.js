@@ -109,6 +109,10 @@ module.exports = function(User) {
 					invite.sendExitNotificationToInviter(userData, next);
 				},
 				function(next) {
+					// 向投票人发出通知，告知他投票的某位用户已被删除
+					invite.sendExitNotificationToUpvote(userData, next);
+				},
+				function(next) {
 					// 更改提名状态
 					invite.setInviteField(userData.iid, 'status', 'deleted', next);
 				},
