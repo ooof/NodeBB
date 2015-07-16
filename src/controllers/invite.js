@@ -157,19 +157,34 @@ inviteController.details = function (req, res, next) {
 				inviteData.invitedByMe = results.invitedByMe;
 				inviteData.canControl = parseInt(inviteData.inviteCount, 10) <= 1;
 				inviteData.hideFooter = (parseInt(inviteData.uid, 10) === parseInt(req.uid, 10) && inviteData.invited) || !userData || inviteData.user.deleted;
+
+				var date, minutes, hours;
+
 				if (inviteData.invited) {
-					var date = new Date(parseInt(inviteData.invitedTime, 10)),
-						minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
-						hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+					date = new Date(parseInt(inviteData.invitedTime, 10));
+					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
 					inviteData.invitedTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 				}
+
 				if (inviteData.notJoined) {
-					inviteData.expiredTime = schedule.expire.text();
+					inviteData.expiredText = schedule.expire.text();
+
+					if(inviteData.expiredTime) {
+						date = new Date(parseInt(inviteData.expiredTime, 10));
+						minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+						hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+						inviteData.expiredTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
+					} else {
+						inviteData.expiredTime = inviteData.invitedTime;
+					}
 				}
+
 				date = new Date(parseInt(inviteData.timestamp, 10));
 				minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
 				hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
 				inviteData.createdTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
+
 				inviteData.inviterDeleted = inviteData.status === 'deleted';
 				if (inviteData.inviterDeleted) {
 					date = new Date(parseInt(inviteData.deletedTime, 10));

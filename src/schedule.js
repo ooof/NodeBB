@@ -189,7 +189,7 @@ Jobs.setExpireField = function (iid, callback) {
 	invite.getInviteData(iid, function (err, inviteData) {
 		// 当已经邀请，但是没有加入，同时超过过期时间的时候
 		if (!!parseInt(inviteData.invited, 10) && !parseInt(inviteData.joined, 10) && !parseInt(inviteData.expired, 10)) {
-			invite.setInviteFields(inviteData.iid, {expired: 1, warned: 1, status: 'failed'});
+			invite.setInviteFields(inviteData.iid, {expired: 1, warned: 1, 'expiredTime': Date.now(), status: 'failed'});
 			invite.sendExpireEmail(inviteData);
 		}
 		db.sortedSetRemove('invite:time', inviteData.invitedTime, callback());
@@ -228,7 +228,7 @@ Jobs.sendInviteNotification = function (inviteData, callback) {
 		},
 		// 设置该提名贴已发出过期提醒通知
 		function (next) {
-			invite.setInviteField(iid, 'warned', 1, next);
+			invite.setInviteFields(iid, {'warned': 1, 'warnedTime': Date.now()}, next);
 		},
 		// 取消定时提醒任务
 		function (next) {
