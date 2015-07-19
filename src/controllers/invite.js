@@ -119,6 +119,9 @@ inviteController.details = function (req, res, next) {
 				},
 				inviteData: function (next) {
 					invite.getInviteData(iid, next)
+				},
+				userCount: function (next) {
+					db.getObjectField('global', 'userCount', next);
 				}
 			}, next)
 		},
@@ -158,6 +161,13 @@ inviteController.details = function (req, res, next) {
 				inviteData.canControl = parseInt(inviteData.inviteCount, 10) <= 1;
 				inviteData.hideFooter = (parseInt(inviteData.uid, 10) === parseInt(req.uid, 10) && inviteData.invited) || !userData || inviteData.user.deleted;
 
+				inviteData.upvoteCount = inviteData.inviteCount ? inviteData.inviteCount : 0;
+				inviteData.downvoteCount = inviteData.downvoteCount ? inviteData.downvoteCount : 0;
+				inviteData.votePercent = meta.config.votePercent || 50;
+				inviteData.userCount = results.userCount;
+				inviteData.needVote = inviteData.userCount * inviteData.votePercent / 100;
+				inviteData.remainVote = inviteData.needVote - inviteData.upvoteCount + inviteData.downvoteCount;
+
 				var date, minutes, hours;
 
 				if (inviteData.invited) {
@@ -170,7 +180,7 @@ inviteController.details = function (req, res, next) {
 				if (inviteData.notJoined) {
 					inviteData.expiredText = schedule.expire.text();
 
-					if(inviteData.expiredTime) {
+					if (inviteData.expiredTime) {
 						date = new Date(parseInt(inviteData.expiredTime, 10));
 						minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
 						hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();

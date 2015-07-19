@@ -15,6 +15,7 @@
   "list.posted_ago": "提名于%1",
 
   "detail.upvote": "支持",
+  "detail.downvote": "反对",
   "detail.deleted_message": "此贴已被删除！",
   "detail.invite_course": "邀请历程",
   "detail.username": "提名人：",
