@@ -8,7 +8,7 @@ var async = require('async'),
 	db = require('../database');
 
 module.exports = function (Invite) {
-	Invite.upVote = function (uid, inviteData, callback) {
+	Invite.upvote = function (uid, inviteData, callback) {
 		// invite:posts:uid:{uid}:iid 创建并默认投票该邀请贴
 		// invite:posts:{iid}:upvote:by 投票支持邀请贴的所有用户
 
@@ -24,7 +24,8 @@ module.exports = function (Invite) {
 			}
 
 			var timestamp = Date.now(),
-				inviteCount;
+				voteCount,
+				upvoteCount;
 
 			async.waterfall([
 				function (next) {
@@ -37,21 +38,27 @@ module.exports = function (Invite) {
 					db.incrObjectField('invite:' + iid, 'inviteCount', next);
 				},
 				function (count, next) {
-					inviteCount = parseInt(count, 10);
-					inviteData.inviteCount = inviteCount;
+					upvoteCount = parseInt(count, 10);
+					inviteData.inviteCount = upvoteCount;
+					// 获取用户总数
+					db.getObjectField('invite:' + iid, 'downvoteCount', next);
+				},
+				function (count, next) {
+					inviteData.downvoteCount = parseInt(count, 10);
+					voteCount  = inviteData.voteCount = inviteData.inviteCount - inviteData.downvoteCount;
 					// 获取用户总数
 					db.getObjectField('global', 'userCount', next);
 				},
 				function (userCount, next) {
 					// 判断是否通过投票比例
-					inviteData.passInvite = inviteCount / parseInt(userCount, 10) >= (meta.config.votePercent ? meta.config.votePercent / 100 : 0.5);
+					inviteData.passInvite = voteCount / parseInt(userCount, 10) >= (meta.config.votePercent ? meta.config.votePercent / 100 : 0.5);
 
 					// 通过投票比例则发出邀请，否则通知所有用户进行投票
 					if (inviteData.passInvite) {
 						return Invite.inviteUser(uid, inviteData, next);
 					}
 					// 当数量为1的时候，就是提名人默认投的票，此时通知全站用户参与投票
-					if (inviteCount === 1) {
+					if (upvoteCount === 1) {
 						return Invite.sendUpvoteNotification(inviteData, next);
 					}
 					next();
@@ -60,8 +67,8 @@ module.exports = function (Invite) {
 					Invite.getInviteFields(iid, ['invited', 'username'], next);
 				},
 				function (data, next) {
-					data.inviteCount = inviteCount;
-					inviteData.inviteCount = inviteCount;
+					data.upvoteCount = upvoteCount;
+					inviteData.upvoteCount = upvoteCount;
 					data.isInvited = !!parseInt(data.invited, 10);
 					websockets.in('invite_' + iid).emit('event:invite_upvote', data);
 					next(null, inviteData);

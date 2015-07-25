@@ -114,8 +114,11 @@ inviteController.details = function (req, res, next) {
 				privileges: function (next) {
 					privileges.invite.get(iid, req.uid, next);
 				},
-				invitedByMe: function (next) {
+				isUpvote: function (next) {
 					db.isSetMember('invite:posts:' + iid + ':upvote:by', req.uid, next);
+				},
+				isDownvote: function (next) {
+					db.isSetMember('invite:posts:' + iid + ':downvote:by', req.uid, next);
 				},
 				inviteData: function (next) {
 					invite.getInviteData(iid, next)
@@ -157,15 +160,15 @@ inviteController.details = function (req, res, next) {
 				inviteData.theirid = inviteData.uid;
 				inviteData.display_moderator_tools = userPrivileges.editable;
 				inviteData.notJoined = !!parseInt(inviteData.expired, 10);
-				inviteData.invitedByMe = results.invitedByMe;
+				inviteData.isVote = results.isUpvote || results.isDownvote;
 				inviteData.canControl = parseInt(inviteData.inviteCount, 10) <= 1;
 				inviteData.hideFooter = (parseInt(inviteData.uid, 10) === parseInt(req.uid, 10) && inviteData.invited) || !userData || inviteData.user.deleted;
 
-				inviteData.upvoteCount = inviteData.inviteCount ? inviteData.inviteCount : 0;
-				inviteData.downvoteCount = inviteData.downvoteCount ? inviteData.downvoteCount : 0;
+				inviteData.upvoteCount = parseInt(inviteData.inviteCount ? inviteData.inviteCount : 0, 10);
+				inviteData.downvoteCount = parseInt(inviteData.downvoteCount ? inviteData.downvoteCount : 0, 10);
 				inviteData.votePercent = meta.config.votePercent || 50;
-				inviteData.userCount = results.userCount;
-				inviteData.needVote = inviteData.userCount * inviteData.votePercent / 100;
+				inviteData.userCount = parseInt(results.userCount, 10);
+				inviteData.needVote = Math.round(inviteData.userCount * inviteData.votePercent / 100);
 				inviteData.remainVote = inviteData.needVote - inviteData.upvoteCount + inviteData.downvoteCount;
 
 				var date, minutes, hours;

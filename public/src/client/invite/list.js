@@ -1,7 +1,14 @@
 "use strict";
 /* globals define, config, socket, app, ajaxify, templates */
 
-define('forum/invite/list', ['forum/invite/events', 'composer', 'components', 'navigator', 'forum/infinitescroll','sort'], function (events, composer, components, navigator, infinitescroll, sort) {
+define('forum/invite/list', [
+	'forum/invite/events',
+	'composer',
+	'components',
+	'navigator',
+	'forum/infinitescroll',
+	'sort'
+], function (events, composer, components, navigator, infinitescroll, sort) {
 	var Invite = {};
 
 	$(window).on('action:ajaxify.start', function (ev, data) {

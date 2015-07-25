@@ -30,6 +30,7 @@
   "composer.type_reason": "提名理由",
 
   "error.already-voted": "您已经投过票",
+  "error.already-downvoted": "您已经投过反对票",
   "error.invalid-iid": "无效的邀请贴",
 
   "email.invite_click": "点击进入！",

@@ -134,9 +134,18 @@ SocketInvite.enter = function (socket, tid, callback) {
 };
 
 SocketInvite.upvote = function (socket, data, callback) {
+	favouriteCommand(socket, 'upvote', data, callback);
+};
+
+SocketInvite.downvote = function (socket, data, callback) {
+	favouriteCommand(socket, 'downvote', data, callback);
+};
+
+function favouriteCommand(socket, command, data, callback) {
 	if (!data || !data.iid || !data.room_id) {
 		return callback(new Error('[[error:invalid-data]]'));
 	}
+
 	async.parallel({
 		exists: function (next) {
 			invite.exists(data.iid, next);
@@ -167,9 +176,15 @@ SocketInvite.upvote = function (socket, data, callback) {
 			return callback(new Error('[[error:post-deleted]]'));
 		}
 
-		invite.upVote(socket.uid, results.inviteData, callback);
+		if (command === 'upvote') {
+			invite.upvote(socket.uid, results.inviteData, callback);
+		}
+
+		if (command === 'downvote') {
+			invite.downvote(socket.uid, results.inviteData, callback);
+		}
 	});
-};
+}
 
 // 检查用户名是否存在
 SocketInvite.usernameExists = function(socket, data, callback) {

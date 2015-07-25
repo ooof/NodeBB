@@ -63,6 +63,7 @@ module.exports = function (Invite) {
 				'invitedTime': 0,
 				'viewcount': 0,
 				'inviteCount': 0,
+				'downvoteCount': 0,
 				'locked': 0,
 				'deleted': 0,
 				'warned': 0,
@@ -102,7 +103,7 @@ module.exports = function (Invite) {
 						db.setObjectField('email:iid', email, iid, next);
 					},
 					function (next) {
-						Invite.upVote(uid, inviteData, next);
+						Invite.upvote(uid, inviteData, next);
 					}
 				], function (err, result) {
 					if (err) {

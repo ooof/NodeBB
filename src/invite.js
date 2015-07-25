@@ -14,6 +14,7 @@ var async = require('async'),
 	require('./invite/unread')(Invite);
 	require('./invite/user')(Invite);
 	require('./invite/upvote')(Invite);
+	require('./invite/downvote')(Invite);
 	require('./invite/email')(Invite);
 	require('./invite/notifications')(Invite);
 

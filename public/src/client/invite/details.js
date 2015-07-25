@@ -1,6 +1,11 @@
 "use strict";
 
-define('forum/invite/details', ['composer', 'components', 'navigator', 'translator', 'forum/invite/events'], function (composer, components, navigator, translator, events) {
+define('forum/invite/details', ['composer',
+	'components',
+	'navigator',
+	'translator',
+	'forum/invite/events'
+], function (composer, components, navigator, translator, events) {
 	var InviteDetails = {};
 
 	$(window).on('action:ajaxify.start', function (ev, data) {
@@ -14,17 +19,13 @@ define('forum/invite/details', ['composer', 'components', 'navigator', 'translat
 	});
 
 	InviteDetails.init = function () {
-		var data = {
-			iid: ajaxify.variables.get('invite_id'),
-			yourid: ajaxify.variables.get('yourid'),
-			theirid: ajaxify.variables.get('theirid')
-		};
+		var iid = ajaxify.variables.get('invite_id');
 
 		$(window).trigger('action:vote.loading');
 
-		app.enterRoom('invite_' + data.iid);
+		app.enterRoom('invite_' + iid);
 
-		addHandlers(data);
+		addInviteHandlers(iid);
 		addSymbol();
 
 		events.init();
@@ -42,19 +43,23 @@ define('forum/invite/details', ['composer', 'components', 'navigator', 'translat
 		})
 	}
 
-	function addHandlers(data) {
+	function addInviteHandlers(iid) {
 		var inviteContainer = components.get('invite').children('.post-row');
 
 		inviteContainer.on('click', '[component="invite/upvote"]', function () {
-			return upvoteInvite(data.iid);
+			return toggleVote($(this), 'invite.upvote');
+		});
+
+		inviteContainer.on('click', '[component="invite/downvote"]', function () {
+			return toggleVote($(this), 'invite.downvote');
 		});
 
 		inviteContainer.on('click', '[component="invite/edit"]', function () {
-			composer.editInvite(data.iid);
+			composer.editInvite(iid);
 		});
 
 		inviteContainer.on('click', '[component="invite/delete"]', function () {
-			deleteInvite(data.iid);
+			deleteInvite(iid);
 		});
 
 		inviteContainer.on('click', '[component="invite/chat"]', function () {
@@ -62,14 +67,17 @@ define('forum/invite/details', ['composer', 'components', 'navigator', 'translat
 		});
 	}
 
-	function upvoteInvite(iid) {
-		// 删除投票按钮
-		components.get('invite/upvote').parent().remove();
+	function toggleVote(button, method) {
+		var invite = button.parents('[data-iid]'),
+			vote = button.parent();
 
-		socket.emit('invite.upvote', {
-			iid: iid,
+		// 删除投票按钮
+		vote.remove();
+
+		socket.emit(method, {
+			iid: invite.attr('data-iid'),
 			room_id: app.currentRoom
-		}, function (err) {
+		}, function(err) {
 			if (err) {
 				app.alertError(err.message);
 			}
