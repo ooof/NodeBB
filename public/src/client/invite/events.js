@@ -30,6 +30,8 @@ define('forum/invite/events', ['components', 'translator'], function (components
 	function onDownvoteInvite(data) {
 		var downvoteEl = components.get('invite/downvote'),
 			downvoteCountEl = components.get('invite/downvote-count'),
+			resultVoteCountEl = components.get('invite/result-count'),
+			resultVoteCount = parseInt(resultVoteCountEl.text(), 10) - 1,
 			remainCountEl = components.get('invite/remain-vote'),
 			remainCount = parseInt(remainCountEl.text(), 10) + 1;
 
@@ -38,6 +40,7 @@ define('forum/invite/events', ['components', 'translator'], function (components
 		// 投票后，自增反对票数
 		downvoteCountEl.text(data.downvoteCount).attr('data-downvote', data.downvoteCount);
 		remainCountEl.text(remainCount).attr('data-votes', remainCount);
+		resultVoteCountEl.text(resultVoteCount).attr('data-votes', resultVoteCount);
 	}
 
 	function onUpvoteInvite(data) {
@@ -46,14 +49,16 @@ define('forum/invite/events', ['components', 'translator'], function (components
 			courseEl = components.get('invite/course'),
 			voteCountEl = components.get('invite/vote-count'),
 			upvoteEl = components.get('invite/upvote'),
-			lastEl = courseEl.children().last(),
 			upvoteCountEl = components.get('invite/upvote-count'),
+			resultVoteCountEl = components.get('invite/result-count'),
+			resultVoteCount = parseInt(resultVoteCountEl.text(), 10) - 1,
 			remainCountEl = components.get('invite/remain-vote'),
 			remainCount = parseInt(remainCountEl.text(), 10) - 1;
 
 		// 投票后，删除投票按钮
 		upvoteEl.parent().remove();
 		// 投票后，自增票数
+		resultVoteCountEl.text(resultVoteCount).attr('data-votes', resultVoteCount);
 		voteCountEl.text(data.upvoteCount).attr('data-votes', data.upvoteCount);
 		upvoteCountEl.text(data.upvoteCount).attr('data-upvote', data.upvoteCount);
 		remainCountEl.text(remainCount).attr('data-votes', remainCount);
@@ -71,7 +76,7 @@ define('forum/invite/events', ['components', 'translator'], function (components
 				hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours(),
 				invitedTime = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 
-			lastEl.text(invitedTime + ' 对 ' + data.username + ' 的提名已获得 ' + data.inviteCount + ' 票支持，达到邀请票数，邀请邮件已经发出；');
+			courseEl.append($('<li></li>').text(invitedTime + ' 对 ' + data.username + ' 的提名已获得 ' + resultVoteCount + ' 票支持，达到邀请票数，邀请邮件已经发出；'));
 		}
 	}
 
