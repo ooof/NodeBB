@@ -166,6 +166,7 @@ inviteController.details = function (req, res, next) {
 
 				inviteData.upvoteCount = parseInt(inviteData.inviteCount ? inviteData.inviteCount : 0, 10);
 				inviteData.downvoteCount = parseInt(inviteData.downvoteCount ? inviteData.downvoteCount : 0, 10);
+				inviteData.resultVoteCount = inviteData.upvoteCount - inviteData.downvoteCount;
 				inviteData.votePercent = meta.config.votePercent || 50;
 				inviteData.userCount = parseInt(results.userCount, 10);
 				inviteData.needVote = Math.round(inviteData.userCount * inviteData.votePercent / 100);
