@@ -12,10 +12,6 @@ $(document).ready(function() {
 
 		translator;
 
-	if (location.pathname === '/') {
-		return window.location.href = '/recent';
-	}
-
 	// Dumb hack to fool ajaxify into thinking translator is still a global
 	// When ajaxify is migrated to a require.js module, then this can be merged into the "define" call
 	require(['translator'], function(_translator) {
