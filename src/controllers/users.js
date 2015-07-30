@@ -84,7 +84,7 @@ usersController.getGhostUsers = function(req, res, next) {
 		};
 
 		userData.users.sort(function (a, b) {
-			return a.username.localeCompare(b.username);
+			return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
 		});
 
 		res.render('users', userData);
@@ -117,6 +117,9 @@ usersController.getUsers = function(set, start, stop, req, res, next) {
 			pagination: pagination.create(1, pageCount)
 		};
 		userData[set] = true;
+		userData.users.sort(function (a, b) {
+			return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
+		});
 		render(req, res, userData, next);
 	});
 };
