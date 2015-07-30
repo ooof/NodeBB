@@ -19,6 +19,7 @@ var inviteController = {},
 
 inviteController.list = function (req, res, next) {
 	var uid = req.user ? req.user.uid : 0,
+		status = req.query.status,
 		page = req.query.page || 1,
 		settings = {};
 
@@ -35,6 +36,24 @@ inviteController.list = function (req, res, next) {
 		},
 		function (results, next) {
 			settings = results.userSettings;
+
+			switch (status) {
+				case 'voting':
+					settings.inviteSort = 'voting';
+					break;
+				case 'joined':
+					settings.inviteSort = 'joined';
+					break;
+				case 'deleted':
+					settings.inviteSort = 'deleted';
+					break;
+				case 'failed':
+					settings.inviteSort = 'failed';
+					break;
+				case 'invited':
+					settings.inviteSort = 'invited';
+					break;
+			}
 
 			var inviteIndex = utils.isNumber(req.params.invite_index) ? parseInt(req.params.invite_index, 10) - 1 : 0;
 			var inviteCount = parseInt(results.inviteCount, 10);
