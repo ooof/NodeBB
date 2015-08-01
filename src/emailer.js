@@ -105,7 +105,7 @@ var	fs = require('fs'),
 			}
 
 			if (Plugins.hasListeners('action:email.send')) {
-				Plugins.fireHook('action:email.send', {
+				var email = {
 					to: params.email || results.email,
 					from: meta.config['email:from'] || 'no-reply@localhost.lan',
 					subject: results.subject,
@@ -114,7 +114,11 @@ var	fs = require('fs'),
 					template: params.template,
 					fromUid: params.uid,
 					fromname: results.fromname
-				});
+				};
+				if (params.trackId) {
+					email.trackId = params.trackId;
+				}
+				Plugins.fireHook('action:email.send', email);
 				callback();
 			} else {
 				winston.warn('[emailer] No active email plugin found!');

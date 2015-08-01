@@ -73,6 +73,7 @@
 			router.post('/logout', Auth.middleware.applyCSRF, logout);
 			router.post('/register', Auth.middleware.applyCSRF, register);
 			router.post('/login', Auth.middleware.applyCSRF, login);
+			router.post('/invite-track', inviteTrack);
 
 			hotswap.replace('auth', router);
 			if (typeof callback === 'function') {
@@ -146,6 +147,17 @@
 			uid: uid
 		});
 	});
+
+	function inviteTrack(req, res) {
+		var body = req.body[0];
+		for (var key in body) {
+			if (body.hasOwnProperty(key) && key === 'trackId') {
+				console.log(body[key]);
+			}
+		}
+
+		res.status(200).send('');
+	}
 
 	function login(req, res, next) {
 		// Handle returnTo data
