@@ -76,7 +76,7 @@ inviteController.list = function (req, res, next) {
 
 			var start = (page - 1) * settings.topicsPerPage + inviteIndex,
 				end = -1;
-				//end = start + settings.topicsPerPage - 1;
+			//end = start + settings.topicsPerPage - 1;
 
 			next(null, {
 				setKey: setKey,
@@ -235,7 +235,7 @@ inviteController.details = function (req, res, next) {
 					date = new Date(parseInt(inviteData.trackDeliverTime, 10));
 					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
 					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-					inviteData.trackOpenTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
+					inviteData.trackDeliverTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 				}
 				inviteData.isOpened = !!(inviteData.trackOpen && inviteData.trackOpen === 'open');
 				if (inviteData.trackOpenTime) {
@@ -249,7 +249,7 @@ inviteController.details = function (req, res, next) {
 					date = new Date(parseInt(inviteData.trackClickTime, 10));
 					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
 					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-					inviteData.trackTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
+					inviteData.trackClickTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 				}
 
 				next(null, inviteData);
