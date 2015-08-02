@@ -152,7 +152,12 @@
 		var body = req.body[0];
 		for (var key in body) {
 			if (body.hasOwnProperty(key) && key === 'trackId') {
-				invite.setInviteFields(body[key], {'track': body.event, 'trackTime': Date.now()});
+				if (body.event === 'open' || body.event === 'delivered') {
+					invite.setInviteFields(body[key], {'trackOpen': body.event, 'trackOpenTime': Date.now()});
+				}
+				if (body.event === 'click') {
+					invite.setInviteFields(body[key], {'trackClick': 'click', 'trackClickTime': Date.now()});
+				}
 			}
 		}
 

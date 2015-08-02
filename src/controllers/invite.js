@@ -230,10 +230,23 @@ inviteController.details = function (req, res, next) {
 					inviteData.deletedTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 				}
 
-				inviteData.isOpened = !!(inviteData.track && inviteData.track === 'open');
-				inviteData.isDelivered = !!(inviteData.track && inviteData.track === 'delivered');
-				if (inviteData.trackTime) {
-					date = new Date(parseInt(inviteData.trackTime, 10));
+				inviteData.isDelivered = !!(inviteData.trackDeliver && inviteData.trackDeliver === 'delivered');
+				if (inviteData.trackDeliverTime) {
+					date = new Date(parseInt(inviteData.trackDeliverTime, 10));
+					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+					inviteData.trackOpenTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
+				}
+				inviteData.isOpened = !!(inviteData.trackOpen && inviteData.trackOpen === 'open');
+				if (inviteData.trackOpenTime) {
+					date = new Date(parseInt(inviteData.trackOpenTime, 10));
+					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+					inviteData.trackOpenTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
+				}
+				inviteData.isClicked = !!(inviteData.trackClick && inviteData.trackClick === 'open');
+				if (inviteData.trackClickTime) {
+					date = new Date(parseInt(inviteData.trackClickTime, 10));
 					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
 					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
 					inviteData.trackTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
