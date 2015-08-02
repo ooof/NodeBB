@@ -118,7 +118,7 @@ usersController.getUsers = function(set, start, stop, req, res, next) {
 		};
 		userData[set] = true;
 
-		if(req.url === '/users/ghost' || req.url === '/users/latest') {
+		if (req.url.indexOf('latest') !== -1) {
 			userData.users.sort(function (a, b) {
 				return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
 			});
