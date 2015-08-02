@@ -84,6 +84,9 @@ var	async = require('async'),
 						if (notifications[i].image.indexOf('http') !== 0) {
 							notifications[i].image = nconf.get('url') + notifications[i].image;
 						}
+						if (notifications[i].path.indexOf('http') !== 0) {
+							notifications[i].path= nconf.get('url') + notifications[i].path;
+						}
 					}
 
 					emailer.send('digest', userObj.uid, {
