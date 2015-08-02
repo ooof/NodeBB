@@ -244,7 +244,7 @@ inviteController.details = function (req, res, next) {
 					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
 					inviteData.trackOpenTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 				}
-				inviteData.isClicked = !!(inviteData.trackClick && inviteData.trackClick === 'open');
+				inviteData.isClicked = !!(inviteData.trackClick && inviteData.trackClick === 'click');
 				if (inviteData.trackClickTime) {
 					date = new Date(parseInt(inviteData.trackClickTime, 10));
 					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
