@@ -230,6 +230,14 @@ inviteController.details = function (req, res, next) {
 					inviteData.deletedTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 				}
 
+				inviteData.isOpen = inviteData.track && inviteData.track === 'open';
+				if (inviteData.trackTime) {
+					date = new Date(parseInt(inviteData.trackTime, 10));
+					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+					inviteData.trackTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
+				}
+
 				next(null, inviteData);
 			});
 		},

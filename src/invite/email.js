@@ -71,7 +71,7 @@ module.exports = function (Invite) {
 			var params = {
 				email: inviteData.email,
 				uid: inviteData.uid,
-				trackId: 'invite_' + inviteData.uid + '_' + register_code,
+				trackId: iid,
 				template: 'invite',
 				username: inviteData.username,
 				from_username: inviteData.from_username,

@@ -68,7 +68,8 @@ module.exports = function (Invite) {
 				'deleted': 0,
 				'warned': 0,
 				'expired': 0,
-				'pinned': 0
+				'pinned': 0,
+				'track': ''
 			};
 
 			db.setObject('invite:' + iid, inviteData, function (err) {
