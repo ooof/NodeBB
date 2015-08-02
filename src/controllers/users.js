@@ -117,9 +117,13 @@ usersController.getUsers = function(set, start, stop, req, res, next) {
 			pagination: pagination.create(1, pageCount)
 		};
 		userData[set] = true;
-		userData.users.sort(function (a, b) {
-			return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
-		});
+
+		if(req.url === '/users/ghost' || req.url === '/users/latest') {
+			userData.users.sort(function (a, b) {
+				return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
+			});
+		}
+
 		render(req, res, userData, next);
 	});
 };
