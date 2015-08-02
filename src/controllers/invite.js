@@ -230,7 +230,8 @@ inviteController.details = function (req, res, next) {
 					inviteData.deletedTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 				}
 
-				inviteData.isOpen = inviteData.track && inviteData.track === 'open';
+				inviteData.isOpened = !!(inviteData.track && inviteData.track === 'open');
+				inviteData.isDelivered = !!(inviteData.track && inviteData.track === 'delivered');
 				if (inviteData.trackTime) {
 					date = new Date(parseInt(inviteData.trackTime, 10));
 					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
