@@ -20,6 +20,7 @@ var inviteController = {},
 inviteController.list = function (req, res, next) {
 	var uid = req.user ? req.user.uid : 0,
 		status = req.query.status,
+		inviteSort,
 		page = req.query.page || 1,
 		settings = {};
 
@@ -42,6 +43,7 @@ inviteController.list = function (req, res, next) {
 					settings.inviteSort = 'voting';
 					break;
 				case 'joined':
+					inviteSort = 'toLowerCase';
 					settings.inviteSort = 'joined';
 					break;
 				case 'deleted':
@@ -113,9 +115,11 @@ inviteController.list = function (req, res, next) {
 			return next(err);
 		}
 
-		data.invite.sort(function (a, b) {
-			return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
-		});
+		if (inviteSort === 'toLowerCase') {
+			data.invite.sort(function (a, b) {
+				return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
+			});
+		}
 
 		res.render('invite/list', data);
 	});
