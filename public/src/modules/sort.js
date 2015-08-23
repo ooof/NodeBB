@@ -17,6 +17,9 @@ define('sort', ['components'], function(components) {
 					return app.alertError(err.message);
 				}
 				config[field] = newSetting;
+				if (field === 'inviteSort') {
+					return ajaxify.go(gotoOnSave + '?status=' + newSetting);
+				}
 				ajaxify.go(gotoOnSave);
 			});
 		});
