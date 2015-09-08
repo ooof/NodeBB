@@ -107,6 +107,7 @@ module.exports = function (Invite) {
 		], callback);
 	};
 
+	// 通知所有投票用户被提名人已加入
 	Invite.sendJoinedNotification = function (uid, userData, callback) {
 		// step: 3
 		async.waterfall([

@@ -31,6 +31,7 @@
                 <p>通知所有投票用户提名已通过并已发出邀请</p>
                 <ol style="padding-left: 1.5em;">
                     <li>username 被提名人用户名</li>
+                    <li>invitedByUsername 提名人用户名</li>
                 </ol>
             </div>
             <br>
@@ -45,14 +46,14 @@
             <div class="help-block">
                 <p>通知所有投票用户提名已通过并已发出邀请</p>
                 <ol style="padding-left: 1.5em;">
-                    <li>username 被提名人用户名</li>
+                    <li>invitedUsername 被提名人用户名</li>
                     <li>invitedByUsername 提名人用户名</li>
                 </ol>
             </div>
             <br>
 
             <div class="help-block">
-                <h4>3. 即将过期提醒</h4>
+                <h4>4. 即将过期提醒</h4>
             </div>
             <div class="form-group">
                 <label for="email-invite-warn-html"><strong>内容</strong></label>
@@ -60,6 +61,7 @@
             </div>
             <div class="help-block">
                 <ol style="padding-left: 1.5em;">
+                    <li>time 提醒时间</li>
                     <li>username 被提名人用户名</li>
                     <li>upvoteByUsername 投票人用户名</li>
                 </ol>
@@ -67,7 +69,7 @@
             <br>
 
             <div class="help-block">
-                <h4>4. 已过期提醒</h4>
+                <h4>5. 已过期提醒</h4>
             </div>
             <div class="form-group">
                 <label for="email-invite-failed-html"><strong>内容</strong></label>
@@ -75,6 +77,7 @@
             </div>
             <div class="help-block">
                 <ol style="padding-left: 1.5em;">
+                    <li>time 过期时间</li>
                     <li>username 被提名人用户名</li>
                     <li>upvoteByUsername 投票人用户名</li>
                 </ol>
@@ -82,7 +85,7 @@
             <br>
 
             <div class="help-block">
-                <h4>5. 用户退出后通知提名人</h4>
+                <h4>6. 用户退出后通知提名人</h4>
             </div>
             <div class="form-group">
                 <label for="email-invite-exit-html"><strong>内容</strong></label>
@@ -96,7 +99,7 @@
             <br>
 
             <div class="help-block">
-                <h4>6. 用户退出后通知投票人</h4>
+                <h4>7. 用户退出后通知投票人</h4>
             </div>
             <div class="form-group">
                 <label for="email-invite-exit-2-html"><strong>内容</strong></label>
