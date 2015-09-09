@@ -133,6 +133,70 @@ SocketInvite.enter = function (socket, tid, callback) {
 	});
 };
 
+// 处理所有正在提名的帖子是否通过
+SocketInvite.checkingVote = function (socket, data, callback) {
+	var query = {
+		setKey: 'invite:posts:iid',
+		reverse: true,
+		start: 0,
+		stop: -1,
+		uid: socket.uid
+	};
+	invite.getInvite(query, function (err, data) {
+		if (err) {
+			return next(err);
+		}
+
+		var invitesData = data.invite.filter(function (item) {
+			return item.status === 'voting';
+		});
+
+		invitesData.map(function (inviteData) {
+			var voteCount,
+				upvoteCount,
+				iid = inviteData.iid;
+
+			async.waterfall([
+				function (next) {
+					db.getObjectField('invite:' + iid, 'inviteCount', next);
+				},
+				function (count, next) {
+					upvoteCount = parseInt(count, 10);
+					inviteData.inviteCount = upvoteCount;
+					// 获取用户总数
+					db.getObjectField('invite:' + iid, 'downvoteCount', next);
+				},
+				function (count, next) {
+					inviteData.downvoteCount = parseInt(count, 10);
+					voteCount  = inviteData.voteCount = inviteData.inviteCount - inviteData.downvoteCount;
+					// 获取用户总数
+					db.getObjectField('global', 'userCount', next);
+				},
+				function (userCount, next) {
+					// 判断是否通过投票比例
+					inviteData.passInvite = voteCount / parseInt(userCount, 10) >= (meta.config.votePercent ? meta.config.votePercent / 100 : 0.5);
+
+					// 通过投票比例则发出邀请，否则通知所有用户进行投票
+					if (inviteData.passInvite) {
+						return invite.inviteUser(uid, inviteData, next);
+					}
+					next();
+				},
+				function (next) {
+					invite.getInviteFields(iid, ['invited', 'username'], next);
+				},
+				function (data, next) {
+					data.upvoteCount = upvoteCount;
+					inviteData.upvoteCount = upvoteCount;
+					data.isInvited = !!parseInt(data.invited, 10);
+					websockets.in('invite_' + iid).emit('event:invite_upvote', data);
+					next(null, inviteData);
+				}
+			], callback);
+		});
+	});
+};
+
 SocketInvite.upvote = function (socket, data, callback) {
 	favouriteCommand(socket, 'upvote', data, callback);
 };

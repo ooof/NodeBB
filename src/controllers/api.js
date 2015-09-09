@@ -76,6 +76,7 @@ apiController.getConfig = function(req, res, next) {
 	config.allowGhost = parseInt(meta.config.allowGhost, 10) === 1;
 	config.csrf_token = req.csrfToken();
 	config.searchEnabled = plugins.hasListeners('filter:search.query');
+	config.votePercent = meta.config.votePercent;
 
 	if (!req.user) {
 		return filterConfig();

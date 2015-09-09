@@ -153,6 +153,18 @@ define('admin/settings', ['uploader', 'sounds'], function(uploader, sounds) {
 			}
 
 			data[key] = value;
+			if (key === 'votePercent') {
+				var newValue = parseInt(data[key]);
+				var oldValue = parseInt(config.votePercent);
+				if (newValue < oldValue) {
+					socket.emit('invite.checkingVote', data, function(err, a) {
+						console.log(a);
+						if (err) {
+							return callback(err);
+						}
+					})
+				}
+			}
 		});
 
 		socket.emit('admin.config.setMultiple', data, function(err) {
