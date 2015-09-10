@@ -196,7 +196,7 @@ inviteController.details = function (req, res, next) {
 				inviteData.resultVoteCount = inviteData.upvoteCount - inviteData.downvoteCount;
 				inviteData.votePercent = meta.config.votePercent || 50;
 				inviteData.userCount = parseInt(results.userCount, 10);
-				inviteData.needVote = Math.round(inviteData.userCount * inviteData.votePercent / 100);
+				inviteData.needVote = Math.ceil(inviteData.userCount * inviteData.votePercent / 100);
 				inviteData.remainVote = inviteData.needVote - inviteData.upvoteCount + inviteData.downvoteCount;
 
 				var date, minutes, hours;
