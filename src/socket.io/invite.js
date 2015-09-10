@@ -169,7 +169,7 @@ SocketInvite.checkingVote = function (socket, data, callback) {
 					db.getObjectField('invite:' + iid, 'downvoteCount', next);
 				},
 				function (count, next) {
-					inviteData.downvoteCount = parseInt(count, 10);
+					inviteData.downvoteCount = count ? parseInt(count, 10) : 0;
 					voteCount = inviteData.voteCount = inviteData.inviteCount - inviteData.downvoteCount;
 					// 获取用户总数
 					db.getObjectField('global', 'userCount', next);
@@ -180,7 +180,7 @@ SocketInvite.checkingVote = function (socket, data, callback) {
 
 					// 通过投票比例则发出邀请，否则通知所有用户进行投票
 					if (inviteData.passInvite) {
-						return invite.inviteUser(uid, inviteData, next);
+						return invite.inviteUser(socket.uid, inviteData, next);
 					}
 					next();
 				},
