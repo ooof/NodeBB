@@ -38,9 +38,9 @@ SocketInvite.post = function (socket, data, callback) {
 };
 
 SocketInvite.edit = function (socket, data, callback) {
-	if(!socket.uid) {
+	if (!socket.uid) {
 		return callback(new Error('[[error:not-logged-in]]'));
-	} else if(!data || !data.iid || !data.username || !data.email || !data.content) {
+	} else if (!data || !data.iid || !data.username || !data.email || !data.content) {
 		return callback(new Error('[[error:invalid-data]]'));
 	} else if (!data.username || data.username.length < parseInt(meta.config.minimumTitleLength, 10)) {
 		return callback(new Error('[[error:username-too-short, ' + meta.config.minimumTitleLength + ']]'));
@@ -59,7 +59,7 @@ SocketInvite.edit = function (socket, data, callback) {
 		username: data.username,
 		email: data.email,
 		content: data.content
-	}, function(err) {
+	}, function (err) {
 		if (err) {
 			return callback(err);
 		}
@@ -86,8 +86,9 @@ SocketInvite.edit = function (socket, data, callback) {
 	});
 };
 
-SocketInvite.delete = function(socket, data, callback) {
-	callback = callback || function () {};
+SocketInvite.delete = function (socket, data, callback) {
+	callback = callback || function () {
+		};
 
 	if (!socket.uid) {
 		return;
@@ -98,7 +99,8 @@ SocketInvite.delete = function(socket, data, callback) {
 	}
 
 	invite.delete(data.iid, function (err, callback) {
-		callback = callback || function () {}
+		callback = callback || function () {
+			}
 
 		if (err) {
 			return callback(err);
@@ -151,7 +153,7 @@ SocketInvite.checkingVote = function (socket, data, callback) {
 			return item.status === 'voting';
 		});
 
-		invitesData.map(function (inviteData) {
+		async.map(invitesData, function (inviteData, callback) {
 			var voteCount,
 				upvoteCount,
 				iid = inviteData.iid;
@@ -168,7 +170,7 @@ SocketInvite.checkingVote = function (socket, data, callback) {
 				},
 				function (count, next) {
 					inviteData.downvoteCount = parseInt(count, 10);
-					voteCount  = inviteData.voteCount = inviteData.inviteCount - inviteData.downvoteCount;
+					voteCount = inviteData.voteCount = inviteData.inviteCount - inviteData.downvoteCount;
 					// 获取用户总数
 					db.getObjectField('global', 'userCount', next);
 				},
@@ -193,7 +195,7 @@ SocketInvite.checkingVote = function (socket, data, callback) {
 					next(null, inviteData);
 				}
 			], callback);
-		});
+		}, callback);
 	});
 };
 
@@ -251,36 +253,36 @@ function favouriteCommand(socket, command, data, callback) {
 }
 
 // 检查用户名是否存在
-SocketInvite.usernameExists = function(socket, data, callback) {
-	if(data && data.username) {
+SocketInvite.usernameExists = function (socket, data, callback) {
+	if (data && data.username) {
 		invite.usernameExists(data.username, callback);
 	}
 };
 
 // 检查邮箱是否存在
-SocketInvite.emailExists = function(socket, data, callback) {
-	if(data && data.email) {
+SocketInvite.emailExists = function (socket, data, callback) {
+	if (data && data.email) {
 		invite.emailExists(data.email, callback);
 	}
 };
 
 // 排序
-SocketInvite.setInviteSort = function(socket, sort, callback) {
+SocketInvite.setInviteSort = function (socket, sort, callback) {
 	if (socket.uid) {
 		user.setSetting(socket.uid, 'inviteSort', sort, callback);
 	}
 };
 
-SocketInvite.loadMore = function(socket, data, callback) {
+SocketInvite.loadMore = function (socket, data, callback) {
 	if (!data) {
 		return callback(new Error('[[error:invalid-data]]'));
 	}
 
 	async.parallel({
-		settings: function(next) {
+		settings: function (next) {
 			user.getSettings(socket.uid, next);
 		}
-	}, function(err, results) {
+	}, function (err, results) {
 		if (err) {
 			return callback(err);
 		}
