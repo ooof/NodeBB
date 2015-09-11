@@ -22,6 +22,8 @@ inviteController.list = function (req, res, next) {
 		status = req.query.status,
 		inviteSort,
 		page = req.query.page || 1,
+		votePercent = meta.config.votePercent || 50,
+		userCount,
 		settings = {};
 
 	async.waterfall([
@@ -32,11 +34,15 @@ inviteController.list = function (req, res, next) {
 				},
 				userSettings: function (next) {
 					user.getSettings(uid, next);
+				},
+				userCount: function (next) {
+					db.getObjectField('global', 'userCount', next);
 				}
 			}, next);
 		},
 		function (results, next) {
 			settings = results.userSettings;
+			userCount = parseInt(results.userCount, 10);
 
 			switch (status) {
 				case 'voting':
@@ -94,6 +100,17 @@ inviteController.list = function (req, res, next) {
 		},
 		function (data, next) {
 			data.invite.map(function (value, index) {
+				var needVote = Math.ceil(userCount * votePercent / 100);
+				if (settings.inviteSort === 'newest_to_oldest') {
+					data.invite[index].visibleRemainCount = false;
+				} else if (settings.inviteSort === 'voting') {
+					data.invite[index].visibleRemainCount = true;
+					data.invite[index].remainCount = needVote - parseInt(data.invite[index].inviteCount, 10) + parseInt(data.invite[index].downvoteCount, 10);
+				} else {
+					data.invite[index].visibleRemainCount = true;
+					data.invite[index].remainCount = 0;
+				}
+				data.remainVote = 0;
 				data.invite[index].joined = parseInt(value.joined, 10);
 				data.invite[index].invited = parseInt(value.invited, 10);
 				data.invite[index].expired = parseInt(value.expired, 10);
