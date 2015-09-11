@@ -46,7 +46,7 @@
             <div class="help-block">
                 <p>通知所有投票用户提名已通过并已发出邀请</p>
                 <ol style="padding-left: 1.5em;">
-                    <li>invitedUsername 被提名人用户名</li>
+                    <li>username 被提名人用户名</li>
                     <li>invitedByUsername 提名人用户名</li>
                 </ol>
             </div>
