@@ -24,7 +24,10 @@ module.exports = function (Invite) {
 			}
 
 			var timestamp = Date.now(),
+				needCount,
 				voteCount,
+				userCount,
+				votePercent = meta.config.votePercent ? meta.config.votePercent / 100 : 0.5,
 				upvoteCount;
 
 			async.waterfall([
@@ -49,9 +52,11 @@ module.exports = function (Invite) {
 					// 获取用户总数
 					db.getObjectField('global', 'userCount', next);
 				},
-				function (userCount, next) {
+				function (count, next) {
 					// 判断是否通过投票比例
-					inviteData.passInvite = voteCount / parseInt(userCount, 10) >= (meta.config.votePercent ? meta.config.votePercent / 100 : 0.5);
+					userCount = count;
+					needCount = Math.ceil(userCount * votePercent);
+					inviteData.passInvite = voteCount / parseInt(userCount, 10) >= votePercent;
 
 					// 通过投票比例则发出邀请，否则通知所有用户进行投票
 					if (inviteData.passInvite) {
@@ -68,9 +73,12 @@ module.exports = function (Invite) {
 				},
 				function (data, next) {
 					data.upvoteCount = upvoteCount;
-					inviteData.upvoteCount = upvoteCount;
 					data.isInvited = !!parseInt(data.invited, 10);
+					data.voteCount = voteCount;
+					data.remainCount = needCount - upvoteCount + inviteData.downvoteCount;
 					websockets.in('invite_' + iid).emit('event:invite_upvote', data);
+
+					inviteData.upvoteCount = upvoteCount;
 					next(null, inviteData);
 				}
 			], callback);
