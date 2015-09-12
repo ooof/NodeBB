@@ -49,7 +49,6 @@ inviteController.list = function (req, res, next) {
 					settings.inviteSort = 'voting';
 					break;
 				case 'joined':
-					inviteSort = 'toLowerCase';
 					settings.inviteSort = 'joined';
 					break;
 				case 'deleted':
@@ -128,11 +127,9 @@ inviteController.list = function (req, res, next) {
 			return next(err);
 		}
 
-		if (inviteSort === 'toLowerCase') {
-			data.invite.sort(function (a, b) {
-				return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
-			});
-		}
+		data.invite.sort(function (a, b) {
+			return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
+		});
 
 		res.render('invite/list', data);
 	});
