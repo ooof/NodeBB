@@ -153,6 +153,10 @@ SocketInvite.checkingVote = function (socket, data, callback) {
 			return item.status === 'voting';
 		});
 
+		if (invitesData && invitesData.length === 0) {
+			callback(null, 0);
+		}
+
 		async.map(invitesData, function (inviteData, callback) {
 			var voteCount,
 				upvoteCount,
@@ -195,7 +199,12 @@ SocketInvite.checkingVote = function (socket, data, callback) {
 					next(null, inviteData);
 				}
 			], callback);
-		}, callback);
+		}, function (err) {
+			if (err) {
+				return console.log(err);
+			}
+			callback(null, invitesData.length)
+		});
 	});
 };
 

@@ -157,11 +157,11 @@ define('admin/settings', ['uploader', 'sounds'], function(uploader, sounds) {
 				var newValue = parseInt(data[key]);
 				var oldValue = parseInt(config.votePercent);
 				if (newValue < oldValue) {
-					socket.emit('invite.checkingVote', data, function(err, a) {
-						console.log(a);
+					socket.emit('invite.checkingVote', data, function(err, count) {
 						if (err) {
 							return callback(err);
 						}
+						console.log(count);
 					})
 				}
 			}
