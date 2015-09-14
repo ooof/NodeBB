@@ -127,9 +127,11 @@ inviteController.list = function (req, res, next) {
 			return next(err);
 		}
 
-		data.invite.sort(function (a, b) {
-			return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
-		});
+		if (settings.inviteSort !== 'newest_to_oldest' || settings.inviteSort !== 'joined') {
+			data.invite.sort(function (a, b) {
+				return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
+			});
+		}
 
 		res.render('invite/list', data);
 	});
