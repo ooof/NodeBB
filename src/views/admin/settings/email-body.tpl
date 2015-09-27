@@ -48,10 +48,10 @@
                 <p>参数都需要使用大括号包裹，所有输入框都支持变量嵌套。</p>
                 <ol style="padding-left: 1.5em;">
                     <li>向被提名人发出邀请邮件</li>
-                    <li>username 被邀请人用户名</li>
-                    <li>register_link 注册链接</li>
-                    <li>from_username 提名人用户名</li>
-                    <li>from_invite_username 提名人被提名的用户名</li>
+                    <li>username 被邀请人的注册用户名</li>
+                    <li>register_link 被邀请人的注册链接</li>
+                    <li>from_username 提名人注册进入后的用户名</li>
+                    <li>from_invite_username 提名人被提名的真实用户名</li>
                 </ol>
             </div>
             <br>

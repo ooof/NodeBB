@@ -37,7 +37,7 @@ module.exports = function (Invite) {
 				}, next);
 			},
 			function (next) {
-				user.getUserField(inviteData.uid, iid, next);
+				user.getUserField(inviteData.uid, 'iid', next);
 			},
 			function (iid, next) {
 				if (!!iid) {
