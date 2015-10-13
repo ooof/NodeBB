@@ -6,7 +6,8 @@ define('forum/invite/details', ['composer',
 	'translator',
 	'forum/invite/events'
 ], function (composer, components, navigator, translator, events) {
-	var InviteDetails = {};
+	var InviteDetails = {},
+		inviteName;
 
 	$(window).on('action:ajaxify.start', function (ev, data) {
 		if (ajaxify.currentPage !== data.url) {
@@ -24,6 +25,8 @@ define('forum/invite/details', ['composer',
 		$(window).trigger('action:vote.loading');
 
 		app.enterRoom('invite_' + iid);
+
+		inviteName = ajaxify.variables.get('invite_name');
 
 		addInviteHandlers(iid);
 		addSymbol();
@@ -43,8 +46,30 @@ define('forum/invite/details', ['composer',
 		})
 	}
 
+	function getData(button, data) {
+		return button.parents('[data-iid]').attr(data);
+	}
+
+	function getUserName(button) {
+		var username = '',
+			post = button.parents('[data-uid]');
+
+		if (post.length) {
+			username = post.attr('data-username').replace(/\s/g, '-');
+		}
+		if (post.length && post.attr('data-iid') !== '0') {
+			username = '@' + username;
+		}
+
+		return username;
+	}
+
 	function addInviteHandlers(iid) {
 		var inviteContainer = components.get('invite').children('.post-row');
+
+		inviteContainer.on('click', '[component="invite/reply"]', function() {
+			onReplyClicked($(this), iid);
+		});
 
 		inviteContainer.on('click', '[component="invite/upvote"]', function () {
 			return toggleVote($(this), 'invite.upvote');
@@ -64,6 +89,31 @@ define('forum/invite/details', ['composer',
 
 		inviteContainer.on('click', '[component="invite/chat"]', function () {
 			app.openChat(inviteContainer.attr('data-username'), inviteContainer.attr('data-uid'));
+		});
+	}
+
+	function onReplyClicked(button, iid) {
+		require(['composer'], function(composer) {
+			var selectionText = '',
+				selection = window.getSelection ? window.getSelection() : document.selection.createRange(),
+				inviteUUID = composer.findByTid(iid);
+
+			if ($(selection.baseNode).parents('[component="invite/content"]').length > 0 || $(selection.baseNode).parents('[component="invite/course"]').length > 0) {
+				var snippet = selection.toString();
+				if (snippet.length) {
+					selectionText = '> ' + snippet.replace(/\n/g, '\n> ') + '\n\n';
+				}
+			}
+
+			var username = getUserName(selectionText ? $(selection.baseNode) : button);
+			if (getData(button, 'data-iid') === '0') {
+				username = '';
+			}
+			if (selectionText.length) {
+				composer.addQuoteInvite(iid, ajaxify.variables.get('invite_slug'), getData(button, 'data-index'), getData(button, 'data-iid'), inviteName, username, selectionText, inviteUUID);
+			} else {
+				composer.newReplyInvite(iid, getData(button, 'data-iid'), inviteName, username ? username + ' ' : '');
+			}
 		});
 	}
 

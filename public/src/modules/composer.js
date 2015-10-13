@@ -83,6 +83,10 @@ define('composer', [
 			type = 'vid';
 		} else if (post.hasOwnProperty('pid')) {
 			type = 'pid';
+		} else if (post.hasOwnProperty('invite')) {
+			type = 'invite';
+		} else if (post.hasOwnProperty('iid')) {
+			type = 'iid';
 		}
 
 		id = post[type];
@@ -109,7 +113,7 @@ define('composer', [
 
 		translator.translate('[[topic:composer.new_topic]],[[invite:composer.new_invite]]', function (data) {
 			data = data.split(',');
-			var title = post.invite || post.iid ? data[1] : post.title ? post.title : data[0];
+			var title = post.invite || (post.iid && !post.toPid) ? data[1] : post.title ? post.title : data[0];
 
 			taskbar.push('composer', uuid, {
 				title: title
@@ -194,11 +198,58 @@ define('composer', [
 			}
 
 			push({
+				type: 'edit',
 				iid: iid,
 				email: threadData.email,
 				username: threadData.username,
 				body: threadData.content,
 				modified: false
+			});
+		});
+	};
+
+	composer.addQuoteInvite = function(iid, inviteSlug, postIndex, pid, title, username, text, uuid) {
+		uuid = uuid || composer.active;
+
+		if (uuid === undefined) {
+			composer.newReplyInvite(iid, pid, title, '[[modules:composer.user_said, ' + username + ']]\n' + text);
+			return;
+		} else if (uuid !== composer.active) {
+			// If the composer is not currently active, activate it
+			composer.load(uuid);
+		}
+
+		var postContainer = $('#cmp-uuid-' + uuid);
+		var bodyEl = postContainer.find('textarea');
+		var prevText = bodyEl.val();
+		if (parseInt(iid, 10) !== parseInt(composer.posts[uuid].tid, 10)) {
+			var link = '[' + title + '](/invite/' + inviteSlug + '/' + (parseInt(postIndex, 10) + 1) + ')';
+			translator.translate('[[modules:composer.user_said_in, ' + username + ', ' + link + ']]\n', config.defaultLang, onTranslated);
+		} else {
+			translator.translate('[[modules:composer.user_said, ' + username + ']]\n', config.defaultLang, onTranslated);
+		}
+
+		function onTranslated(translated) {
+			composer.posts[uuid].body = (prevText.length ? prevText + '\n\n' : '') + translated + text;
+			bodyEl.val(composer.posts[uuid].body);
+			focusElements(postContainer);
+			preview.render(postContainer);
+		}
+	};
+
+	composer.newReplyInvite = function (iid, pid, title, text) {
+		// remove poll button in composer
+		composer.type = 'reply';
+		translator.translate(text, config.defaultLang, function (translated) {
+			push({
+				type: 'reply',
+				iid: iid,
+				toPid: pid,
+				title: $('<div/>').text(title).html(),
+				body: translated,
+				modified: false,
+				isMain: false,
+				isMod: false
 			});
 		});
 	};
@@ -328,7 +379,7 @@ define('composer', [
 		var allowTopicsThumbnail = config.allowTopicsThumbnail && postData.isMain && (config.hasImageUploadPlugin || config.allowFileUploads),
 			isTopic = postData ? !!postData.cid : false,
 			isInvite = postData ? !!postData.invite : false,
-			isInviteEdit = postData ? !!postData.iid : false,
+			isInviteEdit = postData && postData.type === 'edit',
 			isMain = postData ? !!postData.isMain : false,
 			isEditing = postData ? !!postData.pid : false,
 			isGuestPost = postData ? parseInt(postData.uid, 10) === 0 : false;
@@ -577,7 +628,7 @@ define('composer', [
 			thumbEl = postContainer.find('input#topic-thumb-url');
 
 		var isInvite = !!parseInt(postData.invite, 10),
-			isInviteEdit = !!parseInt(postData.iid, 10);
+			isInviteEdit = postData.type === 'edit';
 
 		options = options || {};
 
@@ -659,6 +710,13 @@ define('composer', [
 				content: bodyEl.val(),
 				email: email,
 				username: username
+			};
+		} else if (postData.type === 'reply') {
+			action = 'invite.reply';
+			composerData = {
+				iid: parseInt(postData.iid, 10),
+				toPid: postData.toPid,
+				content: bodyEl.val()
 			};
 		} else if (isInviteEdit) {
 			action = 'invite.edit';
