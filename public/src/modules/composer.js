@@ -716,7 +716,8 @@ define('composer', [
 			composerData = {
 				iid: parseInt(postData.iid, 10),
 				toPid: postData.toPid,
-				content: bodyEl.val()
+				content: bodyEl.val(),
+				lock: false
 			};
 		} else if (isInviteEdit) {
 			action = 'invite.edit';
