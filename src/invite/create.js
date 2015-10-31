@@ -247,6 +247,9 @@ module.exports = function (Invite) {
 			function (next) {
 				async.parallel([
 					function (next) {
+						db.sortedSetAdd('iid:' + iid + ':posts', timestamp, postData.pid, next);
+					},
+					function (next) {
 						db.sortedSetAdd('posts:pid', timestamp, postData.pid, next);
 					},
 					function (next) {
