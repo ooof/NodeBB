@@ -8,6 +8,7 @@ var inviteController = {},
 	user = require('../user'),
 	meta = require('../meta'),
 	posts = require('../posts'),
+	topics = require('../topics'),
 	privileges = require('../privileges'),
 	plugins = require('../plugins'),
 	helpers = require('./helpers'),
@@ -20,7 +21,6 @@ var inviteController = {},
 inviteController.list = function (req, res, next) {
 	var uid = req.user ? req.user.uid : 0,
 		status = req.query.status,
-		inviteSort,
 		page = req.query.page || 1,
 		votePercent = meta.config.votePercent || 50,
 		userCount,
@@ -167,12 +167,17 @@ inviteController.details = function (req, res, next) {
 				},
 				posts: function (next) {
 					var set = 'iid:' + iid + ':posts';
-					db.getSortedSetRange(set, 0, -1, function (err, result) {
-						if (err) {
-							next(err);
+					async.waterfall([
+						function (next) {
+							db.getSortedSetRange(set, 0, -1, next);
+						},
+						function (result, next) {
+							posts.getPostsByPids(result, req.uid, next);
+						},
+						function (result, next) {
+							topics.addPostData(result, req.uid, next);
 						}
-						posts.getPostsByPids(result, req.uid, next);
-					});
+					], next);
 				}
 			}, next)
 		},
