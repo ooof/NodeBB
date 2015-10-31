@@ -189,6 +189,83 @@ module.exports = function (Invite) {
 		], callback);
 	};
 
+	Invite.reply = function (data, callback) {
+		// This is an internal method, consider using Topics.reply instead
+		var uid = data.uid,
+			iid = data.iid,
+			vid = data.vid ? data.vid : '',
+			content = data.content.toString(),
+			timestamp = data.timestamp || Date.now();
+
+		if (!uid && parseInt(uid, 10) !== 0) {
+			return callback(new Error('[[error:invalid-uid]]'));
+		}
+
+		var postData;
+
+		async.waterfall([
+			function (next) {
+				db.incrObjectField('global', 'nextPid', next);
+			},
+			function (pid, next) {
+
+				postData = {
+					'pid': pid,
+					'uid': uid,
+					'content': content,
+					'timestamp': timestamp,
+					'reputation': 0,
+					'votes': 0,
+					'editor': '',
+					'edited': 0,
+					'deleted': 0
+				};
+
+				if (iid) {
+					postData.iid = iid
+				} else if (vid) {
+					postData.vid = vid
+				}
+
+				if (data.toPid) {
+					postData.toPid = data.toPid;
+				}
+
+				if (data.ip && parseInt(meta.config.trackIpPerPost, 10) === 1) {
+					postData.ip = data.ip;
+				}
+
+				if (parseInt(uid, 10) === 0 && data.handle) {
+					postData.handle = data.handle;
+				}
+
+				plugins.fireHook('filter:post.save', postData, next);
+			},
+			function (postData, next) {
+				db.setObject('post:' + postData.pid, postData, next);
+			},
+			function (next) {
+				async.parallel([
+					function (next) {
+						db.sortedSetAdd('posts:pid', timestamp, postData.pid, next);
+					},
+					function (next) {
+						db.incrObjectField('global', 'postCount', next);
+					}
+				], function (err) {
+					if (err) {
+						return next(err);
+					}
+					plugins.fireHook('filter:post.get', postData, next);
+				});
+			},
+			function (postData, next) {
+				plugins.fireHook('action:post.save', postData);
+				next(null, postData);
+			}
+		], callback);
+	};
+
 	Invite.edit = function (data, callback) {
 		var inviteData = {
 			edited: Date.now(),

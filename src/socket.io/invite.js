@@ -86,6 +86,36 @@ SocketInvite.edit = function (socket, data, callback) {
 	});
 };
 
+SocketInvite.reply = function (socket, data, callback) {
+	if(!data || !data.iid || !data.content) {
+		return callback(new Error('[[error:invalid-data]]'));
+	}
+
+	data.uid = socket.uid;
+	data.req = websockets.reqFromSocket(socket);
+
+	invite.reply(data, function(err, postData) {
+		if (err) {
+			return callback(err);
+		}
+
+		var result = {
+			posts: [postData],
+			privileges: {
+				'invite:reply': true
+			},
+			'reputation:disabled': parseInt(meta.config['reputation:disabled'], 10) === 1,
+			'downvote:disabled': parseInt(meta.config['downvote:disabled'], 10) === 1
+		};
+
+		callback(null, postData);
+
+		socket.emit('event:new_post', result);
+
+		user.updateOnlineUsers(socket.uid);
+	});
+};
+
 SocketInvite.delete = function (socket, data, callback) {
 	callback = callback || function () {
 		};
