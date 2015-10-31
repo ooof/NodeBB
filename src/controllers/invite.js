@@ -164,12 +164,22 @@ inviteController.details = function (req, res, next) {
 				},
 				userCount: function (next) {
 					db.getObjectField('global', 'userCount', next);
+				},
+				posts: function (next) {
+					var set = 'iid:' + iid + ':posts';
+					db.getSortedSetRange(set, 0, -1, function (err, result) {
+						if (err) {
+							next(err);
+						}
+						posts.getPostsByPids(result, req.uid, next);
+					});
 				}
 			}, next)
 		},
 		function (results, next) {
 			userPrivileges = results.privileges;
 			var inviteData = results.inviteData;
+			inviteData.posts = results.posts;
 
 			if (iid + '/' + req.params.slug !== inviteData.slug) {
 				return helpers.notFound(req, res);
