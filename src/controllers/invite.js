@@ -101,7 +101,9 @@ inviteController.list = function (req, res, next) {
 			data.invite.map(function (value, index) {
 				var needVote = Math.ceil(userCount * votePercent / 100);
 				if (data.invite[index].status === 'voting') {
-					data.invite[index].remainCount = needVote - parseInt(data.invite[index].inviteCount, 10) + parseInt(data.invite[index].downvoteCount, 10);
+					var upvoteCount = parseInt(data.invite[index].inviteCount ? data.invite[index].inviteCount : 0, 10);
+					var downvoteCount = parseInt(data.invite[index].downvoteCount ? data.invite[index].downvoteCount : 0, 10);
+					data.invite[index].remainCount = needVote - upvoteCount + downvoteCount;
 				} else {
 					data.invite[index].remainCount = 0;
 				}
