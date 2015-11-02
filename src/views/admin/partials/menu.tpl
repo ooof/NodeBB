@@ -17,6 +17,7 @@
                         <li><a href="{relative_path}/admin/settings/ghost">前世幽灵</a></li>
                         <li><a href="{relative_path}/admin/settings/export">导出数据</a></li>
                         <li><a href="{relative_path}/admin/manage/update">系统升级</a></li>
+						<li><a href="{relative_path}/admin/manage/version">系统版本</a></li>
                     </ul>
                 </div>
 				<div class="sidebar-nav">
