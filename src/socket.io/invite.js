@@ -42,10 +42,10 @@ SocketInvite.edit = function (socket, data, callback) {
 		return callback(new Error('[[error:not-logged-in]]'));
 	} else if (!data || !data.iid || !data.username || !data.email || !data.content) {
 		return callback(new Error('[[error:invalid-data]]'));
-	} else if (!data.username || data.username.length < parseInt(meta.config.minimumTitleLength, 10)) {
-		return callback(new Error('[[error:username-too-short, ' + meta.config.minimumTitleLength + ']]'));
-	} else if (data.username.length > parseInt(meta.config.maximumTitleLength, 10)) {
-		return callback(new Error('[[error:username-too-long, ' + meta.config.maximumTitleLength + ']]'));
+	} else if (!data.username || data.username.length < parseInt(meta.config.minimumUsernameLength, 10)) {
+		return callback(new Error('[[error:username-too-short, ' + meta.config.minimumUsernameLength + ']]'));
+	} else if (data.username.length > parseInt(meta.config.maximumUsernameLength, 10)) {
+		return callback(new Error('[[error:username-too-long, ' + meta.config.maximumUsernameLength + ']]'));
 	} else if (!data.content || data.content.length < parseInt(meta.config.minimumPostLength, 10)) {
 		return callback(new Error('[[error:content-too-short, ' + meta.config.minimumPostLength + ']]'));
 	} else if (data.content.length > parseInt(meta.config.maximumPostLength, 10)) {
