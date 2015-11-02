@@ -195,14 +195,7 @@ app.cacheBuster = null;
 		var path = window.location.pathname;
 		$('#main-nav li').removeClass('active');
 		if (path) {
-			$('#main-nav li a').each(function () {
-				var href = $(this).attr('href');
-
-				if (href && path.startsWith(href)) {
-					$(this.parentNode).addClass('active');
-				 	return false;
-				}
-			});
+			$('#main-nav li').removeClass('active').find('a[href="' + path + '"]').parent().addClass('active');
 		}
 	}
 
