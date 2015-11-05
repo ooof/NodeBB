@@ -114,6 +114,7 @@ inviteController.list = function (req, res, next) {
 				data.invite[index].invited = parseInt(value.invited, 10);
 				data.invite[index].expired = parseInt(value.expired, 10);
 				data.invite[index].deleted = value.status === 'deleted';
+				data.invite[index].postCount = value.postCount ? parseInt(value.postCount, 10) : 0;
 			});
 
 			if (settings.inviteSort !== 'newest_to_oldest') {
@@ -122,6 +123,8 @@ inviteController.list = function (req, res, next) {
 				});
 			}
 			data.isVoting = settings.inviteSort === 'voting';
+			data.isAll = settings.inviteSort === 'newest_to_oldest';
+			data.col = data.isVoting || data.isAll;
 
 			data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[global:header.invite]]', url: '/invite'}]);
 

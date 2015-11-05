@@ -253,6 +253,10 @@ module.exports = function (Invite) {
 						db.sortedSetAdd('posts:pid', timestamp, postData.pid, next);
 					},
 					function (next) {
+						// 回复数量
+						db.incrObjectField('invite:' + iid, 'postCount', next);
+					},
+					function (next) {
 						db.incrObjectField('global', 'postCount', next);
 					}
 				], function (err) {
