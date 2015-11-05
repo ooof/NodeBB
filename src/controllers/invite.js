@@ -104,7 +104,9 @@ inviteController.list = function (req, res, next) {
 					var upvoteCount = parseInt(data.invite[index].inviteCount ? data.invite[index].inviteCount : 0, 10);
 					var downvoteCount = parseInt(data.invite[index].downvoteCount ? data.invite[index].downvoteCount : 0, 10);
 					data.invite[index].remainCount = needVote - upvoteCount + downvoteCount;
+					data.invite[index].downvoteCount = downvoteCount;
 				} else {
+					data.invite[index].downvoteCount = 0;
 					data.invite[index].remainCount = 0;
 				}
 				data.remainVote = 0;
@@ -119,6 +121,7 @@ inviteController.list = function (req, res, next) {
 					return item.status === settings.inviteSort;
 				});
 			}
+			data.isVoting = settings.inviteSort === 'voting';
 
 			data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[global:header.invite]]', url: '/invite'}]);
 
@@ -134,6 +137,7 @@ inviteController.list = function (req, res, next) {
 				return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
 			});
 		}
+		data.inviteSort = settings.inviteSort;
 
 		res.render('invite/list', data);
 	});

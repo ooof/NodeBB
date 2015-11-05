@@ -1,6 +1,7 @@
 {
-  "invite_count": "票数",
+  "invite_count": "得票数",
 
+  "list.invite_downvote": "反对票数",
   "list.joined": "已加入",
   "list.voting": "投票中",
   "list.invited": "已邀请",

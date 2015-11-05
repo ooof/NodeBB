@@ -1,6 +1,7 @@
 {
   "invite_count": "Votes",
 
+  "list.invite_downvote": "Downvote",
   "list.joined": "Already Joined",
   "list.voting": "Voting",
   "list.invited": "Has voted",
