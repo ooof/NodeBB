@@ -184,7 +184,7 @@
     },
     {
         "field": "email:invite:success:subject",
-        "value": "我们已经给您提名的{}发出邀请邮件"
+        "value": "我们已经给您提名的{invite_username}发出邀请邮件"
     },
     {
         "field": "email:invite:success:fromname",
