@@ -80,7 +80,7 @@ define('forum/invite/events', ['components', 'translator'], function (components
 
 	function onEditInvite(data) {
 		var contentEl = components.get('invite/content', data.iid),
-			usernameEl = components.get('invite/header', data.iid);
+			usernameEl = components.get('invite/username', data.iid);
 
 		if (usernameEl.length) {
 			usernameEl.fadeOut(250, function () {
