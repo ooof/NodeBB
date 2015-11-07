@@ -31,6 +31,8 @@ define('forum/invite/details', ['composer',
 		addInviteHandlers(iid);
 		addSymbol();
 
+		$('.invite-time').map(processTime);
+
 		events.init();
 	};
 
@@ -44,6 +46,20 @@ define('forum/invite/details', ['composer',
 			}
 			return self.html(self.html() + '。')
 		})
+	}
+
+	function processTime(i, el) {
+		var $el = $(el);
+		var timestamp = parseInt($el.attr('title'), 10);
+		timestamp = parseTimestamp(timestamp);
+		$el.text(timestamp);
+	}
+
+	function parseTimestamp(timestamp) {
+		var date = new Date(timestamp);
+		var minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+		var hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+		return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 	}
 
 	function getData(button, data) {
@@ -67,7 +83,7 @@ define('forum/invite/details', ['composer',
 	function addInviteHandlers(iid) {
 		var inviteContainer = components.get('invite').children('.post-row');
 
-		inviteContainer.on('click', '[component="invite/reply"]', function() {
+		inviteContainer.on('click', '[component="invite/reply"]', function () {
 			onReplyClicked($(this), iid);
 		});
 
@@ -93,7 +109,7 @@ define('forum/invite/details', ['composer',
 	}
 
 	function onReplyClicked(button, iid) {
-		require(['composer'], function(composer) {
+		require(['composer'], function (composer) {
 			var selectionText = '',
 				selection = window.getSelection ? window.getSelection() : document.selection.createRange(),
 				inviteUUID = composer.findByTid(iid);
@@ -127,7 +143,7 @@ define('forum/invite/details', ['composer',
 		socket.emit(method, {
 			iid: invite.attr('data-iid'),
 			room_id: app.currentRoom
-		}, function(err) {
+		}, function (err) {
 			if (err) {
 				app.alertError(err.message);
 			}

@@ -235,62 +235,17 @@ inviteController.details = function (req, res, next) {
 				inviteData.needVote = Math.ceil(inviteData.userCount * inviteData.votePercent / 100);
 				inviteData.remainVote = inviteData.needVote - inviteData.upvoteCount + inviteData.downvoteCount;
 
-				var date, minutes, hours;
-
-				if (inviteData.invited) {
-					date = new Date(parseInt(inviteData.invitedTime, 10));
-					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-					inviteData.invitedTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
-				}
-
 				if (inviteData.notJoined) {
 					inviteData.expiredText = schedule.expire.text();
-
-					if (inviteData.expiredTime) {
-						date = new Date(parseInt(inviteData.expiredTime, 10));
-						minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-						hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-						inviteData.expiredTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
-					} else {
-						inviteData.expiredTime = inviteData.invitedTime;
-					}
 				}
-
-				date = new Date(parseInt(inviteData.timestamp, 10));
-				minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-				hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-				inviteData.createdTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
 
 				inviteData.inviterDeleted = inviteData.status === 'deleted';
-				if (inviteData.inviterDeleted) {
-					date = new Date(parseInt(inviteData.deletedTime, 10));
-					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-					inviteData.deletedTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
-				}
-
+				// 提名邮件达到收件方时间
 				inviteData.isDelivered = !!(inviteData.trackDeliver && inviteData.trackDeliver === 'delivered');
-				if (inviteData.trackDeliverTime) {
-					date = new Date(parseInt(inviteData.trackDeliverTime, 10));
-					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-					inviteData.trackDeliverTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
-				}
+				// 提名邮件打开时间
 				inviteData.isOpened = !!(inviteData.trackOpen && inviteData.trackOpen === 'open');
-				if (inviteData.trackOpenTime) {
-					date = new Date(parseInt(inviteData.trackOpenTime, 10));
-					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-					inviteData.trackOpenTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
-				}
+				// 提名邮件点击时间
 				inviteData.isClicked = !!(inviteData.trackClick && inviteData.trackClick === 'click');
-				if (inviteData.trackClickTime) {
-					date = new Date(parseInt(inviteData.trackClickTime, 10));
-					minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-					hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-					inviteData.trackClickTime = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' - ' + hours + ':' + minutes;
-				}
 
 				next(null, inviteData);
 			});
