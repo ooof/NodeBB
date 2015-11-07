@@ -185,4 +185,35 @@ module.exports = function (Invite) {
 			}
 		], callback);
 	};
+
+	// 当有新的回复的时候，给提名人发送邮件
+	Invite.sendInviteReplyEmail = function (postData, callback) {
+		callback = callback || function () {};
+		var inviteData,
+			iid = postData.iid;
+
+		async.waterfall([
+			function (next) {
+				invite.getInviteFields(iid, ['username', 'invitedByUsername', 'uid', 'email', 'slug'], next);
+			},
+			function (result, next) {
+				inviteData = result;
+				var params = {
+					uid: inviteData.uid,
+					template: 'invite:reply',
+					invite_username: inviteData.username,
+					post_content: postData.content,
+					username: inviteData.invitedByUsername,
+					invite_link: nconf.get('url') + '/invite/' + inviteData.slug
+				};
+				if (parseInt(inviteData.uid, 10) === parseInt(postData.uid, 10)) {
+					next(null);
+				} else if (plugins.hasListeners('action:email.send')) {
+					emailer.sendPlus(params, next);
+				} else {
+					next(new Error('[[error:no-emailers-configured]]'));
+				}
+			}
+		], callback);
+	};
 };

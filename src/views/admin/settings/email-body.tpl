@@ -225,6 +225,28 @@
                 </ol>
             </div>
             <br>
+
+            <div class="help-block">
+                <h4>发送回复提醒</h4>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-reply-fromname"><strong>收件人姓名</strong></label>
+                <input type="text" class="form-control" id="email-invite-reply-fromname" data-field="email:invite:reply:fromname"/>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-reply-subject"><strong>邮件标题</strong></label>
+                <input type="text" class="form-control" id="email-invite-reply-subject" data-field="email:invite:reply:subject"/>
+            </div>
+            <div class="form-group">
+                <label for="email-invite-reply-html"><strong>邮件内容</strong></label>
+                <textarea class="form-control" id="email-invite-reply-html" data-field="email:invite:reply:html" style="min-height:130px;"></textarea>
+            </div>
+            <div class="help-block">
+                <ol style="padding-left: 1.5em;">
+                    <li>post_content 回复内容</li>
+                </ol>
+            </div>
+            <br>
         </form>
     </div>
 </div>

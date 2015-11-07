@@ -110,6 +110,8 @@ SocketInvite.reply = function (socket, data, callback) {
 
 		callback(null, postData);
 
+		invite.sendInviteReplyEmail(postData);
+
 		socket.emit('event:new_post', result);
 
 		user.updateOnlineUsers(socket.uid);

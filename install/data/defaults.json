@@ -270,6 +270,19 @@
     },
 
     {
+        "field": "email:invite:reply:html",
+        "value": "<p>您好，{username}:</p>\r\n\r\n<p>您提名的{invite_username}已有新的回复！</p>\r\n\r\n<p>内容为{post_content}！</p>\r\n\r\n<blockquote>\r\n\t<a href=\"{invite_link}\">点击查看详情</a>\r\n</blockquote>\r\n\r\n<p>谢谢！</p>"
+    },
+    {
+        "field": "email:invite:reply:subject",
+        "value": "{username}，您提名的{invite_username}已有新的回复"
+    },
+    {
+        "field": "email:invite:reply:fromname",
+        "value": "InviteReply"
+    },
+
+    {
         "field": "notification:invite:upvote",
         "value": "{invitedByUsername} 邀请 {username}，请投票表决"
     },
