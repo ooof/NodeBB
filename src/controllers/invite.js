@@ -115,6 +115,10 @@ inviteController.list = function (req, res, next) {
 				data.invite[index].expired = parseInt(value.expired, 10);
 				data.invite[index].deleted = value.status === 'deleted';
 				data.invite[index].postCount = value.postCount ? parseInt(value.postCount, 10) : 0;
+
+				if (settings.inviteSort !== 'invited') {
+					data.invite[index].emailStatus = getEmailStatus(value.emailStatus) || '无';
+				}
 			});
 
 			if (settings.inviteSort !== 'newest_to_oldest') {
@@ -123,8 +127,10 @@ inviteController.list = function (req, res, next) {
 				});
 			}
 			data.isVoting = settings.inviteSort === 'voting';
+			data.isInvited = settings.inviteSort === 'invited';
+			data.isJoined = settings.inviteSort === 'joined';
 			data.isAll = settings.inviteSort === 'newest_to_oldest';
-			data.col = data.isVoting || data.isAll;
+			data.col = data.isVoting || data.isAll || data.isInvited;
 
 			data.breadcrumbs = helpers.buildBreadcrumbs([{text: '[[global:header.invite]]', url: '/invite'}]);
 
@@ -293,5 +299,15 @@ inviteController.details = function (req, res, next) {
 		});
 	});
 };
+
+function getEmailStatus(status) {
+	if (status === 'delivered') {
+		return '已达到'
+	} else if (status === 'open') {
+		return '已查阅'
+	} else if (status === 'click') {
+		return '已点击'
+	}
+}
 
 module.exports = inviteController;

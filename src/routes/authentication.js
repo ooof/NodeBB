@@ -153,10 +153,10 @@
 		for (var key in body) {
 			if (body.hasOwnProperty(key) && key === 'trackId') {
 				if (body.event === 'open' || body.event === 'delivered') {
-					invite.setInviteFields(body[key], {'trackOpen': body.event, 'trackOpenTime': Date.now()});
+					invite.setInviteFields(body[key], {'emailStatus': body.event, 'trackOpen': body.event, 'trackOpenTime': Date.now()});
 				}
 				if (body.event === 'click') {
-					invite.setInviteFields(body[key], {'trackClick': 'click', 'trackClickTime': Date.now()});
+					invite.setInviteFields(body[key], {'emailStatus': 'click', 'trackClick': 'click', 'trackClickTime': Date.now()});
 				}
 			}
 		}
