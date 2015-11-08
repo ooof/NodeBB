@@ -80,7 +80,14 @@ define('forum/invite/events', ['components', 'translator'], function (components
 
 	function onEditInvite(data) {
 		var contentEl = components.get('invite/content', data.iid),
+			emailEl = components.get('invite/email', data.iid),
 			usernameEl = components.get('invite/username', data.iid);
+
+		if (emailEl.length) {
+			emailEl.fadeOut(250, function () {
+				emailEl.html(data.email).fadeIn(250);
+			});
+		}
 
 		if (usernameEl.length) {
 			usernameEl.fadeOut(250, function () {
@@ -104,7 +111,7 @@ define('forum/invite/events', ['components', 'translator'], function (components
 			return;
 		}
 
-		translator.translate('[[invite:detail.deleted_message]]', function(translated) {
+		translator.translate('[[invite:detail.deleted_message]]', function (translated) {
 			inviteEl.fadeOut(500, function () {
 				$('<div id="thread-deleted" class="alert alert-warning">' + translated + '</div>').insertBefore(inviteEl);
 				inviteEl.remove();
