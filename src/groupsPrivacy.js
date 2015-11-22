@@ -493,40 +493,48 @@ var async = require('async'),
 			var system = true;
 		}
 
-		var timestamp = data.timestamp || Date.now();
 
-		var slug = utils.slugify(data.name),
-			groupData = {
-				name: data.name,
-				slug: slug,
-				createtime: timestamp,
-				userTitle: data.name,
-				description: data.description || '',
-				memberCount: 0,
-				deleted: '0',
-				hidden: data.hidden || '0',
-				system: system ? '1' : '0',
-				private: data.private || '1'
-			},
-			tasks = [
-				async.apply(db.sortedSetAdd, 'groupPrivacy:createTime', timestamp, data.name),
-				async.apply(db.setObject, 'groupPrivacy:' + data.name, groupData)
-			];
+		db.incrObjectField('global', 'nextPGid', function (err, gid) {
+			if (err) {
+				return callback(err);
+			}
 
-		if (data.hasOwnProperty('ownerUid')) {
-			tasks.push(async.apply(db.setAdd, 'groupPrivacy:' + data.name + ':owners', data.ownerUid));
-			tasks.push(async.apply(db.sortedSetAdd, 'groupPrivacy:' + data.name + ':members', timestamp, data.ownerUid));
-			tasks.push(async.apply(db.setObjectField, 'groupPrivacy:' + data.name, 'memberCount', 1));
+			var timestamp = data.timestamp || Date.now();
 
-			groupData.ownerUid = data.ownerUid;
-		}
+			var slug = utils.slugify(data.name),
+				groupData = {
+					gid: gid,
+					name: data.name,
+					slug: slug,
+					createtime: timestamp,
+					userTitle: data.name,
+					description: data.description || '',
+					memberCount: 0,
+					deleted: '0',
+					hidden: data.hidden || '0',
+					system: system ? '1' : '0',
+					private: data.private || '1'
+				},
+				tasks = [
+					async.apply(db.sortedSetAdd, 'groupPrivacy:createTime', timestamp, data.name),
+					async.apply(db.setObject, 'groupPrivacy:' + data.name, groupData)
+				];
 
-		if (!data.hidden) {
-			tasks.push(async.apply(db.setObjectField, 'groupPrivacySlug:groupName', slug, data.name));
-		}
+			if (data.hasOwnProperty('ownerUid')) {
+				tasks.push(async.apply(db.setAdd, 'groupPrivacy:' + data.name + ':owners', data.ownerUid));
+				tasks.push(async.apply(db.sortedSetAdd, 'groupPrivacy:' + data.name + ':members', timestamp, data.ownerUid));
+				tasks.push(async.apply(db.setObjectField, 'groupPrivacy:' + data.name, 'memberCount', 1));
 
-		async.series(tasks, function (err) {
-			callback(err, groupData);
+				groupData.ownerUid = data.ownerUid;
+			}
+
+			if (!data.hidden) {
+				tasks.push(async.apply(db.setObjectField, 'groupPrivacySlug:groupName', slug, data.name));
+			}
+
+			async.series(tasks, function (err) {
+				callback(err, groupData);
+			});
 		});
 	};
 
@@ -888,6 +896,9 @@ var async = require('async'),
 				});
 			}, callback);
 		});
+	};
+
+	Groups.getPosts = function(groupId, max, uid, callback) {
 	};
 
 	Groups.getLatestMemberPosts = function(groupName, max, uid, callback) {
