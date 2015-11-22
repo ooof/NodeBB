@@ -43,7 +43,6 @@
     "node-schedule": "^0.2.6",
     "nodebb-plugin-emailer-sendgrid-plus": "git://github.com/cismous/nodebb-plugin-emailer-sendgrid-plus",
     "nodebb-plugin-poll-plus": "git://github.com/cismous/nodebb-plugin-poll-plus",
-    "nodebb-rewards-essentials": "^0.0.1",
     "nodebb-theme-sim": "git://github.com/cismous/nodebb-theme-sim",
     "nodebb-plugin-dbsearch": "^0.2.12",
     "nodebb-plugin-emoji-extended": "^0.4.8",
