@@ -5,6 +5,13 @@ define('forum/groups-privacy/list', function () {
 	var Groups = {};
 
 	Groups.init = function () {
+		var groupsEl = $('#groups-list');
+		groupsEl.on('click', '.list-cover', function () {
+			var groupSlug = $(this).parents('[data-slug]').attr('data-slug');
+
+			ajaxify.go('privacy-groups/' + groupSlug);
+		});
+
 		// Group creation
 		$('button[data-action="privacy-new"]').on('click', function () {
 			bootbox.prompt('隐私群组名:', function (name) {
