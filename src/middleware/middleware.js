@@ -478,8 +478,11 @@ middleware.exposeGroupPrivacyName = function(req, res, next) {
 	groupsPrivacy.getGroupNameByGroupSlug(req.params.slug, function(err, groupName) {
 		if (err) { return next(err); }
 
-		res.locals.groupName = groupName;
-		next();
+		groupsPrivacy.getGroupFields(groupName, ['gid'], function(err, data) {
+			res.locals.groupName = groupName;
+			res.locals.groupId = data.gid;
+			next();
+		});
 	});
 };
 
