@@ -14,6 +14,7 @@ var async = require('async'),
 	db = require('./database'),
 	plugins = require('./plugins'),
 	posts = require('./posts'),
+	topics = require('./topics'),
 	privileges = require('./privileges'),
 	utils = require('../public/src/utils'),
 	util = require('util'),
@@ -899,6 +900,9 @@ var async = require('async'),
 	};
 
 	Groups.getPosts = function(groupId, max, uid, callback) {
+		db.getSortedSetRange('gid:' + groupId + ':tids', 0, -1, function (err, tids) {
+			topics.getTopicsByTids(tids, uid, callback);
+		});
 	};
 
 	Groups.getLatestMemberPosts = function(groupName, max, uid, callback) {

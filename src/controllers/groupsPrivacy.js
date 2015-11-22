@@ -67,7 +67,7 @@ groupsController.details = function(req, res, next) {
 				}, next);
 			},
 			posts: function(next) {
-				groups.getLatestMemberPosts(res.locals.groupName, 10, req.uid, next);
+				groups.getPosts(res.locals.groupId, 10, req.uid, next);
 			}
 		}, function(err, results) {
 			if (err) {
