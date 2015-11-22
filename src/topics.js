@@ -200,6 +200,9 @@ var async = require('async'),
 				}
 
 				topics = topics.filter(function(topic) {
+					if (topic.gid) {
+						return topic;
+					}
 					return topic &&	topic.category && !topic.category.disabled;
 				});
 

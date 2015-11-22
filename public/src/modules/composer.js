@@ -132,6 +132,8 @@ define('composer', [
 				post.save_id = ['composer', app.user.uid, 'invite', post.invite].join(':');
 			} else if (post.hasOwnProperty('iid')) {
 				post.save_id = ['composer', app.user.uid, 'iid', post.iid].join(':');
+			} else if (post.hasOwnProperty('gid')) {
+				post.save_id = ['composer', app.user.uid, 'group', post.gid].join(':');
 			}
 		}
 
@@ -178,6 +180,16 @@ define('composer', [
 				isMain: true,
 				isMod: isMod
 			});
+		});
+	};
+
+	composer.newGroupTopic = function (gid) {
+		push({
+			gid: gid,
+			title: '',
+			body: '',
+			modified: false,
+			isMain: true
 		});
 	};
 
@@ -682,6 +694,17 @@ define('composer', [
 				content: bodyEl.val(),
 				topic_thumb: thumbEl.val() || '',
 				category_id: postData.cid,
+				tags: tags.getTags(post_uuid),
+				lock: options.lock || false
+			};
+		} else if (parseInt(postData.gid, 10) > 0) {
+			action = 'topics.post';
+			composerData = {
+				handle: handleEl ? handleEl.val() : undefined,
+				title: titleEl.val(),
+				content: bodyEl.val(),
+				topic_thumb: thumbEl.val() || '',
+				group_id: postData.gid,
 				tags: tags.getTags(post_uuid),
 				lock: options.lock || false
 			};

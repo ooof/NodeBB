@@ -19,6 +19,7 @@ module.exports = function(Topics) {
 		var uid = data.uid,
 			title = data.title,
 			cid = data.cid,
+			gid = data.gid || null,
 			tags = data.tags;
 
 		db.incrObjectField('global', 'nextTid', function(err, tid) {
@@ -38,7 +39,6 @@ module.exports = function(Topics) {
 			var topicData = {
 				'tid': tid,
 				'uid': uid,
-				'cid': cid,
 				'mainPid': 0,
 				'title': title,
 				'slug': slug,
@@ -55,39 +55,70 @@ module.exports = function(Topics) {
 				topicData.thumb = data.thumb;
 			}
 
-			db.setObject('topic:' + tid, topicData, function(err) {
-				if (err) {
-					return callback(err);
-				}
-
-				async.parallel([
-					function(next) {
-						db.sortedSetsAdd([
-							'topics:tid',
-							'cid:' + cid + ':tids',
-							'cid:' + cid + ':uid:' + uid + ':tids'
-						], timestamp, tid, next);
-					},
-					function(next) {
-						user.addTopicIdToUser(uid, tid, timestamp, next);
-					},
-					function(next) {
-						db.incrObjectField('category:' + cid, 'topic_count', next);
-					},
-					function(next) {
-						db.incrObjectField('global', 'topicCount', next);
-					},
-					function(next) {
-						Topics.createTags(tags, tid, timestamp, next);
-					}
-				], function(err) {
+			if (gid) {
+				topicData.gid = gid;
+				db.setObject('topic:' + tid, topicData, function (err) {
 					if (err) {
 						return callback(err);
 					}
-					plugins.fireHook('action:topic.save', topicData);
-					callback(null, tid);
+
+					async.parallel([
+						function (next) {
+							db.sortedSetsAdd([
+								'topics:tid',
+								'gid:' + gid + ':tids',
+								'gid:' + gid + ':uid:' + uid + ':tids'
+							], timestamp, tid, next);
+						},
+						function (next) {
+							user.addTopicIdToUser(uid, tid, timestamp, next);
+						},
+						function (next) {
+							db.incrObjectField('group:' + gid, 'topic_count', next);
+						}
+					], function (err) {
+						if (err) {
+							return callback(err);
+						}
+						callback(null, tid);
+					});
 				});
-			});
+			} else {
+				topicData.cid = cid;
+				db.setObject('topic:' + tid, topicData, function (err) {
+					if (err) {
+						return callback(err);
+					}
+
+					async.parallel([
+						function (next) {
+							db.sortedSetsAdd([
+								'topics:tid',
+								'cid:' + cid + ':tids',
+								'cid:' + cid + ':uid:' + uid + ':tids'
+							], timestamp, tid, next);
+						},
+						function (next) {
+							user.addTopicIdToUser(uid, tid, timestamp, next);
+						},
+						function (next) {
+							db.incrObjectField('category:' + cid, 'topic_count', next);
+						},
+						function (next) {
+							db.incrObjectField('global', 'topicCount', next);
+						},
+						function (next) {
+							Topics.createTags(tags, tid, timestamp, next);
+						}
+					], function (err) {
+						if (err) {
+							return callback(err);
+						}
+						plugins.fireHook('action:topic.save', topicData);
+						callback(null, tid);
+					});
+				});
+			}
 		});
 	};
 
@@ -95,6 +126,7 @@ module.exports = function(Topics) {
 		var uid = data.uid,
 			title = data.title,
 			content = data.content,
+			gid = data.gid || null,
 			cid = data.cid,
 			tags = data.tags;
 
@@ -116,6 +148,9 @@ module.exports = function(Topics) {
 				categories.exists(cid, next);
 			},
 			function(categoryExists, next) {
+				if (gid) {
+					return next(null, true);
+				}
 				if (!categoryExists) {
 					return next(new Error('[[error:no-category]]'));
 				}
@@ -133,14 +168,17 @@ module.exports = function(Topics) {
 				user.isReadyToPost(uid, next);
 			},
 			function(next) {
+				if (gid) {
+					return next(null, data);
+				}
 				plugins.fireHook('filter:topic.post', data, next);
 			},
 			function(filteredData, next) {
 				content = filteredData.content || data.content;
-				Topics.create({ uid: uid, title: title, cid: cid, thumb: data.thumb, tags: tags, timestamp: data.timestamp }, next);
+				Topics.create({ uid: uid, title: title, cid: cid, gid: gid, thumb: data.thumb, tags: tags, timestamp: data.timestamp }, next);
 			},
 			function(tid, next) {
-				Topics.reply({ uid:uid, tid:tid, handle: data.handle, content:content, timestamp: data.timestamp, req: data.req }, next);
+				Topics.reply({ uid:uid, tid:tid, gid:gid, handle: data.handle, content:content, timestamp: data.timestamp, req: data.req }, next);
 			},
 			function(postData, next) {
 				async.parallel({
@@ -209,7 +247,7 @@ module.exports = function(Topics) {
 				if (results.locked && !results.isAdmin) {
 					return next(new Error('[[error:topic-locked]]'));
 				}
-				if (!results.canReply) {
+				if (!results.canReply && !data.gid) {
 					return next(new Error('[[error:no-privileges]]'));
 				}
 
@@ -246,7 +284,7 @@ module.exports = function(Topics) {
 						posts.getUserInfoForPosts([postData.uid], uid, next);
 					},
 					topicInfo: function(next) {
-						Topics.getTopicFields(tid, ['tid', 'title', 'slug', 'cid', 'postcount'], next);
+						Topics.getTopicFields(tid, ['tid', 'title', 'slug', 'cid', 'gid', 'postcount'], next);
 					},
 					settings: function(next) {
 						user.getSettings(uid, next);
@@ -281,7 +319,7 @@ module.exports = function(Topics) {
 
 				if (parseInt(uid, 10) && data.req) {
 					Topics.notifyFollowers(postData, uid);
-					user.setUserField(uid, 'lastonline', Date.now()); 
+					user.setUserField(uid, 'lastonline', Date.now());
 				}
 
 				if (postData.index > 0) {

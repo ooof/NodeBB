@@ -33,6 +33,7 @@ SocketTopics.post = function(socket, data, callback) {
 		title: data.title,
 		content: data.content,
 		cid: data.category_id,
+		gid: data.group_id,
 		thumb: data.topic_thumb,
 		tags: data.tags,
 		req: websockets.reqFromSocket(socket)
@@ -46,6 +47,9 @@ SocketTopics.post = function(socket, data, callback) {
 		}
 
 		callback(null, result.topicData);
+		if (data.group_id) {
+			return;
+		}
 		socket.emit('event:new_post', {posts: [result.postData]});
 		socket.emit('event:new_topic', result.topicData);
 
