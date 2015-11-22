@@ -103,7 +103,7 @@ function inviteRoutes(app, middleware, controllers) {
 }
 
 function groupPrivacyRoutes(app, middleware, controllers) {
-	var middlewares = [middleware.checkGlobalPrivacySettings];
+	var middlewares = [middleware.checkGlobalPrivacySettings, middleware.exposeGroupPrivacyName];
 	setupPageRoute(app, '/privacy-groups', middleware, middlewares, controllers.groupsPrivacy.list);
 	setupPageRoute(app, '/privacy-groups/:slug', middleware, middlewares, controllers.groupsPrivacy.details);
 	setupPageRoute(app, '/privacy-groups/:slug/members', middleware, middlewares, controllers.groupsPrivacy.members);
