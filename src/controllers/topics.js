@@ -122,6 +122,7 @@ topicsController.get = function(req, res, next) {
 				if (page > 1) {
 					topicData.posts.splice(0, 1);
 				}
+				topicData.category || (topicData.category = {});
 
 				plugins.fireHook('filter:controllers.topic.get', topicData, next);
 			});
