@@ -15,7 +15,7 @@
     "details.pending": "预备成员",
     "details.has_no_posts": "此用户组的会员尚未发表任何帖子。",
     "details.latest_posts": "最新帖子",
-    "details.private": "私有",
+    "details.private": "邀请加入",
     "details.grant": "授予/取消所有权",
     "details.kick": "踢",
     "details.owner_options": "用户组管理",
@@ -31,6 +31,8 @@
     "details.private_help": "如果条件允许，必须得到群主批准才能加入该群。",
     "details.hidden": "隐藏",
     "details.hidden_help": "如果条件允许，这个群不再出现在此列表，所有用户要人工邀请加入。",
+    "details.privacy": "私有群组",
+    "details.privacy_help": "只有群主邀请才能进入，里面只显示群成员发布的帖子",
     "event.updated": "用户组信息已更新",
     "event.deleted": "用户组 \"%1\" 已被删除"
 }
