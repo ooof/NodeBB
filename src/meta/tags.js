@@ -1,6 +1,7 @@
 var nconf = require('nconf'),
 	validator = require('validator'),
 	async = require('async'),
+	winston = require('winston'),
 	plugins = require('../plugins');
 
 module.exports = function(Meta) {
