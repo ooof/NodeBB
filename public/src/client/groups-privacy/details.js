@@ -27,7 +27,19 @@ define('forum/groups-privacy/details', ['iconSelect', 'components', 'composer', 
 
 			switch (action) {
 				case 'add-user':
-					console.log('add-user');
+					bootbox.prompt('添加群成员:', function (username) {
+						if (username && username.length) {
+							socket.emit('groupsPrivacy.addMember', {
+								groupName: ajaxify.variables.get('group_name'),
+								groupId: ajaxify.variables.get('group_id'),
+								username: username
+							}, function (err) {
+								if (!err) {
+									app.alertError(err.message);
+								}
+							});
+						}
+					});
 					break;
 				case 'new-topic':
 					var gid = ajaxify.variables.get('group_gid');

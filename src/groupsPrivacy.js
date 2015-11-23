@@ -1125,6 +1125,34 @@ var async = require('async'),
 		next(null, groups);
 	};
 
+	Groups.addMember = function(data, callback) {
+		var uid, groupName = data.groupName;
+		async.waterfall([
+			function (next) {
+				user.getUidByUsername(data.username, next);
+			},
+			function (result, next) {
+				if (!result) {
+					return callback(new Error('[[error:no-user]]'));
+				}
+				uid = result;
+				Groups.isMember(uid, groupName, next);
+			},
+			function (exist, next) {
+				if (exist) {
+					return callback(new Error('该用户已加入该群组'));
+				}
+				var tasks = [
+					async.apply(db.sortedSetAdd, 'groupPrivacy:' + groupName + ':members', Date.now(), uid),
+					async.apply(db.incrObjectField, 'groupPrivacy:' + groupName, 'memberCount')
+				];
+				async.parallel(tasks, next);
+			}
+		], function (err) {
+			callback(err, null);
+		});
+	};
+
 	Groups.searchMembers = function(data, callback) {
 
 		function findUids(query, searchBy, callback) {

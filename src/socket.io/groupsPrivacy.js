@@ -17,9 +17,19 @@ SocketGroupsPrivacy.create = function(socket, data, callback) {
 		return callback(new Error('[[error:group-creation-disabled]]'));
 	}
 
-
 	data.ownerUid = socket.uid;
 	groups.create(data, callback);
+};
+
+SocketGroupsPrivacy.addMember = function(socket, data, callback) {
+	if (!data) {
+		return callback(new Error('[[error:invalid-data]]'));
+	} else if (socket.uid === 0) {
+		return callback(new Error('[[error:no-privileges]]'));
+	}
+
+	data.ownerUid = socket.uid;
+	groups.addMember(data, callback);
 };
 
 module.exports = SocketGroupsPrivacy;
