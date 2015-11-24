@@ -31,6 +31,8 @@
     "details.private_help": "如果条件允许，必须得到群主批准才能加入该群。",
     "details.hidden": "隐藏",
     "details.hidden_help": "如果条件允许，这个群不再出现在此列表，所有用户要人工邀请加入。",
+    "details.support_topic": "支持新建主题",
+    "details.support_topic_help": "默认是引用成员帖子，选中后，群组内不会引用帖子，而只能新建帖子",
     "details.privacy": "私有群组",
     "details.privacy_help": "只有群主邀请才能进入，里面只显示群成员发布的帖子",
     "event.updated": "用户组信息已更新",
