@@ -1,7 +1,7 @@
 {
   "invite_count": "得票数",
 
-  "list.postCount": "回复数",
+  "list.postCount": "回复",
   "list.invite_downvote": "反对票数",
   "list.joined": "已加入",
   "list.voting": "投票中",
@@ -9,10 +9,10 @@
   "list.new": "提名新人",
   "list.no_invite": "<strong>空</strong>",
   "list.status": "所有状态",
-  "list.status_voting": "正在投票",
+  "list.status_voting": "正在投票中",
   "list.status_invited": "已发邀请",
   "list.status_failed": "邀请失败",
-  "list.status_joined": "已进社区",
+  "list.status_joined": "邀请成功，已进社区",
   "list.status_deleted": "离开社区",
   "list.posted_ago": "提名于%1",
   "list.invite_count": "票数",
