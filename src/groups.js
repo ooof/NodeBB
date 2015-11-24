@@ -281,6 +281,10 @@ var async = require('async'),
 		});
 	};
 
+	Groups.getGroupNameByGroupGid = function(gid, callback) {
+		db.getObjectField('groupgid:groupname', gid, callback);
+	};
+
 	Groups.getGroupNameByGroupSlug = function(slug, callback) {
 		db.getObjectField('groupslug:groupname', slug, callback);
 	};
@@ -545,6 +549,7 @@ var async = require('async'),
 				if (data.hasOwnProperty('ownerUid')) {
 					tasks.push(async.apply(db.setAdd, 'group:' + data.name + ':owners', data.ownerUid));
 					tasks.push(async.apply(db.sortedSetAdd, 'group:' + data.name + ':members', timestamp, data.ownerUid));
+					tasks.push(async.apply(db.setObjectField, 'groupgid:groupname', gid, data.name));
 					tasks.push(async.apply(db.setObjectField, 'group:' + data.name, 'memberCount', 1));
 
 					groupData.ownerUid = data.ownerUid;
@@ -663,7 +668,7 @@ var async = require('async'),
 				return callback(err);
 			}
 
-			if (parseInt(group.system, 10) === 1 || parseInt(group.hidden, 10) === 1) {
+			if (parseInt(group.system, 10) === 1) {
 				return callback();
 			}
 
@@ -677,6 +682,8 @@ var async = require('async'),
 					async.apply(db.setObjectField, 'group:' + oldName, 'slug', utils.slugify(newName)),
 					async.apply(db.deleteObjectField, 'groupslug:groupname', group.slug),
 					async.apply(db.setObjectField, 'groupslug:groupname', utils.slugify(newName), newName),
+					async.apply(db.deleteObjectField, 'groupgid:groupname', group.gid),
+					async.apply(db.setObjectField, 'groupgid:groupname', group.gid, newName),
 					function(next) {
 						db.getSortedSetRange('groups:createtime', 0, -1, function(err, groups) {
 							if (err) {
@@ -954,6 +961,29 @@ var async = require('async'),
 				posts.getPostSummaryByPids(pids, uid, {stripTags: false}, next);
 			}
 		], callback);
+	};
+
+	Groups.getGroupFieldsByGid = function(gid, fields, callback) {
+		Groups.getGroupNameByGroupGid(gid, function (err, groupName) {
+			if (err) {
+				return callback(err);
+			}
+			Groups.getGroupFields(groupName, fields, callback);
+		});
+	};
+
+	Groups.getGroupsDataByGid = function(gid, callback) {
+		Groups.getGroupNameByGroupGid(gid, function (err, groupName) {
+			if (err) {
+				return callback(err);
+			}
+			Groups.getGroupsData([groupName], function (err, result) {
+				if (err) {
+					return callback(err);
+				}
+				return callback(null, result[0]);
+			});
+		});
 	};
 
 	Groups.getGroupsData = function(groupNames, callback) {

@@ -18,7 +18,7 @@ module.exports = function(privileges) {
 	privileges.topics.get = function(tid, uid, callback) {
 		var topic;
 		async.waterfall([
-			async.apply(topics.getTopicFields, tid, ['cid', 'uid', 'locked']),
+			async.apply(topics.getTopicFields, tid, ['cid', 'uid', 'gid', 'locked']),
 			function(_topic, next) {
 				topic = _topic;
 				async.parallel({
@@ -28,6 +28,18 @@ module.exports = function(privileges) {
 						next(null, parseInt(uid, 10) === parseInt(topic.uid, 10));
 					},
 					isAdministrator: async.apply(user.isAdministrator, uid),
+					isGroupMember: function (next) {
+						if (!topic.gid) {
+							return next(null, false);
+						}
+						groups.getGroupFieldsByGid(topic.gid, ['name'], function (err, result) {
+							if (err) {
+								return next(err);
+							}
+							var groupName = result.name;
+							groups.isMember([uid], groupName, next);
+						});
+					},
 					isModerator: async.apply(user.isModerator, uid, topic.cid),
 					disabled: async.apply(categories.getCategoryField, topic.cid, 'disabled')
 				}, next);
@@ -45,7 +57,7 @@ module.exports = function(privileges) {
 
 			plugins.fireHook('filter:privileges.topics.get', {
 				'topics:reply': (results['topics:reply'][0] && !locked) || isAdminOrMod,
-				read: results.read[0] || isAdminOrMod,
+				read: results.read[0] || isAdminOrMod || results.isGroupMember,
 				view_thread_tools: editable || deletable,
 				editable: editable,
 				deletable: deletable,
