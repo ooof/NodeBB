@@ -184,6 +184,17 @@ SocketGroups.search = function(socket, data, callback) {
 	groups.search(data.query || '', data.options || {}, callback);
 };
 
+SocketGroups.addMember = function(socket, data, callback) {
+	if (!data) {
+		return callback(new Error('[[error:invalid-data]]'));
+	} else if (socket.uid === 0) {
+		return callback(new Error('[[error:no-privileges]]'));
+	}
+
+	data.ownerUid = socket.uid;
+	groups.addMember(data, callback);
+};
+
 SocketGroups.searchMembers = function(socket, data, callback) {
 	if (!data) {
 		return callback(null, []);

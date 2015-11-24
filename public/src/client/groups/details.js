@@ -35,6 +35,8 @@ define('forum/groups/details', ['iconSelect', 'components', 'composer', 'vendor/
 								username: username
 							}, function (err) {
 								if (!err) {
+									ajaxify.refresh();
+								} else {
 									app.alertError(err.message);
 								}
 							});
