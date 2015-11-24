@@ -80,6 +80,9 @@ groupsController.details = function(req, res, next) {
 			if (!results.group) {
 				return helpers.notFound(req, res);
 			}
+			results.posts.sort(function (a, b) {
+				return parseInt(b.lastposttime, 10) - parseInt(a.lastposttime, 10);
+			});
 
 			res.render('groups/details', results);
 		});
