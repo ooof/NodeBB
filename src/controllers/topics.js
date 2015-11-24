@@ -129,17 +129,34 @@ topicsController.get = function(req, res, next) {
 			});
 		},
 		function (topicData, next) {
-			var slug = !_.isEmpty(topicData.category) ? topicData.category.slug : topicData.group.slug;
-			var breadcrumbs = [
-				{
-					text: !_.isEmpty(topicData.category) ? topicData.category.name : topicData.group.name,
-					url: slug
-				},
-				{
-					text: topicData.title,
-					url: nconf.get('relative_path') + '/topic/' + topicData.slug
-				}
-			];
+			var breadcrumbs = [];
+			if (!_.isEmpty(topicData.category)) {
+				breadcrumbs = [
+					{
+						text: topicData.category.name,
+						url: topicData.category.slug
+					},
+					{
+						text: topicData.title,
+						url: nconf.get('relative_path') + '/topic/' + topicData.slug
+					}
+				];
+			} else if (topicData.group && !_.isEmpty(topicData.group)){
+				breadcrumbs = [
+					{
+						text: '私密群组',
+						url: nconf.get('relative_path') + '/groups/'
+					},
+					{
+						text: topicData.group.name,
+						url: nconf.get('relative_path') + '/groups/' + topicData.group.slug
+					},
+					{
+						text: topicData.title,
+						url: nconf.get('relative_path') + '/topic/' + topicData.slug
+					}
+				];
+			}
 
 			helpers.buildCategoryBreadcrumbs(topicData.category.parentCid, function(err, crumbs) {
 				if (err) {
