@@ -1,7 +1,7 @@
 "use strict";
 /* globals define, socket, ajaxify, app, bootbox, RELATIVE_PATH, utils */
 
-define('forum/groups/details', ['iconSelect', 'components', 'vendor/colorpicker/colorpicker', 'vendor/jquery/draggable-background/backgroundDraggable'], function(iconSelect, components) {
+define('forum/groups/details', ['iconSelect', 'components', 'composer', 'vendor/colorpicker/colorpicker', 'vendor/jquery/draggable-background/backgroundDraggable'], function(iconSelect, components, composer) {
 	var Details = {
 			cover: {}
 		};
@@ -26,6 +26,25 @@ define('forum/groups/details', ['iconSelect', 'components', 'vendor/colorpicker/
 				action = btnEl.attr('data-action');
 
 			switch(action) {
+				case 'add-user':
+					bootbox.prompt('添加群成员:', function (username) {
+						if (username && username.length) {
+							socket.emit('groups.addMember', {
+								groupName: ajaxify.variables.get('group_name'),
+								groupId: ajaxify.variables.get('group_id'),
+								username: username
+							}, function (err) {
+								if (!err) {
+									app.alertError(err.message);
+								}
+							});
+						}
+					});
+					break;
+				case 'new-topic':
+					var gid = ajaxify.variables.get('group_gid');
+					composer.newGroupTopic(gid);
+					break;
 				case 'toggleOwnership':
 					socket.emit('groups.' + (isOwner ? 'rescind' : 'grant'), {
 						toUid: uid,
