@@ -44,8 +44,20 @@ define('forum/groups/details', ['iconSelect', 'components', 'composer', 'vendor/
 					});
 					break;
 				case 'new-topic':
-					var gid = ajaxify.variables.get('group_gid');
-					composer.newGroupTopic(gid);
+					socket.emit('groups.isMember', {
+						groupName: ajaxify.variables.get('group_name')
+					}, function (err, result) {
+						if (!err) {
+							var gid = ajaxify.variables.get('group_gid');
+							if (result) {
+								composer.newGroupTopic(gid);
+							} else {
+								app.alertError('您不是该群成员，没有权限发表主题');
+							}
+						} else {
+							app.alertError(err.message);
+						}
+					});
 					break;
 				case 'toggleOwnership':
 					socket.emit('groups.' + (isOwner ? 'rescind' : 'grant'), {
