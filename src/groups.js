@@ -945,7 +945,7 @@ var async = require('async'),
 	};
 
 	Groups.getPosts = function(groupId, max, uid, callback) {
-		db.getSortedSetRange('gid:' + groupId + ':tids', 0, -1, function (err, tids) {
+		db.getSortedSetRevRange('gid:' + groupId + ':tids', 0, -1, function (err, tids) {
 			topics.getTopicsByTids(tids, uid, callback);
 		});
 	};
