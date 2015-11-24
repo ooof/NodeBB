@@ -109,6 +109,19 @@ inviteController.list = function (req, res, next) {
 					data.invite[index].downvoteCount = 0;
 					data.invite[index].remainCount = 0;
 				}
+				if (data.invite[index].emailStatus === 'click') {
+					data.invite[index].emailStatusText = '被提名人已经点击过邀请链接';
+					data.invite[index].expiredText = '用户点击过邀请链接，但没有（或没有成功）注册';
+				} else if (data.invite[index].emailStatus === 'open') {
+					data.invite[index].emailStatusText = '被提名人已经看到邀请邮件';
+					data.invite[index].expiredText = '用户查看过邀请邮件，但没有点击邀请链接';
+				} else if (data.invite[index].emailStatus === 'delivered') {
+					data.invite[index].emailStatusText = '邀请邮件已经发到被提名人邮箱';
+					data.invite[index].expiredText = '用户服务器接收到邀请邮件，但用户没有查看邀请邮件';
+				} else {
+					data.invite[index].emailStatusText = '邀请邮件已经发到被提名人邮箱';
+					data.invite[index].expiredText = '用户邮箱服务器没有接收到邀请邮件';
+				}
 				data.remainVote = 0;
 				data.invite[index].joined = parseInt(value.joined, 10);
 				data.invite[index].invited = parseInt(value.invited, 10);
