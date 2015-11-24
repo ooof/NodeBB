@@ -7,6 +7,7 @@ var async = require('async'),
 	db = require('./database'),
 	posts = require('./posts'),
 	utils = require('../public/src/utils'),
+	group = require('./groups'),
 	plugins = require('./plugins'),
 	user = require('./user'),
 	categories = require('./categories'),
@@ -222,6 +223,13 @@ var async = require('async'),
 			async.parallel({
 				posts: async.apply(getMainPostAndReplies, topicData, set, uid, start, stop, reverse),
 				category: async.apply(Topics.getCategoryData, tid),
+				group: function (next) {
+					if (topicData.gid) {
+						group.getGroupsDataByGid(topicData.gid, next);
+					} else {
+						next();
+					}
+				},
 				threadTools: async.apply(plugins.fireHook, 'filter:topic.thread_tools', {topic: topicData, uid: uid, tools: []}),
 				tags: async.apply(Topics.getTopicTagsObjects, tid),
 				isFollowing: async.apply(Topics.isFollowing, [tid], uid)
@@ -232,6 +240,7 @@ var async = require('async'),
 
 				topicData.posts = results.posts;
 				topicData.category = results.category;
+				topicData.group = results.group;
 				topicData.thread_tools = results.threadTools.tools;
 				topicData.tags = results.tags;
 				topicData.isFollowing = results.isFollowing[0];

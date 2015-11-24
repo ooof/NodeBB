@@ -3,6 +3,7 @@
 var topicsController = {},
 	async = require('async'),
 	S = require('string'),
+	_ = require('underscore'),
 	validator = require('validator'),
 	nconf = require('nconf'),
 	qs = require('querystring'),
@@ -128,10 +129,11 @@ topicsController.get = function(req, res, next) {
 			});
 		},
 		function (topicData, next) {
+			var slug = !_.isEmpty(topicData.category) ? topicData.category.slug : topicData.group.slug;
 			var breadcrumbs = [
 				{
-					text: topicData.category.name,
-					url: nconf.get('relative_path') + '/category/' + topicData.category.slug
+					text: !_.isEmpty(topicData.category) ? topicData.category.name : topicData.group.name,
+					url: slug
 				},
 				{
 					text: topicData.title,
