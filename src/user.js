@@ -494,6 +494,19 @@ var	async = require('async'),
 		}
 	};
 
+	User.isGroupMember = function(uid, gid, callback) {
+		if (!gid) {
+			return callback(null, false);
+		}
+		groups.getGroupFieldsByGid(gid, ['name'], function (err, result) {
+			if (err) {
+				return callback(err);
+			}
+			var groupName = result.name;
+			groups.isMember(uid, groupName, callback);
+		});
+	};
+
 	User.getIgnoredCategories = function(uid, callback) {
 		db.getSortedSetRange('uid:' + uid + ':ignored:cids', 0, -1, callback);
 	};

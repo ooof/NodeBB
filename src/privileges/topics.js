@@ -32,13 +32,7 @@ module.exports = function(privileges) {
 						if (!topic.gid) {
 							return next(null, false);
 						}
-						groups.getGroupFieldsByGid(topic.gid, ['name'], function (err, result) {
-							if (err) {
-								return next(err);
-							}
-							var groupName = result.name;
-							groups.isMember([uid], groupName, next);
-						});
+						user.isGroupMember(uid, topic.gid, next);
 					},
 					isModerator: async.apply(user.isModerator, uid, topic.cid),
 					disabled: async.apply(categories.getCategoryField, topic.cid, 'disabled')
@@ -56,7 +50,7 @@ module.exports = function(privileges) {
 			var deletable = isAdminOrMod || results.isOwner;
 
 			plugins.fireHook('filter:privileges.topics.get', {
-				'topics:reply': (results['topics:reply'][0] && !locked) || isAdminOrMod,
+				'topics:reply': (results['topics:reply'][0] && !locked) || isAdminOrMod || results.isGroupMember,
 				read: results.read[0] || isAdminOrMod || results.isGroupMember,
 				view_thread_tools: editable || deletable,
 				editable: editable,

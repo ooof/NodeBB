@@ -233,10 +233,14 @@ module.exports = function(Topics) {
 
 		async.waterfall([
 			function(next) {
+				Topics.getTopicField(tid, 'gid', next);
+			},
+			function(gid, next) {
 				async.parallel({
 					exists: async.apply(Topics.exists, tid),
 					locked: async.apply(Topics.isLocked, tid),
 					canReply: async.apply(privileges.topics.can, 'topics:reply', tid, uid),
+					isGroupMember: async.apply(user.isGroupMember, uid, gid),
 					isAdmin: async.apply(user.isAdministrator, uid)
 				}, next);
 			},
@@ -247,7 +251,7 @@ module.exports = function(Topics) {
 				if (results.locked && !results.isAdmin) {
 					return next(new Error('[[error:topic-locked]]'));
 				}
-				if (!results.canReply && !data.gid) {
+				if (!results.canReply && !results.isGroupMember) {
 					return next(new Error('[[error:no-privileges]]'));
 				}
 
