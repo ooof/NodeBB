@@ -14,6 +14,7 @@ var async = require('async'),
 	db = require('./database'),
 	plugins = require('./plugins'),
 	posts = require('./posts'),
+	topics = require('./topics'),
 	privileges = require('./privileges'),
 	utils = require('../public/src/utils'),
 	util = require('util'),
@@ -257,6 +258,8 @@ var async = require('async'),
 				results.base.isPending = results.isPending;
 				results.base.isInvited = results.isInvited;
 				results.base.isOwner = results.isOwner;
+				results.base.supportTopic = !!parseInt(results.base.supportTopic, 10);
+				results.base.privacy = results.base.hidden && results.base.private;
 
 
 				plugins.fireHook('filter:group.get', {group: results.base}, function(err, data) {
@@ -506,52 +509,58 @@ var async = require('async'),
 			var system = true;
 		}
 
-		meta.userOrGroupExists(data.name, function (err, exists) {
+		db.incrObjectField('global', 'nextGid', function (err, gid) {
 			if (err) {
 				return callback(err);
 			}
-
-			if (exists) {
-				return callback(new Error('[[error:group-already-exists]]'));
-			}
-			var timestamp = data.timestamp || Date.now();
-
-			var slug = utils.slugify(data.name),
-				groupData = {
-					name: data.name,
-					slug: slug,
-					createtime: timestamp,
-					userTitle: data.name,
-					description: data.description || '',
-					memberCount: 0,
-					deleted: '0',
-					hidden: data.hidden || '0',
-					system: system ? '1' : '0',
-					private: data.private || '1'
-				},
-				tasks = [
-					async.apply(db.sortedSetAdd, 'groups:createtime', timestamp, data.name),
-					async.apply(db.setObject, 'group:' + data.name, groupData)
-				];
-
-			if (data.hasOwnProperty('ownerUid')) {
-				tasks.push(async.apply(db.setAdd, 'group:' + data.name + ':owners', data.ownerUid));
-				tasks.push(async.apply(db.sortedSetAdd, 'group:' + data.name + ':members', timestamp, data.ownerUid));
-				tasks.push(async.apply(db.setObjectField, 'group:' + data.name, 'memberCount', 1));
-
-				groupData.ownerUid = data.ownerUid;
-			}
-
-			if (!data.hidden) {
-				tasks.push(async.apply(db.setObjectField, 'groupslug:groupname', slug, data.name));
-			}
-
-			async.series(tasks, function(err) {
-				if (!err) {
-					plugins.fireHook('action:group.create', groupData);
+			meta.userOrGroupExists(data.name, function (err, exists) {
+				if (err) {
+					return callback(err);
 				}
 
-				callback(err, groupData);
+				if (exists) {
+					return callback(new Error('[[error:group-already-exists]]'));
+				}
+				var timestamp = data.timestamp || Date.now();
+
+				var slug = utils.slugify(data.name),
+					groupData = {
+						gid: gid,
+						name: data.name,
+						slug: slug,
+						createtime: timestamp,
+						userTitle: data.name,
+						description: data.description || '',
+						memberCount: 0,
+						deleted: '0',
+						hidden: data.hidden || '0',
+						system: system ? '1' : '0',
+						private: data.private || '1'
+					},
+					tasks = [
+						async.apply(db.sortedSetAdd, 'groups:createtime', timestamp, data.name),
+						async.apply(db.setObject, 'group:' + data.name, groupData)
+					];
+
+				if (data.hasOwnProperty('ownerUid')) {
+					tasks.push(async.apply(db.setAdd, 'group:' + data.name + ':owners', data.ownerUid));
+					tasks.push(async.apply(db.sortedSetAdd, 'group:' + data.name + ':members', timestamp, data.ownerUid));
+					tasks.push(async.apply(db.setObjectField, 'group:' + data.name, 'memberCount', 1));
+
+					groupData.ownerUid = data.ownerUid;
+				}
+
+				if (!data.hidden) {
+					tasks.push(async.apply(db.setObjectField, 'groupslug:groupname', slug, data.name));
+				}
+
+				async.series(tasks, function (err) {
+					if (!err) {
+						plugins.fireHook('action:group.create', groupData);
+					}
+
+					callback(err, groupData);
+				});
 			});
 		});
 	};
@@ -588,6 +597,11 @@ var async = require('async'),
 
 			if (values.hasOwnProperty('private')) {
 				payload.private = values.private ? '1' : '0';
+			}
+
+			if (values.hasOwnProperty('supportTopic')) {
+				console.log(values);
+				payload.supportTopic = values.supportTopic ? '1' : '0';
 			}
 
 			async.series([
@@ -916,6 +930,12 @@ var async = require('async'),
 		});
 	};
 
+	Groups.getPosts = function(groupId, max, uid, callback) {
+		db.getSortedSetRange('gid:' + groupId + ':tids', 0, -1, function (err, tids) {
+			topics.getTopicsByTids(tids, uid, callback);
+		});
+	};
+
 	Groups.getLatestMemberPosts = function(groupName, max, uid, callback) {
 		async.waterfall([
 			async.apply(Groups.getMembers, groupName, 0, -1),
@@ -1138,6 +1158,30 @@ var async = require('async'),
 		}
 
 		next(null, groups);
+	};
+
+	Groups.addMember = function(data, callback) {
+		var uid, groupName = data.groupName;
+		async.waterfall([
+			function (next) {
+				user.getUidByUsername(data.username, next);
+			},
+			function (result, next) {
+				if (!result) {
+					return callback(new Error('[[error:no-user]]'));
+				}
+				uid = result;
+				Groups.isMember(uid, groupName, next);
+			},
+			function (exist, next) {
+				if (exist) {
+					return callback(new Error('该用户已加入该群组'));
+				}
+				Groups.join(groupName, uid, next);
+			}
+		], function (err) {
+			callback(err, null);
+		});
 	};
 
 	Groups.searchMembers = function(data, callback) {

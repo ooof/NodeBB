@@ -492,8 +492,12 @@ middleware.exposeGroupName = function(req, res, next) {
 	groups.getGroupNameByGroupSlug(req.params.slug, function(err, groupName) {
 		if (err) { return next(err); }
 
-		res.locals.groupName = groupName;
-		next();
+		groups.getGroupFields(groupName, ['gid', 'supportTopic'], function(err, data) {
+			res.locals.groupName = groupName;
+			res.locals.groupId = data.gid;
+			res.locals.supportTopic = !!parseInt(data.supportTopic, 10);
+			next();
+		});
 	});
 };
 
