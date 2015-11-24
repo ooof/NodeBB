@@ -746,6 +746,14 @@ var async = require('async'),
 			plugins.fireHook('action:group.destroy', groupObj);
 
 			async.parallel([
+				function(next) {
+					Groups.getGroupFields(groupName, ['name', 'gid'], function (err, result) {
+						if (err) {
+							return next(err);
+						}
+						db.deleteObjectField('groupgid:groupname', result.gid, next);
+					});
+				},
 				async.apply(db.delete, 'group:' + groupName),
 				async.apply(db.sortedSetRemove, 'groups:createtime', groupName),
 				async.apply(db.delete, 'group:' + groupName + ':members'),
