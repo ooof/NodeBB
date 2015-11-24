@@ -600,7 +600,6 @@ var async = require('async'),
 			}
 
 			if (values.hasOwnProperty('supportTopic')) {
-				console.log(values);
 				payload.supportTopic = values.supportTopic ? '1' : '0';
 			}
 
