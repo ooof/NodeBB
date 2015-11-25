@@ -87,6 +87,9 @@ groupsController.details = function(req, res, next) {
 			results.posts.sort(function (a, b) {
 				return parseInt(b.lastposttime, 10) - parseInt(a.lastposttime, 10);
 			});
+			results.posts.forEach(function (post, i) {
+				return results.posts[i].postcount = post.postcount - 1;
+			});
 
 			res.render('groups/details', results);
 		});
