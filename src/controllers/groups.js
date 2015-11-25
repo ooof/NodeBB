@@ -66,6 +66,9 @@ groupsController.details = function(req, res, next) {
 					uid: req.uid
 				}, next);
 			},
+			isGroupMember: function(next) {
+				groups.isMember(req.uid, res.locals.groupName, next);
+			},
 			posts: function(next) {
 				if (res.locals.supportTopic) {
 					return groups.getPosts(res.locals.groupId, 10, req.uid, next);
@@ -80,6 +83,7 @@ groupsController.details = function(req, res, next) {
 			if (!results.group) {
 				return helpers.notFound(req, res);
 			}
+			results.group.isMember = results.isGroupMember;
 			results.posts.sort(function (a, b) {
 				return parseInt(b.lastposttime, 10) - parseInt(a.lastposttime, 10);
 			});
