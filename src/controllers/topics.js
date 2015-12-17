@@ -134,7 +134,7 @@ topicsController.get = function(req, res, next) {
 				breadcrumbs = [
 					{
 						text: topicData.category.name,
-						url: '/category/' + topicData.category.slug
+						url: nconf.get('relative_path') + '/category/' + topicData.category.slug
 					},
 					{
 						text: topicData.title,
