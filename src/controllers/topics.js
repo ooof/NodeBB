@@ -123,7 +123,9 @@ topicsController.get = function(req, res, next) {
 				if (page > 1) {
 					topicData.posts.splice(0, 1);
 				}
+				console.log(topicData.category);
 				topicData.category || (topicData.category = {});
+				console.log(topicData.category);
 
 				plugins.fireHook('filter:controllers.topic.get', topicData, next);
 			});
@@ -134,7 +136,7 @@ topicsController.get = function(req, res, next) {
 				breadcrumbs = [
 					{
 						text: topicData.category.name,
-						url: topicData.category.slug
+						url: '/category/' + topicData.category.slug
 					},
 					{
 						text: topicData.title,
