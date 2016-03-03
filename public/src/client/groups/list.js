@@ -14,23 +14,6 @@ define('forum/groups/list', function() {
 		});
 
 		// Group creation
-		$('button[data-action="privacy-new"]').on('click', function() {
-			bootbox.prompt('隐私群组名:', function(name) {
-				if (name && name.length) {
-					socket.emit('groupsPrivacy.create', {
-						name: name
-					}, function(err) {
-						if (!err) {
-							ajaxify.go('privacy-groups/' + utils.slugify(name));
-						} else {
-							app.alertError(err.message);
-						}
-					});
-				}
-			});
-		});
-
-		// Group creation
 		$('button[data-action="new"]').on('click', function() {
 			bootbox.prompt('Group Name:', function(name) {
 				if (name && name.length) {

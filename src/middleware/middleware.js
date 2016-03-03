@@ -18,7 +18,6 @@ var app,
 	translator = require('../../public/src/modules/translator'),
 	user = require('../user'),
 	groups = require('../groups'),
-	groupsPrivacy = require('../groupsPrivacy'),
 	db = require('../database'),
 	categories = require('../categories'),
 	topics = require('../topics'),
@@ -470,20 +469,6 @@ middleware.privateTagListing = function(req, res, next) {
 	} else {
 		next();
 	}
-};
-
-middleware.exposeGroupPrivacyName = function(req, res, next) {
-	if (!req.params.hasOwnProperty('slug')) { return next(); }
-
-	groupsPrivacy.getGroupNameByGroupSlug(req.params.slug, function(err, groupName) {
-		if (err) { return next(err); }
-
-		groupsPrivacy.getGroupFields(groupName, ['gid'], function(err, data) {
-			res.locals.groupName = groupName;
-			res.locals.groupId = data.gid;
-			next();
-		});
-	});
 };
 
 middleware.exposeGroupName = function(req, res, next) {

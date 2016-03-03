@@ -27,7 +27,6 @@ var Controllers = {
 	search: require('./search'),
 	users: require('./users'),
 	groups: require('./groups'),
-	groupsPrivacy: require('./groupsPrivacy'),
 	accounts: require('./accounts'),
 	api: require('./api'),
 	admin: require('./admin')

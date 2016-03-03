@@ -102,13 +102,6 @@ function inviteRoutes(app, middleware, controllers) {
 	setupPageRoute(app, '/invite/:invite_id/:slug?', middleware, [], controllers.invite.details);
 }
 
-function groupPrivacyRoutes(app, middleware, controllers) {
-	var middlewares = [middleware.checkGlobalPrivacySettings, middleware.exposeGroupPrivacyName];
-	setupPageRoute(app, '/privacy-groups', middleware, middlewares, controllers.groupsPrivacy.list);
-	setupPageRoute(app, '/privacy-groups/:slug', middleware, middlewares, controllers.groupsPrivacy.details);
-	setupPageRoute(app, '/privacy-groups/:slug/members', middleware, middlewares, controllers.groupsPrivacy.members);
-}
-
 module.exports = function(app, middleware) {
 	var router = express.Router(),
 		pluginRouter = express.Router(),
@@ -142,7 +135,6 @@ module.exports = function(app, middleware) {
 		'chats/?*',
 		'users/?*',
 		'groups/?*',
-		'privacy-groups/?*',
 		'invite/?*',
 		'api/category/?*',
 		'api/topic/?*',
@@ -178,7 +170,6 @@ module.exports = function(app, middleware) {
 	userRoutes(router, middleware, controllers);
 	groupRoutes(router, middleware, controllers);
 	inviteRoutes(router, middleware, controllers);
-	groupPrivacyRoutes(router, middleware, controllers);
 
 	app.use(relativePath, pluginRouter);
 	app.use(relativePath, router);
