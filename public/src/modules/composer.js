@@ -391,7 +391,7 @@ define('composer', [
 
 		var allowTopicsThumbnail = config.allowTopicsThumbnail && postData.isMain && (config.hasImageUploadPlugin || config.allowFileUploads),
 			isTopic = postData ? !!postData.cid : false,
-			isGroup = postData ? !!postData.gid : false,
+			supportRecord = postData ? !!postData.gid && ajaxify.variables.get('group_support_topic') === 'true' : false,
 			isInvite = postData ? !!postData.invite : false,
 			isInviteEdit = postData && postData.type === 'edit',
 			isMain = postData ? !!postData.isMain : false,
@@ -416,7 +416,7 @@ define('composer', [
 			maximumTagLength: config.maximumTagLength,
 			isInvite: isInvite,
 			isTopic: isTopic,
-			isGroup: isGroup,
+			supportRecord: supportRecord,
 			isEditing: isEditing,
 			showHandleInput: config.allowGuestHandles && (app.user.uid === 0 || (isEditing && isGuestPost && app.user.isAdmin)),
 			handle: postData ? postData.handle || '' : undefined,
