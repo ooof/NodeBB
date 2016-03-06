@@ -32,6 +32,10 @@ var async = require('async'),
 		db.isSortedSetMember('topics:tid', tid, callback);
 	};
 
+	Topics.getTopicRecord = function(tid, callback) {
+		db.getSetMembers('record:' + tid, callback);
+	};
+
 	Topics.getTopicData = function(tid, callback) {
 		db.getObject('topic:' + tid, function(err, topic) {
 			if (err || !topic) {
@@ -63,7 +67,10 @@ var async = require('async'),
 		topic.title = validator.escape(topic.title);
 		topic.relativeTime = utils.toISOString(topic.timestamp);
 		topic.lastposttimeISO = utils.toISOString(topic.lastposttime);
-		callback(null, topic);
+		Topics.getTopicRecord(topic.tid, function(err, record) {
+			topic.record = record && record.length ? record.join(',') : '';
+			callback(null, topic);
+		});
 	}
 
 	Topics.getPageCount = function(tid, uid, callback) {

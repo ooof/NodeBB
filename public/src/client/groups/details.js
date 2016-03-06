@@ -8,7 +8,12 @@ define('forum/groups/details', ['iconSelect', 'components', 'composer', 'vendor/
 
 	Details.init = function() {
 		var detailsPage = components.get('groups/container'),
+			playModal = $('#record-play-modal'),
 			settingsFormEl = detailsPage.find('form');
+
+		playModal.find('.play-complete').on('click', function () {
+			playModal.modal('hide');
+		});
 
 		if (ajaxify.variables.get('is_owner') === 'true') {
 			Details.prepareSettings();
@@ -23,6 +28,7 @@ define('forum/groups/details', ['iconSelect', 'components', 'composer', 'vendor/
 				ownerFlagEl = userRow.find('.member-name i'),
 				isOwner = !ownerFlagEl.hasClass('invisible') ? true : false,
 				uid = userRow.attr('data-uid'),
+				tid = userRow.attr('data-tid'),
 				action = btnEl.attr('data-action');
 
 			switch(action) {
@@ -58,6 +64,23 @@ define('forum/groups/details', ['iconSelect', 'components', 'composer', 'vendor/
 							app.alertError(err.message);
 						}
 					});
+					break;
+				case 'play-record':
+					var recordListEl = playModal.find('.record-list');
+					var recordList = userRow.attr('data-record');
+					recordListEl.html('');
+					if (recordList){
+						recordList = recordList.split(',');
+						recordList.map(function(url) {
+							var li = document.createElement('li');
+							var au = document.createElement('audio');
+							au.controls = true;
+							au.src = config.relative_path + '/uploads/record/' + url + '.wmv';
+							li.appendChild(au);
+							$(li).appendTo(recordListEl);
+						});
+					}
+					playModal.modal('show');
 					break;
 				case 'toggleOwnership':
 					socket.emit('groups.' + (isOwner ? 'rescind' : 'grant'), {

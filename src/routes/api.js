@@ -24,6 +24,7 @@ module.exports =  function(app, middleware, controllers) {
 	var middlewares = [multipartMiddleware, middleware.validateFiles, middleware.applyCSRF];
 	router.post('/post/upload', middlewares, uploadsController.uploadPost);
 	router.post('/topic/thumb/upload', middlewares, uploadsController.uploadThumb);
+	router.post('/uploadrecord', multipartMiddleware, middleware.applyCSRF, uploadsController.uploadRecord);
 	router.post('/user/:userslug/uploadpicture', middlewares.concat([middleware.authenticate, middleware.checkGlobalPrivacySettings, middleware.checkAccountPermissions]), controllers.accounts.uploadPicture);
 };
 

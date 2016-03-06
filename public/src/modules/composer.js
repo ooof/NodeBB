@@ -13,8 +13,9 @@ define('composer', [
 	'composer/categoryList',
 	'composer/preview',
 	'forum/invite/composer',
+	'composer/record',
 	'composer/resize'
-], function(taskbar, translator, controls, uploads, formatting, drafts, tags, categoryList, preview, inviteComposer, resize) {
+], function(taskbar, translator, controls, uploads, formatting, drafts, tags, categoryList, preview, inviteComposer, record, resize) {
 	var composer = {
 		active: undefined,
 		posts: {},
@@ -390,6 +391,7 @@ define('composer', [
 
 		var allowTopicsThumbnail = config.allowTopicsThumbnail && postData.isMain && (config.hasImageUploadPlugin || config.allowFileUploads),
 			isTopic = postData ? !!postData.cid : false,
+			isGroup = postData ? !!postData.gid : false,
 			isInvite = postData ? !!postData.invite : false,
 			isInviteEdit = postData && postData.type === 'edit',
 			isMain = postData ? !!postData.isMain : false,
@@ -414,6 +416,7 @@ define('composer', [
 			maximumTagLength: config.maximumTagLength,
 			isInvite: isInvite,
 			isTopic: isTopic,
+			isGroup: isGroup,
 			isEditing: isEditing,
 			showHandleInput: config.allowGuestHandles && (app.user.uid === 0 || (isEditing && isGuestPost && app.user.isAdmin)),
 			handle: postData ? postData.handle || '' : undefined,
@@ -678,7 +681,7 @@ define('composer', [
 			return composerAlert(post_uuid, '[[error:title-too-long, ' + config.maximumTitleLength + ']]');
 		} else if (checkTitle && !utils.slugify(titleEl.val()).length) {
 			return composerAlert(post_uuid, '[[error:invalid-title]]');
-		} else if (bodyEl.val().length < parseInt(config.minimumPostLength, 10)) {
+		} else if (bodyEl.val().length < parseInt(config.minimumPostLength, 10) && record.getFileList().length === 0) {
 			return composerAlert(post_uuid, '[[error:content-too-short, ' + config.minimumPostLength + ']]');
 		} else if (bodyEl.val().length > parseInt(config.maximumPostLength, 10)) {
 			return composerAlert(post_uuid, '[[error:content-too-long, ' + config.maximumPostLength + ']]');
@@ -750,6 +753,38 @@ define('composer', [
 				email: email,
 				username: username
 			};
+		}
+		if (parseInt(postData.gid, 10) > 0) {
+			record.uploadFileList(function(data) {
+				composerData.files = data.map(function(item) {
+					return item.id;
+				});
+				socket.emit(action, composerData, function (err, data) {
+					postContainer.find('.composer-submit').removeAttr('disabled');
+					if (err) {
+						if (err.message === '[[error:email-not-confirmed]]') {
+							return app.showEmailConfirmWarning(err);
+						}
+
+						return app.alertError(err.message);
+					}
+					record.emptyFileList();
+
+					discard(post_uuid);
+					drafts.removeDraft(postData.save_id);
+
+					if (action === 'topics.post') {
+						ajaxify.go('topic/' + data.slug);
+					} else if (action === 'invite.reply') {
+						ajaxify.refresh();
+					} else {
+						removeComposerHistory();
+					}
+
+					$(window).trigger('action:composer.' + action, {composerData: composerData, data: data});
+				});
+			});
+			return;
 		}
 
 		socket.emit(action, composerData, function (err, data) {

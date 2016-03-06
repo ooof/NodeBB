@@ -167,6 +167,25 @@ topicsController.get = function(req, res, next) {
 			});
 		},
 		function (topicData, next) {
+			if (topicData.group && !_.isEmpty(topicData.group)) {
+				topics.getTopicRecord(tid, function (err, _record) {
+					if (err) {
+						return next(err);
+					} else {
+						var record;
+						if(_record && _record.length) {
+							topicData.record = _record.map(function(item) {
+								return {url: nconf.get('relative_path') + '/uploads/record/' + item + '.wmv'};
+							});
+						}
+						next(null, topicData);
+					}
+				});
+			} else {
+				next(null, topicData);
+			}
+		},
+		function (topicData, next) {
 			var description = '';
 
 			if (topicData.posts[0] && topicData.posts[0].content) {
@@ -282,11 +301,11 @@ topicsController.get = function(req, res, next) {
 
 		topics.increaseViewCount(tid);
 
-		plugins.fireHook('filter:topic.build', {req: req, res: res, templateData: data}, function(err, data) {
+		plugins.fireHook('filter:topic.build', {req: req, res: res, templateData: data}, function(err, _data) {
 			if (err) {
 				return next(err);
 			}
-			res.render('topic', data.templateData);
+			res.render('topic', _data.templateData);
 		});
 	});
 };

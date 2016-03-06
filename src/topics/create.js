@@ -74,6 +74,13 @@ module.exports = function(Topics) {
 							user.addTopicIdToUser(uid, tid, timestamp, next);
 						},
 						function (next) {
+							if (data.files.length) {
+								db.setAdds('record:' + tid, data.files, next);
+							} else {
+								next()
+							}
+						},
+						function (next) {
 							db.incrObjectField('group:' + gid, 'topic_count', next);
 						}
 					], function (err) {
@@ -128,6 +135,7 @@ module.exports = function(Topics) {
 			content = data.content,
 			gid = data.gid || null,
 			cid = data.cid,
+			files = data.files,
 			tags = data.tags;
 
 		if (title) {
@@ -142,9 +150,16 @@ module.exports = function(Topics) {
 
 		async.waterfall([
 			function(next) {
-				checkContentLength(content, next);
+				if (gid && files.length) {
+					next();
+				} else {
+					checkContentLength(content, next);
+				}
 			},
 			function(next) {
+				if (gid) {
+					return next(null, true);
+				}
 				categories.exists(cid, next);
 			},
 			function(categoryExists, next) {
@@ -175,10 +190,10 @@ module.exports = function(Topics) {
 			},
 			function(filteredData, next) {
 				content = filteredData.content || data.content;
-				Topics.create({ uid: uid, title: title, cid: cid, gid: gid, thumb: data.thumb, tags: tags, timestamp: data.timestamp }, next);
+				Topics.create({ uid: uid, title: title, cid: cid, gid: gid, files: files, thumb: data.thumb, tags: tags, timestamp: data.timestamp }, next);
 			},
 			function(tid, next) {
-				Topics.reply({ uid:uid, tid:tid, gid:gid, handle: data.handle, content:content, timestamp: data.timestamp, req: data.req }, next);
+				Topics.reply({ uid:uid, tid:tid, gid: gid, files: files, handle: data.handle, content:content, timestamp: data.timestamp, req: data.req }, next);
 			},
 			function(postData, next) {
 				async.parallel({
@@ -270,7 +285,11 @@ module.exports = function(Topics) {
 					content = content.trim();
 				}
 
-				checkContentLength(content, next);
+				if (data.gid && data.files.length) {
+					next();
+				} else {
+					checkContentLength(content, next);
+				}
 			},
 			function(next) {
 				posts.create({uid: uid, tid: tid, handle: data.handle, content: content, toPid: data.toPid, timestamp: data.timestamp, ip: data.req ? data.req.ip : null}, next);

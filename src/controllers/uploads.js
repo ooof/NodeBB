@@ -2,6 +2,8 @@
 
 var uploadsController = {},
 
+	ObjectId = require('../ObjectId'),
+	mkdirp = require('mkdirp'),
 	fs = require('fs'),
 	path = require('path'),
 	async = require('async'),
@@ -60,6 +62,24 @@ uploadsController.uploadPost = function(req, res, next) {
 	}, next);
 };
 
+uploadsController.uploadRecord = function (req, res, next) {
+	var uploadedFile = req.files.file;
+	var folder = 'record';
+	var id = new ObjectId().toString();
+	var filename = id + '.wmv';
+
+	function done(err, file) {
+		fs.unlink(uploadedFile.path);
+		if (err) {
+			return next(err);
+		}
+		res.json([{name: uploadedFile.name, id: id, url: file.url.startsWith('http') ? file.url : nconf.get('relative_path') + file.url}]);
+	}
+
+	mkdirp.sync(path.join(nconf.get('base_dir'), nconf.get('upload_path'), folder));
+	file.saveFileToLocal(filename, folder, uploadedFile.path, done);
+};
+
 uploadsController.uploadThumb = function(req, res, next) {
 	if (parseInt(meta.config.allowTopicsThumbnail, 10) !== 1) {
 		deleteTempFiles(req.files.files);
@@ -92,6 +112,7 @@ uploadsController.uploadGroupCover = function(data, next) {
 };
 
 function uploadImage(uid, image, callback) {
+	console.log(arguments);
 	if (plugins.hasListeners('filter:uploadImage')) {
 		return plugins.fireHook('filter:uploadImage', {image: image, uid: uid}, callback);
 	}
