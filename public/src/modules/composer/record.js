@@ -7,6 +7,7 @@ define('composer/record', ['csrf'], function (csrf) {
 		recordModalError,
 		recordStart,
 		recordStop,
+		recordList,
 		recordComplete;
 
 	var upload = function (item) {
@@ -80,15 +81,21 @@ define('composer/record', ['csrf'], function (csrf) {
 
 	function createDownloadLink() {
 		recorder && recorder.exportWAV(function (blob) {
-			fileList.push({file: blob});
+			var id = parseInt(('' + Math.random()).substr(3, 3), 10);
+			fileList.push({file: blob, id: id});
 			var url = URL.createObjectURL(blob);
 			var li = document.createElement('li');
 			var au = document.createElement('audio');
+			var deleteBtn = document.createElement('i');
+			deleteBtn.className = 'fa fa-times delete-record';
 
 			au.controls = true;
 			au.src = url;
 			li.appendChild(au);
-			$(li).appendTo(recordModal.find('.record-list'));
+			li.appendChild(deleteBtn);
+			li.dataset.id = id;
+			var liEl = $(li);
+			liEl.appendTo(recordList);
 		});
 	}
 
@@ -119,8 +126,22 @@ define('composer/record', ['csrf'], function (csrf) {
 		recordModalError = $('#record-modal-error');
 		recordStart = recordModal.find('.record-start');
 		recordStop = recordModal.find('.record-stop');
+		recordList = recordModal.find('.record-list');
 		recordComplete = recordModal.find('.record-complete');
 
+		recordList.on('click', function (event) {
+			var target = $(event.target);
+			if (target.hasClass('delete-record')) {
+				var li = target.parent('li');
+				var id = li.data('id');
+				fileList.map(function (file, i) {
+					if (file.id === parseInt(id, 10)) {
+						fileList.splice(i, 1);
+					}
+				});
+				li.remove();
+			}
+		});
 		recordStart.on('click', function () {
 			startRecording();
 		});
