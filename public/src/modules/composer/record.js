@@ -3,6 +3,7 @@
 /* globals define */
 
 define('composer/record', ['csrf'], function (csrf) {
+	console.log('record');
 	var recordModal = $('#record-modal'),
 		recordModalError = $('#record-modal-error'),
 		recordStart = recordModal.find('.record-start'),
@@ -118,8 +119,7 @@ define('composer/record', ['csrf'], function (csrf) {
 		stopRecording();
 	});
 	recordComplete.on('click', function () {
-		//recordModal.modal('hide');
-		//fileList.map(upload);
+		recordModal.modal('hide');
 	});
 
 	return {
@@ -134,6 +134,7 @@ define('composer/record', ['csrf'], function (csrf) {
 		},
 		emptyFileList: function () {
 			fileList.length = 0;
+			recordModal.modal('hide');
 		}
 	}
 });
