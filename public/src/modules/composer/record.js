@@ -3,12 +3,11 @@
 /* globals define */
 
 define('composer/record', ['csrf'], function (csrf) {
-	console.log('record');
-	var recordModal = $('#record-modal'),
-		recordModalError = $('#record-modal-error'),
-		recordStart = recordModal.find('.record-start'),
-		recordStop = recordModal.find('.record-stop'),
-		recordComplete = recordModal.find('.record-complete');
+	var recordModal,
+		recordModalError,
+		recordStart,
+		recordStop,
+		recordComplete;
 
 	var upload = function (item) {
 		var uploadUrl = config.relative_path + '/api/uploadrecord';
@@ -60,9 +59,10 @@ define('composer/record', ['csrf'], function (csrf) {
 	}
 
 	function startRecording() {
+		if (!recorder) return;
 		recordStart.attr('disabled', 'disabled');
 		recordStop.removeAttr('disabled');
-		recorder && recorder.record();
+		recorder.record();
 		__log('Recording...');
 	}
 
@@ -110,17 +110,27 @@ define('composer/record', ['csrf'], function (csrf) {
 		navigator.getUserMedia({audio: true}, startUserMedia, function (e) {
 			__log('No live audio input: ' + e);
 		});
+
+		initEvent();
 	}
 
-	recordStart.on('click', function () {
-		startRecording();
-	});
-	recordStop.on('click', function () {
-		stopRecording();
-	});
-	recordComplete.on('click', function () {
-		recordModal.modal('hide');
-	});
+	function initEvent() {
+		recordModal = $('#record-modal');
+		recordModalError = $('#record-modal-error');
+		recordStart = recordModal.find('.record-start');
+		recordStop = recordModal.find('.record-stop');
+		recordComplete = recordModal.find('.record-complete');
+
+		recordStart.on('click', function () {
+			startRecording();
+		});
+		recordStop.on('click', function () {
+			stopRecording();
+		});
+		recordComplete.on('click', function () {
+			recordModal.modal('hide');
+		});
+	}
 
 	return {
 		init: init,
