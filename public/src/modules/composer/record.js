@@ -1,6 +1,6 @@
 'use strict';
 
-/* globals define */
+/* globals define app */
 
 define('composer/record', ['csrf'], function (csrf) {
 	var recordModal,
@@ -149,6 +149,7 @@ define('composer/record', ['csrf'], function (csrf) {
 			stopRecording();
 		});
 		recordComplete.on('click', function () {
+			app.alertSuccess('录音完成');
 			recordModal.modal('hide');
 		});
 	}
