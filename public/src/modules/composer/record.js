@@ -165,6 +165,7 @@ define('composer/record', ['csrf'], function (csrf) {
 		},
 		emptyFileList: function () {
 			fileList.length = 0;
+			recordList.html('');
 			recordModal.modal('hide');
 		}
 	}
