@@ -168,6 +168,7 @@ define('composer/record', ['csrf'], function (csrf) {
 			fileList.length = 0;
 			recordList.html('');
 			recordModal.modal('hide');
+			recorder = undefined;
 		}
 	}
 });

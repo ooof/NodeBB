@@ -282,7 +282,7 @@ module.exports = function(Topics) {
 					content = content.trim();
 				}
 
-				if (data.files.length) {
+				if (data.files && data.files.length) {
 					next();
 				} else {
 					checkContentLength(content, next);
