@@ -51,6 +51,10 @@ module.exports = function(Topics) {
 				'pinned': 0
 			};
 
+			if (data.files) {
+				topicData.record = data.files.join(',');
+			}
+
 			if (data.thumb) {
 				topicData.thumb = data.thumb;
 			}
@@ -72,13 +76,6 @@ module.exports = function(Topics) {
 						},
 						function (next) {
 							user.addTopicIdToUser(uid, tid, timestamp, next);
-						},
-						function (next) {
-							if (data.files.length) {
-								db.setAdds('record:' + tid, data.files, next);
-							} else {
-								next()
-							}
 						},
 						function (next) {
 							db.incrObjectField('group:' + gid, 'topic_count', next);
@@ -285,14 +282,14 @@ module.exports = function(Topics) {
 					content = content.trim();
 				}
 
-				if (data.gid && data.files.length) {
+				if (data.files.length) {
 					next();
 				} else {
 					checkContentLength(content, next);
 				}
 			},
 			function(next) {
-				posts.create({uid: uid, tid: tid, handle: data.handle, content: content, toPid: data.toPid, timestamp: data.timestamp, ip: data.req ? data.req.ip : null}, next);
+				posts.create({uid: uid, tid: tid, record: data.files, handle: data.handle, content: content, toPid: data.toPid, timestamp: data.timestamp, ip: data.req ? data.req.ip : null}, next);
 			},
 			function(data, next) {
 				postData = data;

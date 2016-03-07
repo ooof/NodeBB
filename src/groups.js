@@ -259,6 +259,7 @@ var async = require('async'),
 				results.base.isInvited = results.isInvited;
 				results.base.isOwner = results.isOwner;
 				results.base.supportTopic = !!parseInt(results.base.supportTopic, 10);
+				results.base.supportRecord = results.base.supportTopic;
 				results.base.privacy = results.base.hidden && results.base.private;
 
 

@@ -43,6 +43,9 @@ module.exports = function(Posts) {
 					'edited': 0,
 					'deleted': 0
 				};
+				if (data.record) {
+					postData.record = data.record.join(',');
+				}
 
 				if (tid) {
 					postData.tid = tid

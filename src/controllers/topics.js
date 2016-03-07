@@ -167,23 +167,19 @@ topicsController.get = function(req, res, next) {
 			});
 		},
 		function (topicData, next) {
+			topicData.supportRecord = false;
 			if (topicData.group && !_.isEmpty(topicData.group)) {
-				topics.getTopicRecord(tid, function (err, _record) {
-					if (err) {
-						return next(err);
-					} else {
-						var record;
-						if(_record && _record.length) {
-							topicData.record = _record.map(function(item) {
-								return {url: nconf.get('relative_path') + '/uploads/record/' + item + '.wmv'};
-							});
-						}
-						next(null, topicData);
+				topicData.posts.map(function (post, i) {
+					var record = post.record;
+					if (record) {
+						topicData.posts[i].record = record.split(',').map(function (item) {
+							return {url: nconf.get('relative_path') + '/uploads/record/' + item + '.wmv'};
+						});
 					}
 				});
-			} else {
-				next(null, topicData);
+				topicData.supportRecord = true;
 			}
+			next(null, topicData);
 		},
 		function (topicData, next) {
 			var description = '';

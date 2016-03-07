@@ -391,7 +391,7 @@ define('composer', [
 
 		var allowTopicsThumbnail = config.allowTopicsThumbnail && postData.isMain && (config.hasImageUploadPlugin || config.allowFileUploads),
 			isTopic = postData ? !!postData.cid : false,
-			supportRecord = postData ? !!postData.gid && ajaxify.variables.get('group_support_topic') === 'true' : false,
+			supportRecord = ajaxify.variables.get('supportRecord') === 'true',
 			isInvite = postData ? !!postData.invite : false,
 			isInviteEdit = postData && postData.type === 'edit',
 			isMain = postData ? !!postData.isMain : false,
@@ -643,6 +643,8 @@ define('composer', [
 			thumbEl = postContainer.find('input#topic-thumb-url');
 
 		var isInvite = !!parseInt(postData.invite, 10),
+			recordList = record.getFileList(),
+			isRecord = !!recordList.length,
 			isInviteEdit = postData.type === 'edit';
 
 		options = options || {};
@@ -681,7 +683,7 @@ define('composer', [
 			return composerAlert(post_uuid, '[[error:title-too-long, ' + config.maximumTitleLength + ']]');
 		} else if (checkTitle && !utils.slugify(titleEl.val()).length) {
 			return composerAlert(post_uuid, '[[error:invalid-title]]');
-		} else if (bodyEl.val().length < parseInt(config.minimumPostLength, 10) && record.getFileList().length === 0) {
+		} else if (bodyEl.val().length < parseInt(config.minimumPostLength, 10) && !isRecord) {
 			return composerAlert(post_uuid, '[[error:content-too-short, ' + config.minimumPostLength + ']]');
 		} else if (bodyEl.val().length > parseInt(config.maximumPostLength, 10)) {
 			return composerAlert(post_uuid, '[[error:content-too-long, ' + config.maximumPostLength + ']]');
@@ -754,7 +756,7 @@ define('composer', [
 				username: username
 			};
 		}
-		if (parseInt(postData.gid, 10) > 0) {
+		if (record.getFileList().length) {
 			record.uploadFileList(function(data) {
 				composerData.files = data.map(function(item) {
 					return item.id;

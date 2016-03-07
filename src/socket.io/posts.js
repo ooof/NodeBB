@@ -24,7 +24,7 @@ var	async = require('async'),
 
 
 SocketPosts.reply = function(socket, data, callback) {
-	if(!data || !data.tid || !data.content) {
+	if ((!data || !data.tid || !data.content) && !data.files) {
 		return callback(new Error('[[error:invalid-data]]'));
 	}
 
