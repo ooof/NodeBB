@@ -22,14 +22,51 @@ define('forum/groups/details', ['iconSelect', 'components', 'composer', 'vendor/
 
 		components.get('groups/activity').find('.content img').addClass('img-responsive');
 
-		detailsPage.on('click', '[data-action]', function() {
-			var btnEl = $(this),
+		var audio;
+		function playAudio(src) {
+			src = config.relative_path + '/uploads/record/' + src + '.wmv';
+			if (audio) {
+				audio.pause();
+			}
+			audio = new Audio(src);
+			audio.play();
+		}
+
+		function playAllAudio(record) {
+			if (audio) {
+				audio.pause();
+			}
+			var i = 0;
+			var length = record.length;
+			var playOne = function () {
+				if (i < length) {
+					var src = config.relative_path + '/uploads/record/' + record[i] + '.wmv';
+					if (audio) {
+						audio.pause();
+					}
+					audio = new Audio(src);
+					audio.play();
+					audio.addEventListener('ended', function() {
+						i++;
+						playOne();
+					});
+				}
+			};
+			playOne();
+		}
+
+		detailsPage.on('click', function (e) {
+			if (!e.target.hasAttribute('data-action')) {
+				return;
+			}
+			var btnEl = $(e.target),
 				userRow = btnEl.parents('[data-uid]'),
 				ownerFlagEl = userRow.find('.member-name i'),
 				isOwner = !ownerFlagEl.hasClass('invisible') ? true : false,
 				uid = userRow.attr('data-uid'),
 				tid = userRow.attr('data-tid'),
-				action = btnEl.attr('data-action');
+				record = userRow.attr('data-record'),
+				action = e.target.getAttribute('data-action');
 
 			switch(action) {
 				case 'add-user':
@@ -66,22 +103,30 @@ define('forum/groups/details', ['iconSelect', 'components', 'composer', 'vendor/
 					});
 					break;
 				case 'play-record':
-					var recordListEl = playModal.find('.record-list');
-					var recordList = userRow.attr('data-record');
-					recordListEl.html('');
-					if (recordList){
-						recordList = recordList.split(',');
-						recordList.map(function(url) {
-							var li = document.createElement('li');
-							var au = document.createElement('audio');
-							au.controls = true;
-							au.src = config.relative_path + '/uploads/record/' + url + '.wmv';
-							li.appendChild(au);
-							$(li).appendTo(recordListEl);
-						});
+					if (record) {
+						record = record.split(',');
+						playAudio(record[0]);
 					}
-					playModal.modal('show');
-					break;
+					return;
+				case 'all-record':
+					if (record) {
+						record = record.split(',');
+						playAllAudio(record);
+					}
+					return;
+				case 'pause-record':
+					if (audio) {
+						if (audio.paused) {
+							audio.play();
+						} else {
+							audio.pause();
+						}
+					}
+					return;
+				case 'stop-record':
+					if (record) {
+					}
+					return;
 				case 'toggleOwnership':
 					socket.emit('groups.' + (isOwner ? 'rescind' : 'grant'), {
 						toUid: uid,
