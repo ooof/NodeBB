@@ -130,18 +130,7 @@ topicsController.get = function(req, res, next) {
 		},
 		function (topicData, next) {
 			var breadcrumbs = [];
-			if (!_.isEmpty(topicData.category)) {
-				breadcrumbs = [
-					{
-						text: topicData.category.name,
-						url: nconf.get('relative_path') + '/category/' + topicData.category.slug
-					},
-					{
-						text: topicData.title,
-						url: nconf.get('relative_path') + '/topic/' + topicData.slug
-					}
-				];
-			} else if (topicData.group && !_.isEmpty(topicData.group)){
+			if (topicData.group && !_.isEmpty(topicData.group)) {
 				breadcrumbs = [
 					{
 						text: '私密群组',
@@ -150,6 +139,18 @@ topicsController.get = function(req, res, next) {
 					{
 						text: topicData.group.name,
 						url: nconf.get('relative_path') + '/groups/' + topicData.group.slug
+					},
+					{
+						text: topicData.title,
+						url: nconf.get('relative_path') + '/topic/' + topicData.slug
+					}
+				];
+			}
+			else if (!_.isEmpty(topicData.category)) {
+				breadcrumbs = [
+					{
+						text: topicData.category.name,
+						url: nconf.get('relative_path') + '/category/' + topicData.category.slug
 					},
 					{
 						text: topicData.title,
