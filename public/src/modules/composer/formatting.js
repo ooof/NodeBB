@@ -2,16 +2,11 @@
 
 /* globals define */
 
-define('composer/formatting', ['composer/controls', 'composer/preview', 'composer/record'], function(controls, preview, record) {
+define('composer/formatting', ['composer/controls', 'composer/preview'], function(controls, preview) {
 
 	var formatting = {};
 
 	var formattingDispatchTable = {
-		record: function(){
-			$('#record-modal').modal('show');
-			record.init();
-		},
-
 		'picture': function(){
 			$('#files').click();
 		},

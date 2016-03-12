@@ -464,6 +464,8 @@ define('composer', [
 					draft = drafts.getDraft(postData.save_id),
 					submitBtn = postContainer.find('.composer-submit');
 
+				record.init(postContainer);
+
 				preview.handleToggler(postContainer);
 				tags.init(postContainer, composer.posts[post_uuid]);
 				categoryList.init(postContainer, composer.posts[post_uuid]);

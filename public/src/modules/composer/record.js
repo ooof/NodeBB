@@ -3,12 +3,8 @@
 /* globals define app */
 
 define('composer/record', ['csrf'], function (csrf) {
-	var recordModal,
-		recordModalError,
-		recordStart,
-		recordStop,
-		recordList,
-		recordComplete;
+	var recordToggle,
+		recordList;
 
 	var upload = function (item) {
 		var uploadUrl = config.relative_path + '/api/uploadrecord';
@@ -57,20 +53,21 @@ define('composer/record', ['csrf'], function (csrf) {
 		//__log('Input connected to audio context destination.');
 
 		recorder = new Recorder(input);
+		recorder.recordingFlag = false;
 	}
 
 	function startRecording() {
 		if (!recorder) return;
-		recordStart.attr('disabled', 'disabled');
-		recordStop.removeAttr('disabled');
+		recordToggle.addClass('record-red');
 		recorder.record();
+		recorder.recordingFlag = true;
 		__log('Recording...');
 	}
 
 	function stopRecording() {
-		recordStop.attr('disabled', 'disabled');
-		recordStart.removeAttr('disabled');
+		recordToggle.removeClass('record-red');
 		recorder && recorder.stop();
+		recorder.recordingFlag = false;
 		__log('Stopped recording.');
 
 		// create WAV download link using audio data blob
@@ -99,7 +96,7 @@ define('composer/record', ['csrf'], function (csrf) {
 		});
 	}
 
-	function init() {
+	function init(postContainer) {
 		if (recorder) return;
 		try {
 			// webkit shim
@@ -118,16 +115,12 @@ define('composer/record', ['csrf'], function (csrf) {
 			__log('No live audio input: ' + e);
 		});
 
-		initEvent();
+		initEvent(postContainer);
 	}
 
-	function initEvent() {
-		recordModal = $('#record-modal');
-		recordModalError = $('#record-modal-error');
-		recordStart = recordModal.find('.record-start');
-		recordStop = recordModal.find('.record-stop');
-		recordList = recordModal.find('.record-list');
-		recordComplete = recordModal.find('.record-complete');
+	function initEvent(container) {
+		recordToggle = container.find('[data-format="record-toggle"]');
+		recordList = container.find('.record-list');
 
 		recordList.on('click', function (event) {
 			var target = $(event.target);
@@ -142,15 +135,15 @@ define('composer/record', ['csrf'], function (csrf) {
 				li.remove();
 			}
 		});
-		recordStart.on('click', function () {
-			startRecording();
-		});
-		recordStop.on('click', function () {
-			stopRecording();
-		});
-		recordComplete.on('click', function () {
-			app.alertSuccess('录音完成');
-			recordModal.modal('hide');
+		recordToggle.on('click', function () {
+			if (!recorder) {
+				return;
+			}
+			if (!recorder.recordingFlag) {
+				startRecording();
+			} else if (recorder.recordingFlag) {
+				stopRecording();
+			}
 		});
 	}
 
@@ -164,10 +157,11 @@ define('composer/record', ['csrf'], function (csrf) {
 				callback && callback(data);
 			});
 		},
+		startRecording: startRecording,
+		stopRecording: stopRecording,
 		emptyFileList: function () {
 			fileList.length = 0;
 			recordList.html('');
-			recordModal.modal('hide');
 			recorder = undefined;
 		}
 	}
