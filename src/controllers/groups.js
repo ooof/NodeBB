@@ -71,7 +71,7 @@ groupsController.details = function(req, res, next) {
 			},
 			posts: function(next) {
 				if (res.locals.supportTopic) {
-					return groups.getPosts(res.locals.groupId, 10, req.uid, next);
+					return groups.getTopicWithRecords(res.locals.groupId, 10, req.uid, next);
 				}
 				groups.getLatestMemberPosts(res.locals.groupName, 10, req.uid, next);
 			}

@@ -214,6 +214,16 @@ var async = require('async'),
 		});
 	};
 
+	Topics.getTopicWithPostsForGroup = function(tid, set, uid, start, stop, reverse, callback) {
+		Topics.getTopicData(tid, function(err, topicData) {
+			if (err || !topicData) {
+				return callback(err || new Error('[[error:no-topic]]'));
+			}
+
+			getMainPostAndRepliesForGroup(topicData, set, uid, start, stop, reverse, callback);
+		});
+	};
+
 	Topics.getTopicWithPosts = function(tid, set, uid, start, stop, reverse, callback) {
 		Topics.getTopicData(tid, function(err, topicData) {
 			if (err || !topicData) {
@@ -256,6 +266,43 @@ var async = require('async'),
 			});
 		});
 	};
+
+	function getMainPostAndRepliesForGroup(topic, set, uid, start, stop, reverse, callback) {
+		async.waterfall([
+			function(next) {
+				posts.getPidsFromSet(set, start, stop, reverse, next);
+			},
+			function(pids, next) {
+				if ((!Array.isArray(pids) || !pids.length) && !topic.mainPid) {
+					return callback(null, []);
+				}
+
+				if (topic.mainPid) {
+					pids.unshift(topic.mainPid);
+				}
+				posts.getPostsByPids(pids, uid, next);
+			},
+			function(posts, next) {
+				if (!posts.length) {
+					callback(null, []);
+					return next();
+				}
+
+				if (topic.mainPid) {
+					posts[0].index = 0;
+				}
+
+				var indices = Topics.calculatePostIndices(start, stop, topic.postcount, reverse);
+				for (var i=1; i<posts.length; ++i) {
+					if (posts[i]) {
+						posts[i].index = indices[i - 1];
+					}
+				}
+
+				Topics.addPostData(posts, uid, callback);
+			}
+		]);
+	}
 
 	function getMainPostAndReplies(topic, set, uid, start, stop, reverse, callback) {
 		async.waterfall([

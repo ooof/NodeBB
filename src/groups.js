@@ -951,6 +951,37 @@ var async = require('async'),
 		});
 	};
 
+	Groups.getTopicWithRecords = function (groupId, max, uid, callback) {
+		async.waterfall([
+			function (next) {
+				db.getSortedSetRevRange('gid:' + groupId + ':tids', 0, -1, next);
+			},
+			function (tids, next) {
+				topics.getTopicsByTids(tids, uid, next);
+			},
+			function (results, next) {
+				async.map(results, function (item, _next) {
+					if (item.record) {
+						var key = 'tid:' + item.tid + ':posts';
+						topics.getTopicWithPostsForGroup(item.tid, key, uid, 0, -1, false, function (err, posts) {
+							posts.map(function (post, i) {
+								if (i === 0) {
+									return;
+								}
+								if (post.record) {
+									item.record = item.record + ',' + post.record;
+								}
+							});
+							_next(null, item);
+						});
+					} else {
+						_next(null, item);
+					}
+				}, next);
+			}
+		], callback);
+	};
+
 	Groups.getLatestMemberPosts = function(groupName, max, uid, callback) {
 		async.waterfall([
 			async.apply(Groups.getMembers, groupName, 0, -1),
