@@ -147,7 +147,7 @@ module.exports = function(Topics) {
 
 		async.waterfall([
 			function(next) {
-				if (gid && files.length) {
+				if (gid && files && files.length) {
 					next();
 				} else {
 					checkContentLength(content, next);
