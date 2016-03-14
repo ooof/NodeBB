@@ -961,22 +961,18 @@ var async = require('async'),
 			},
 			function (results, next) {
 				async.map(results, function (item, _next) {
-					if (item.record) {
-						var key = 'tid:' + item.tid + ':posts';
-						topics.getTopicWithPostsForGroup(item.tid, key, uid, 0, -1, false, function (err, posts) {
-							posts.map(function (post, i) {
-								if (i === 0) {
-									return;
-								}
-								if (post.record) {
-									item.record = item.record + ',' + post.record;
-								}
-							});
-							_next(null, item);
+					var key = 'tid:' + item.tid + ':posts';
+					topics.getTopicWithPostsForGroup(item.tid, key, uid, 0, -1, false, function (err, posts) {
+						posts.map(function (post, i) {
+							if (i === 0) {
+								return;
+							}
+							if (post.record) {
+								item.record = (item.record ? item.record + ',' : '') + post.record;
+							}
 						});
-					} else {
 						_next(null, item);
-					}
+					});
 				}, next);
 			}
 		], callback);
