@@ -951,6 +951,22 @@ var async = require('async'),
 		});
 	};
 
+	function getStrLen(str) {
+		var realLength = 0;
+		var len = str.length;
+		var charCode = -1;
+		for (var i = 0; i < len; i++) {
+			charCode = str.charCodeAt(i);
+			if (charCode >= 0 && charCode <= 128) {
+				realLength += 1;
+			} else {
+				// 如果是中文则长度加3
+				realLength += 3;
+			}
+		}
+		return realLength;
+	}
+
 	Groups.getTopicWithRecords = function (groupId, max, uid, callback) {
 		async.waterfall([
 			function (next) {
@@ -963,14 +979,16 @@ var async = require('async'),
 				async.map(results, function (item, _next) {
 					var key = 'tid:' + item.tid + ':posts';
 					topics.getTopicWithPostsForGroup(item.tid, key, uid, 0, -1, false, function (err, posts) {
+						item.contentLen = 0;
 						posts.map(function (post, i) {
 							if (i === 0) {
 								return;
 							}
-							if (post.record) {
-								item.record = (item.record ? item.record + ',' : '') + post.record;
+							if (post.content) {
+								item.contentLen += post.content ? getStrLen(post.content) : 0;
 							}
 						});
+						item.contentLen = Math.floor(item.contentLen / 3);
 						_next(null, item);
 					});
 				}, next);
