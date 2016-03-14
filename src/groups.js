@@ -987,6 +987,9 @@ var async = require('async'),
 							if (post.content) {
 								item.contentLen += post.content ? getStrLen(post.content) : 0;
 							}
+							if (post.record) {
+								item.record = (item.record ? item.record + ',' : 0) + post.record;
+							}
 						});
 						item.contentLen = Math.floor(item.contentLen / 3);
 						_next(null, item);
