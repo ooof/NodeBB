@@ -981,11 +981,11 @@ var async = require('async'),
 					topics.getTopicWithPostsForGroup(item.tid, key, uid, 0, -1, false, function (err, posts) {
 						item.contentLen = 0;
 						posts.map(function (post, i) {
-							if (i === 0) {
-								return;
-							}
 							if (post.content) {
 								item.contentLen += post.content ? getStrLen(post.content) : 0;
+							}
+							if (i === 0) {
+								return;
 							}
 							if (post.record) {
 								item.record = (item.record ? item.record + ',' : 0) + post.record;
