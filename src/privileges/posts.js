@@ -57,6 +57,9 @@ module.exports = function(privileges) {
 			if (err) {
 				return callback(err);
 			}
+			if (!cid) {
+				return callback(null, true);
+			}
 
 			privileges.categories.can(privilege, cid, uid, callback);
 		});
