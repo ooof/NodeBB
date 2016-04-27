@@ -84,6 +84,9 @@ groupsController.details = function(req, res, next) {
 				return helpers.notFound(req, res);
 			}
 			results.group.isMember = results.isGroupMember;
+			results.posts = results.posts.filter(function (data) {
+				return !data.deleted;
+			});
 			results.posts.sort(function (a, b) {
 				return parseInt(b.lastposttime, 10) - parseInt(a.lastposttime, 10);
 			});

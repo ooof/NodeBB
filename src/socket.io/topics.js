@@ -247,7 +247,7 @@ SocketTopics.doTopicAction = function(action, event, socket, data, callback) {
 	if (!socket.uid) {
 		return;
 	}
-	if(!data || !Array.isArray(data.tids) || !data.cid) {
+	if(!data || !Array.isArray(data.tids)) {
 		return callback(new Error('[[error:invalid-tid]]'));
 	}
 

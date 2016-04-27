@@ -29,6 +29,9 @@ module.exports = function(Posts) {
 						updateTopicTimestamp(postData.tid, next);
 					},
 					function(next) {
+						if (!cid) {
+							return next();
+						}
 						db.sortedSetRemove('cid:' + cid + ':pids', pid, next);
 					},
 					function(next) {
