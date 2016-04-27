@@ -201,6 +201,9 @@ var async = require('async'),
 				}
 
 				topics = topics.filter(function(topic) {
+					if (!topic) {
+						return false;
+					}
 					if (topic.gid) {
 						return topic;
 					}
