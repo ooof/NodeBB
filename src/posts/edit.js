@@ -118,6 +118,9 @@ module.exports = function(Posts) {
 			async.waterfall([
 				async.apply(plugins.fireHook,'filter:topic.edit', topicData),
 				function(topicData, next) {
+					if (topicData.cid === null) {
+						delete topicData.cid;
+					}
 					db.setObject('topic:' + tid, topicData, next);
 				},
 				function(next) {
