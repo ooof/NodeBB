@@ -444,6 +444,36 @@ define('composer', [
 				composerTemplate.attr('id', 'cmp-uuid-' + post_uuid);
 
 				$(document.body).append(composerTemplate);
+				tinymce.EditorManager.editors = [];
+				tinymce.init({
+					selector: '#text-editor',
+					elements : "elm1",
+					resize: false,
+					language: 'zh_CN',
+					height: 'auto',
+					theme: 'modern',
+					plugins: [
+						'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+						'searchreplace wordcount visualblocks visualchars code fullscreen',
+						'insertdatetime media nonbreaking save table contextmenu directionality',
+						'emoticons template paste textcolor colorpicker textpattern imagetools'
+					],
+					toolbar1: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+					toolbar2: 'print preview media | forecolor backcolor emoticons',
+					image_advtab: true,
+					templates: [
+						{ title: 'Test template 1', content: 'Test 1' },
+						{ title: 'Test template 2', content: 'Test 2' }
+					],
+					setup: function (ed) {
+						ed.on('init', function(args) {
+							setTimeout(function () {
+								resize.reposition(postContainer);
+							}, 50);
+						});
+					}
+				});
+
 
 				// remove poll button when composer is reply
 				function removePollButton () {
@@ -476,7 +506,6 @@ define('composer', [
 				}
 
 				activate(post_uuid);
-				resize.reposition(postContainer);
 
 				if (config.allowFileUploads || config.hasImageUploadPlugin) {
 					uploads.initialize(post_uuid);
@@ -643,6 +672,7 @@ define('composer', [
 			titleEl = postContainer.find('.title'),
 			bodyEl = postContainer.find('textarea'),
 			thumbEl = postContainer.find('input#topic-thumb-url');
+		var content = tinyMCE.activeEditor.getContent({format: 'raw'});
 
 		var isInvite = !!parseInt(postData.invite, 10),
 			recordList = record.getFileList(),
@@ -667,7 +697,6 @@ define('composer', [
 		} else {
 			titleEl.val(titleEl.val().trim());
 		}
-		bodyEl.val(bodyEl.val().trim());
 		if (thumbEl.length) {
 			thumbEl.val(thumbEl.val().trim());
 		}
@@ -685,9 +714,9 @@ define('composer', [
 			return composerAlert(post_uuid, '[[error:title-too-long, ' + config.maximumTitleLength + ']]');
 		} else if (checkTitle && !utils.slugify(titleEl.val()).length) {
 			return composerAlert(post_uuid, '[[error:invalid-title]]');
-		} else if (bodyEl.val().length < parseInt(config.minimumPostLength, 10) && !isRecord) {
+		} else if (content.length < parseInt(config.minimumPostLength, 10) && !isRecord) {
 			return composerAlert(post_uuid, '[[error:content-too-short, ' + config.minimumPostLength + ']]');
-		} else if (bodyEl.val().length > parseInt(config.maximumPostLength, 10)) {
+		} else if (content.length > parseInt(config.maximumPostLength, 10)) {
 			return composerAlert(post_uuid, '[[error:content-too-long, ' + config.maximumPostLength + ']]');
 		}
 
@@ -698,7 +727,7 @@ define('composer', [
 			composerData = {
 				handle: handleEl ? handleEl.val() : undefined,
 				title: titleEl.val(),
-				content: bodyEl.val(),
+				content: content,
 				topic_thumb: thumbEl.val() || '',
 				category_id: postData.cid,
 				tags: tags.getTags(post_uuid),
@@ -709,7 +738,7 @@ define('composer', [
 			composerData = {
 				handle: handleEl ? handleEl.val() : undefined,
 				title: titleEl.val(),
-				content: bodyEl.val(),
+				content: content,
 				topic_thumb: thumbEl.val() || '',
 				group_id: postData.gid,
 				tags: tags.getTags(post_uuid),
@@ -720,7 +749,7 @@ define('composer', [
 			composerData = {
 				tid: postData.tid,
 				handle: handleEl ? handleEl.val() : undefined,
-				content: bodyEl.val(),
+				content: content,
 				toPid: postData.toPid,
 				lock: options.lock || false
 			};
@@ -729,7 +758,7 @@ define('composer', [
 			composerData = {
 				pid: postData.pid,
 				handle: handleEl ? handleEl.val() : undefined,
-				content: bodyEl.val(),
+				content: content,
 				title: titleEl.val(),
 				topic_thumb: thumbEl.val() || '',
 				tags: tags.getTags(post_uuid)
@@ -737,7 +766,7 @@ define('composer', [
 		} else if (isInvite) {
 			action = 'invite.post';
 			composerData = {
-				content: bodyEl.val(),
+				content: content,
 				email: email,
 				username: username
 			};
@@ -746,14 +775,14 @@ define('composer', [
 			composerData = {
 				iid: parseInt(postData.iid, 10),
 				toPid: postData.toPid,
-				content: bodyEl.val(),
+				content: content,
 				lock: false
 			};
 		} else if (isInviteEdit) {
 			action = 'invite.edit';
 			composerData = {
 				iid: parseInt(postData.iid, 10),
-				content: bodyEl.val(),
+				content: content,
 				email: email,
 				username: username
 			};
@@ -791,6 +820,8 @@ define('composer', [
 			return;
 		}
 
+		console.log(action);
+		console.log(composerData);
 		socket.emit(action, composerData, function (err, data) {
 			postContainer.find('.composer-submit').removeAttr('disabled');
 			if (err) {

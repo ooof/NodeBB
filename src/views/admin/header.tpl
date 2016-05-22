@@ -81,7 +81,7 @@
 							</a>
 						</li>
 						<li class="hidden-lg hidden-md hidden-sm">
-							<a id="user-profile-link" href="{relative_path}/user/{user.userslug}" target="_top">
+							<a id="user-profile-link-0" href="{relative_path}/user/{user.userslug}" target="_top">
 								View Profile
 							</a>
 						</li>

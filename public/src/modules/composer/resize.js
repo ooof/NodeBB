@@ -37,14 +37,7 @@ define('composer/resize', ['autosize'], function(autosize) {
 			}
 
 			if (env === 'md' || env === 'lg') {
-				var transform = 'translate(0, ' + (Math.abs(1-percentage) * 100) + '%)';
-				postContainer.css({
-					'-webkit-transform': transform,
-					'-moz-transform': transform,
-					'-ms-transform': transform,
-					'-o-transform': transform,
-					'transform': transform
-				});
+				postContainer.css({top: (Math.abs(1-percentage) * 100) + '%'});
 			} else {
 				postContainer.removeAttr('style');
 			}
@@ -174,9 +167,15 @@ define('composer/resize', ['autosize'], function(autosize) {
 
 	function resizeWritePreview(postContainer) {
 		var total = getFormattingHeight(postContainer);
+		var height = postContainer.percentage * $(window).height() - $('#header-menu').height() - total;
+		var height1 = postContainer.find('.mce-tinymce').height() - postContainer.find('#text-editor_ifr').height();
 		postContainer
-			.find('.write-preview-container')
-			.css('height', postContainer.percentage * $(window).height() - $('#header-menu').height() - total);
+			.find('.text-editor')
+			.css('height', height);
+		postContainer
+			.find('#text-editor_ifr')
+			.css('height', height - (height1 || 141));
+
 	}
 
 	function getFormattingHeight(postContainer) {

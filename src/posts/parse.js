@@ -20,6 +20,7 @@ module.exports = function(Posts) {
 			postData.content = postData.content.toString();
 		}
 
+		return callback(null, postData);
 		plugins.fireHook('filter:parse.post', {postData: postData}, function(err, data) {
 			if (err) {
 				return callback(err);
