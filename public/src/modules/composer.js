@@ -431,6 +431,7 @@ define('composer', [
 		} else {
 			renderComposer();
 		}
+		console.log(postData);
 
 		function renderComposer() {
 			var composerTemplate = isInvite || isInviteEdit ? 'invite/composer' : 'composer';
@@ -468,6 +469,9 @@ define('composer', [
 					setup: function (ed) {
 						ed.on('init', function(args) {
 							setTimeout(function () {
+								if (postData.body) {
+									ed.setContent(postData.body, {format: 'raw'});
+								}
 								resize.reposition(postContainer);
 							}, 50);
 						});
