@@ -14,8 +14,9 @@ define('composer', [
 	'composer/preview',
 	'forum/invite/composer',
 	'composer/record',
+	'composer/image',
 	'composer/resize'
-], function(taskbar, translator, controls, uploads, formatting, drafts, tags, categoryList, preview, inviteComposer, record, resize) {
+], function(taskbar, translator, controls, uploads, formatting, drafts, tags, categoryList, preview, inviteComposer, record, image, resize) {
 	var composer = {
 		active: undefined,
 		posts: {},
@@ -478,6 +479,13 @@ define('composer', [
 					}
 				});
 
+				$('#post-image-upload').on('change', function (e) {
+					const file = event.currentTarget.files[0];
+					image.upload({file: file}).then(function (result) {
+						var imageUrl = config.relative_path + result.url;
+						window.postImage.val(imageUrl);
+					});
+				});
 
 				// remove poll button when composer is reply
 				function removePollButton () {
@@ -824,8 +832,6 @@ define('composer', [
 			return;
 		}
 
-		console.log(action);
-		console.log(composerData);
 		socket.emit(action, composerData, function (err, data) {
 			postContainer.find('.composer-submit').removeAttr('disabled');
 			if (err) {

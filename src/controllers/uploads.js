@@ -80,6 +80,25 @@ uploadsController.uploadRecord = function (req, res, next) {
 	file.saveFileToLocal(filename, folder, uploadedFile.path, done);
 };
 
+uploadsController.uploadPostImage = function (req, res, next) {
+	var uploadedFile = req.files.file;
+	var folder = 'image';
+	var id = new ObjectId().toString();
+	var extname = path.extname(uploadedFile.name);
+	var filename = id + extname;
+
+	function done(err, file) {
+		fs.unlink(uploadedFile.path);
+		if (err) {
+			return next(err);
+		}
+		res.json([{name: uploadedFile.name, id: id, url: file.url.startsWith('http') ? file.url : nconf.get('relative_path') + file.url}]);
+	}
+
+	mkdirp.sync(path.join(nconf.get('base_dir'), nconf.get('upload_path'), folder));
+	file.saveFileToLocal(filename, folder, uploadedFile.path, done);
+};
+
 uploadsController.uploadThumb = function(req, res, next) {
 	if (parseInt(meta.config.allowTopicsThumbnail, 10) !== 1) {
 		deleteTempFiles(req.files.files);
