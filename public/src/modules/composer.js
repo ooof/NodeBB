@@ -427,13 +427,13 @@ define('composer', [
 
 		if (data.mobile) {
 			ajaxify.go('compose', function() {
-				renderComposer();
+				renderComposer('body > .composer #text-editor');
 			});
 		} else {
 			renderComposer();
 		}
 
-		function renderComposer() {
+		function renderComposer(editor) {
 			var composerTemplate = isInvite || isInviteEdit ? 'invite/composer' : 'composer';
 
 			parseAndTranslate(composerTemplate, data, function(composerTemplate) {
@@ -447,7 +447,9 @@ define('composer', [
 				$(document.body).append(composerTemplate);
 				tinymce.EditorManager.editors = [];
 				tinymce.init({
-					selector: '#text-editor',
+					menubar: false,
+					statusbar: false,
+					selector: editor ? editor : '#text-editor',
 					elements : "elm1",
 					resize: false,
 					language: 'zh_CN',
@@ -459,12 +461,10 @@ define('composer', [
 						'insertdatetime media nonbreaking save table contextmenu directionality',
 						'emoticons template paste textcolor colorpicker textpattern imagetools'
 					],
-					toolbar1: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
-					toolbar2: 'print preview media | forecolor backcolor emoticons',
+					toolbar1: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image preview media | forecolor backcolor emoticons',
 					image_advtab: true,
 					templates: [
-						{ title: 'Test template 1', content: 'Test 1' },
-						{ title: 'Test template 2', content: 'Test 2' }
+						{ title: 'Test template 1', content: 'Test 1' }
 					],
 					setup: function (ed) {
 						ed.on('init', function(args) {
