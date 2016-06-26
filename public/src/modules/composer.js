@@ -456,16 +456,10 @@ define('composer', [
 					height: 'auto',
 					theme: 'modern',
 					plugins: [
-						'advlist autolink lists link image charmap print preview hr anchor pagebreak',
-						'searchreplace wordcount visualblocks visualchars code fullscreen',
-						'insertdatetime media nonbreaking save table contextmenu directionality',
-						'emoticons template paste textcolor colorpicker textpattern imagetools'
+						'lists link image media table contextmenu textcolor imagetools'
 					],
-					toolbar1: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image preview media | forecolor backcolor emoticons',
+					toolbar1: 'undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image preview media',
 					image_advtab: true,
-					templates: [
-						{ title: 'Test template 1', content: 'Test 1' }
-					],
 					setup: function (ed) {
 						ed.on('init', function(args) {
 							if (postData.body) {
