@@ -482,6 +482,7 @@ define('composer', [
 				$('#post-image-upload').on('change', function (e) {
 					const file = event.currentTarget.files[0];
 					image.upload({file: file}).then(function (result) {
+						$('#post-image-upload').val('');
 						var imageUrl = config.relative_path + result.url;
 						window.postImage.val(imageUrl);
 					});
