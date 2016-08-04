@@ -34,6 +34,7 @@ SocketTopics.post = function(socket, data, callback) {
 		content: data.content,
 		cid: data.category_id,
 		files: data.files,
+		attachment: data.attachment,
 		gid: data.group_id,
 		thumb: data.topic_thumb,
 		tags: data.tags,

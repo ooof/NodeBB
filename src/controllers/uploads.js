@@ -99,6 +99,31 @@ uploadsController.uploadPostImage = function (req, res, next) {
 	file.saveFileToLocal(filename, folder, uploadedFile.path, done);
 };
 
+Date.prototype.yyyymmdd = function() {
+	var mm = this.getMonth() + 1; // getMonth() is zero-based
+	var dd = this.getDate();
+
+	return [this.getFullYear(), !mm[1] && '0', mm, !dd[1] && '0', dd].join(''); // padding
+};
+uploadsController.uploadPostFile = function (req, res, next) {
+	var uploadedFile = req.files.file;
+	var folder =  new Date().yyyymmdd() + '/file';
+	// var extname = path.extname(uploadedFile.name);
+	// var filename = id + extname;
+	var filename = uploadedFile.name;
+
+	function done(err, file) {
+		fs.unlink(uploadedFile.path);
+		if (err) {
+			return next(err);
+		}
+		res.json([{name: uploadedFile.name, url: file.url.startsWith('http') ? file.url : nconf.get('relative_path') + file.url}]);
+	}
+
+	mkdirp.sync(path.join(nconf.get('base_dir'), nconf.get('upload_path'), folder));
+	file.saveFileToLocal(filename, folder, uploadedFile.path, done);
+};
+
 uploadsController.uploadThumb = function(req, res, next) {
 	if (parseInt(meta.config.allowTopicsThumbnail, 10) !== 1) {
 		deleteTempFiles(req.files.files);

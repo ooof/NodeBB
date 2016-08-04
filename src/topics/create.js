@@ -55,6 +55,10 @@ module.exports = function(Topics) {
 				topicData.record = data.files.join(',');
 			}
 
+			if (data.attachment) {
+				topicData.attachment = JSON.stringify(data.attachment);
+			}
+
 			if (data.thumb) {
 				topicData.thumb = data.thumb;
 			}
@@ -133,6 +137,7 @@ module.exports = function(Topics) {
 			gid = data.gid || null,
 			cid = data.cid,
 			files = data.files,
+			attachment = data.attachment,
 			tags = data.tags;
 
 		if (title) {
@@ -187,10 +192,10 @@ module.exports = function(Topics) {
 			},
 			function(filteredData, next) {
 				content = filteredData.content || data.content;
-				Topics.create({ uid: uid, title: title, cid: cid, gid: gid, files: files, thumb: data.thumb, tags: tags, timestamp: data.timestamp }, next);
+				Topics.create({ uid: uid, title: title, cid: cid, gid: gid, attachment: attachment, files: files, thumb: data.thumb, tags: tags, timestamp: data.timestamp }, next);
 			},
 			function(tid, next) {
-				Topics.reply({ uid:uid, tid:tid, gid: gid, files: files, handle: data.handle, content:content, timestamp: data.timestamp, req: data.req }, next);
+				Topics.reply({ uid:uid, tid:tid, gid: gid, files: files, attachment: attachment, handle: data.handle, content:content, timestamp: data.timestamp, req: data.req }, next);
 			},
 			function(postData, next) {
 				async.parallel({
@@ -289,7 +294,7 @@ module.exports = function(Topics) {
 				}
 			},
 			function(next) {
-				posts.create({uid: uid, tid: tid, record: data.files, handle: data.handle, content: content, toPid: data.toPid, timestamp: data.timestamp, ip: data.req ? data.req.ip : null}, next);
+				posts.create({uid: uid, tid: tid, record: data.files, attachment: data.attachment, handle: data.handle, content: content, toPid: data.toPid, timestamp: data.timestamp, ip: data.req ? data.req.ip : null}, next);
 			},
 			function(data, next) {
 				postData = data;

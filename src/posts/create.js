@@ -47,6 +47,10 @@ module.exports = function(Posts) {
 					postData.record = data.record.join(',');
 				}
 
+				if (data.attachment) {
+					postData.attachment = JSON.stringify(data.attachment);
+				}
+
 				if (tid) {
 					postData.tid = tid
 				} else if (vid) {

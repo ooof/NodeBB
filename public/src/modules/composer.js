@@ -15,8 +15,9 @@ define('composer', [
 	'forum/invite/composer',
 	'composer/record',
 	'composer/image',
+	'composer/file',
 	'composer/resize'
-], function(taskbar, translator, controls, uploads, formatting, drafts, tags, categoryList, preview, inviteComposer, record, image, resize) {
+], function(taskbar, translator, controls, uploads, formatting, drafts, tags, categoryList, preview, inviteComposer, record, image, file, resize) {
 	var composer = {
 		active: undefined,
 		posts: {},
@@ -32,7 +33,6 @@ define('composer', [
 	});
 
 	$(window).on('action:composer.invite.post', function (ev, data) {
-		console.log(data);
 		ajaxify.go('invite/' + data.data.slug);
 	});
 
@@ -456,9 +456,9 @@ define('composer', [
 					height: 'auto',
 					theme: 'modern',
 					plugins: [
-						'lists link image media table contextmenu textcolor imagetools'
+						'lists link image media table contextmenu textcolor imagetools file'
 					],
-					toolbar1: 'undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image preview media',
+					toolbar1: 'undo redo | styleselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image preview media | file',
 					image_advtab: true,
 					setup: function (ed) {
 						ed.on('init', function(args) {
@@ -474,11 +474,20 @@ define('composer', [
 				});
 
 				$('#post-image-upload').on('change', function (e) {
-					const file = event.currentTarget.files[0];
+					const file = e.currentTarget.files[0];
 					image.upload({file: file}).then(function (result) {
 						$('#post-image-upload').val('');
 						var imageUrl = config.relative_path + result.url;
 						window.postImage.val(imageUrl);
+					});
+				});
+
+				$('#post-file-upload').on('change', function (e) {
+					const uploddFile = e.currentTarget.files[0];
+					file.upload({file: uploddFile}).then(function (result) {
+						$('#post-file-upload').val('');
+						var fileUrl = config.relative_path + result.url;
+						window.postFile.val(fileUrl);
 					});
 				});
 
@@ -502,6 +511,7 @@ define('composer', [
 					submitBtn = postContainer.find('.composer-submit');
 
 				record.init(postContainer);
+				file.init(postContainer);
 
 				preview.handleToggler(postContainer);
 				tags.init(postContainer, composer.posts[post_uuid]);
@@ -683,7 +693,9 @@ define('composer', [
 
 		var isInvite = !!parseInt(postData.invite, 10),
 			recordList = record.getFileList(),
+			attachment = file.getFileList(),
 			isRecord = !!recordList.length,
+			isFile = !!attachment.length,
 			isInviteEdit = postData.type === 'edit';
 
 		options = options || {};
@@ -793,6 +805,9 @@ define('composer', [
 				email: email,
 				username: username
 			};
+		}
+		if (attachment.length) {
+			composerData.attachment = attachment;
 		}
 		if (record.getFileList().length) {
 			record.uploadFileList(function(data) {

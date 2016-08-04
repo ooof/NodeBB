@@ -180,6 +180,13 @@ topicsController.get = function(req, res, next) {
 				});
 				topicData.supportRecord = true;
 			}
+			topicData.posts.map(function (post, i) {
+				var attachment = post.attachment;
+				if (attachment) {
+					topicData.posts[i].hasAttachment = true;
+					topicData.posts[i].attachment = JSON.parse(attachment);
+				}
+			});
 			next(null, topicData);
 		},
 		function (topicData, next) {
