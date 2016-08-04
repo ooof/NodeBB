@@ -483,11 +483,13 @@ define('composer', [
 				});
 
 				$('#post-file-upload').on('change', function (e) {
-					const uploddFile = e.currentTarget.files[0];
-					file.upload({file: uploddFile}).then(function (result) {
-						$('#post-file-upload').val('');
-						window.postFile.text(result.name);
-					});
+					const uploadFile = e.currentTarget.files[0];
+					window.postFile.text(uploadFile.name);
+					window.tempUploadFile = function () {
+						file.upload({file: uploadFile}).then(function (result) {
+							console.log(result);
+						});
+					};
 				});
 
 				// remove poll button when composer is reply
