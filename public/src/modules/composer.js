@@ -486,8 +486,8 @@ define('composer', [
 					const uploddFile = e.currentTarget.files[0];
 					file.upload({file: uploddFile}).then(function (result) {
 						$('#post-file-upload').val('');
-						var fileUrl = config.relative_path + result.url;
-						window.postFile.val(fileUrl);
+						window.postFile.val(result.name);
+						window.postFile.prop( "disabled", true );
 					});
 				});
 
