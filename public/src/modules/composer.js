@@ -843,6 +843,7 @@ define('composer', [
 		}
 
 		socket.emit(action, composerData, function (err, data) {
+			file.cleanFileList();
 			postContainer.find('.composer-submit').removeAttr('disabled');
 			if (err) {
 				if (err.message === '[[error:email-not-confirmed]]') {

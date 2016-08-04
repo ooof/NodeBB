@@ -78,6 +78,9 @@ define('composer/file', ['csrf'], function (csrf) {
 		upload: upload,
 		getFileList: function () {
 			return fileList;
+		},
+		cleanFileList: function () {
+			fileList = [];
 		}
 	}
 });
