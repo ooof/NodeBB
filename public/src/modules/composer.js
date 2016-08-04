@@ -487,7 +487,6 @@ define('composer', [
 					window.postFile.text(uploadFile.name);
 					window.tempUploadFile = function () {
 						file.upload({file: uploadFile}).then(function (result) {
-							console.log(result);
 						});
 					};
 				});
