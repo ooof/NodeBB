@@ -858,7 +858,7 @@ define('composer', [
 
 			if (action === 'topics.post') {
 				ajaxify.go('topic/' + data.slug);
-			} else if (action === 'invite.reply') {
+			} else if (action === 'invite.reply' || 'posts.reply') {
 				ajaxify.refresh();
 			} else {
 				removeComposerHistory();
